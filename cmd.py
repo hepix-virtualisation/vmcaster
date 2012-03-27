@@ -57,7 +57,7 @@ class imagelistpub:
         #self.Session = self.SessionFactory()
     def imagesList(self):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Subscription)
+        query_imagelists = Session.query(model.Imagelist)
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')            
         for imagelist in query_imagelists:
@@ -69,15 +69,15 @@ class imagelistpub:
             u'dc:description' : str(UUID),
             u'hv:uri' : str(UUID),
         }
-        newImage = model.Subscription(details,True)
+        newImage = model.Imagelist(details,True)
         Session.add(newImage)
         Session.commit()
         return True
 
     def imagesDel(self,UUID):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Subscription).\
-                filter(model.Subscription.identifier == UUID )
+        query_imagelists = Session.query(model.Imagelist).\
+                filter(model.Imagelist.identifier == UUID )
         for item in query_imagelists:
             Session.delete(item)
         Session.commit()
@@ -88,27 +88,48 @@ class imagelistpub:
 
     def imagesShow(self,UUID):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Subscription).\
-                filter(model.Subscription.identifier == UUID )
+        query_imagelists = Session.query(model.Imagelist).\
+                filter(model.Imagelist.identifier == UUID )
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')
             return None
         imagelist = query_imagelists.one()
-        outModel = {
-                u'dc:identifier' : imagelist.identifier
-            }
+        outModel = {}
+        query_imagelists = Session.query(model.ImagelistMetadata).\
+                filter(model.Imagelist.identifier == UUID ).\
+                filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList)
+        for item in query_imagelists:
+            outModel[item.key] = item.value
+        
+        
+        
+        outModel[u'dc:identifier'] = imagelist.identifier
         return json.dumps(outModel,sort_keys=True, indent=2)
         
     def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Subscription).\
-                filter(model.Subscription.identifier == imageListUuid)
+        query_imagelists = Session.query(model.Imagelist).\
+                filter(model.Imagelist.identifier == imageListUuid)
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')
             return None
-        query_imagekeys = Session.query(model.Subscription).\
-                filter(model.Subscription.identifier == imageListUuid)
-        print query_imagelists.one()
+        query_imagekeys = Session.query(model.ImagelistMetadata).\
+                filter(model.Imagelist.identifier == imageListUuid).\
+                filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
+                filter(model.ImagelistMetadata.key == imagelist_key)
+        if not query_imagekeys.count() == 0:
+            metadata = query_imagekeys.one()
+            if metadata.value != imagelist_key_value:
+                metadata.value = imagelist_key_value
+                Session.add(metadata)
+                Session.commit()
+            return imagelist_key_value
+        ThisImageList = query_imagelists.one()
+        newMetaData = model.ImagelistMetadata(ThisImageList.id,imagelist_key,imagelist_key_value)
+        Session.add(newMetaData)
+        Session.commit()
+        return imagelist_key_value
+        
         
 def main():
     """Runs program and handles command line options"""
