@@ -106,15 +106,16 @@ def main():
     p.add_option('-d', '--database', action ='store', help='Database conection string')
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Logfile configuration file.', metavar='CFG_FILE')
+    p.add_option('--imagelist', action ='store',help='select imagelist.', metavar='IMAGELIST_UUID')
     p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.')
-    p.add_option('--imagelist-add', action ='store',help='write to stdout the image list.', metavar='IMAGE_UUID')
-    p.add_option('--imagelist-del', action ='store',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-add', action ='store_true',help='write to stdout the image list.')
+    p.add_option('--imagelist-del', action ='store_true',help='write to stdout the image list.')
     
-    p.add_option('--imagelist-show', action ='store',help='write to stdout the list images.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-show', action ='store_true',help='write to stdout the list images.', metavar='IMAGE_UUID')
     p.add_option('--imagelist-upload', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
     
     # Key value pairs to add to an image
-    p.add_option('--imagelist-keys', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
+    p.add_option('--imagelist-keys', action ='store_true',help='Edit imagelist.', metavar='CFG_LOGFILE')
     p.add_option('--imagelist-key', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
     p.add_option('--imagelist-value', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
     
@@ -164,17 +165,27 @@ def main():
     
     # Now process command line
     actions = []
+    if options.imagelist:
+        imagelistUUID = options.imagelist
     if options.imagelist_list:
         actions.append('imagelist_list')
+        
     if options.imagelist_add:
         actions.append('imagelist_add')
-        imagelistUUID = options.imagelist_add
+        imagelist_req = True
+        
     if options.imagelist_show:
         actions.append('imagelist_show')
-        imagelistUUID = options.imagelist_show
+        imagelist_req = True
+        
     if options.imagelist_del:
         actions.append('imagelist_del')
-        imagelistUUID = options.imagelist_del
+        imagelist_req = True
+        
+    if options.imagelist_keys:
+        actions.append('imagelist_keys')
+        imagelist_req = True
+        
     
     
     
@@ -195,6 +206,15 @@ def main():
     if databaseConnectionString == None:
         databaseConnectionString = 'sqlite:///dish.db'
         log.info("Defaulting DB connection to '%s'" % (databaseConnectionString))
+    
+    # Now check for required fields
+    
+    if imagelist_req:
+        if imagelistUUID == None:
+            log.error('Image list UUID is needed')
+            sys.exit(1)
+    
+    # now do the work.
     
     imagepub = imagelistpub(databaseConnectionString)
     
