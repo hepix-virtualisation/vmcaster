@@ -99,6 +99,16 @@ class imagelistpub:
             }
         return json.dumps(outModel,sort_keys=True, indent=2)
         
+    def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Subscription).\
+                filter(model.Subscription.identifier == imageListUuid)
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelists found')
+            return None
+        query_imagekeys = Session.query(model.Subscription).\
+                filter(model.Subscription.identifier == imageListUuid)
+        print query_imagelists.one()
         
 def main():
     """Runs program and handles command line options"""
@@ -116,7 +126,8 @@ def main():
     
     # Key value pairs to add to an image
     p.add_option('--imagelist-keys', action ='store_true',help='Edit imagelist.', metavar='CFG_LOGFILE')
-    p.add_option('--imagelist-key', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
+    p.add_option('--imagelist-key-add', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
+    p.add_option('--imagelist-key-del', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
     p.add_option('--imagelist-value', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
     
     p.add_option('--image', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
@@ -141,6 +152,13 @@ def main():
     logFile = None
     databaseConnectionString = None
     imagelistUUID = None
+    imagelist_req = False
+    imagelist_key = None
+    imagelist_key_add_req = False
+    imagelist_key_value = None
+    imagelist_key_value_add_req = False
+
+    
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -164,30 +182,39 @@ def main():
     log = logging.getLogger("main")
     
     # Now process command line
-    actions = []
+    actions = set([])
     if options.imagelist:
         imagelistUUID = options.imagelist
     if options.imagelist_list:
-        actions.append('imagelist_list')
+        actions.add('imagelist_list')
         
     if options.imagelist_add:
-        actions.append('imagelist_add')
+        actions.add('imagelist_add')
         imagelist_req = True
         
     if options.imagelist_show:
-        actions.append('imagelist_show')
+        actions.add('imagelist_show')
         imagelist_req = True
         
     if options.imagelist_del:
-        actions.append('imagelist_del')
+        actions.add('imagelist_del')
         imagelist_req = True
         
     if options.imagelist_keys:
-        actions.append('imagelist_keys')
+        actions.add('imagelist_keys')
         imagelist_req = True
         
-    
-    
+    if options.imagelist_key_add:
+        actions.add('imagelist_key_update')
+        imagelist_req = True
+        imagelist_key_value_add_req = True
+        imagelist_key = options.imagelist_key_add
+        
+    if options.imagelist_value:
+        actions.add('imagelist_key_update')
+        imagelist_req = True
+        imagelist_key_add_req = True
+        imagelist_key_value = options.imagelist_value
     
     if options.database:
         databaseConnectionString = options.database
@@ -230,6 +257,10 @@ def main():
     
     if 'imagelist_del' in actions:
         imagepub.imagesDel(imagelistUUID)
+    if 'imagelist_key_update' in actions:
+        #imagepub.imagesDel(imagelistUUID)
+        imagepub.imagelist_key_update(imagelistUUID, imagelist_key, imagelist_key_value)
+    
     
     
     
