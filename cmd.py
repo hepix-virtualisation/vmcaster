@@ -48,19 +48,71 @@ import subprocess
 import time
 
 
+class imagelistpub:
+    def __init__(self,databaseConnectionString):
+        self.log = logging.getLogger("imagelistpub")
+        self.engine = create_engine(databaseConnectionString, echo=False)
+        model.init(self.engine)
+        self.SessionFactory = sessionmaker(bind=self.engine)
+        #self.Session = self.SessionFactory()
+    def imagesList(self):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Subscription)
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelists found')            
+        for imagelist in query_imagelists:
+            print imagelist.identifier
+        
+    def imagesAdd(self,UUID):
+        Session = self.SessionFactory()
+        details = { u'dc:identifier' : str(UUID),
+            u'dc:description' : str(UUID),
+            u'hv:uri' : str(UUID),
+        }
+        newImage = model.Subscription(details,True)
+        Session.add(newImage)
+        Session.commit()
+        return True
+
+    def imagesDel(self,UUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Subscription).\
+                filter(model.Subscription.identifier == UUID )
+        for item in query_imagelists:
+            Session.delete(item)
+        Session.commit()
+        return True
+
+
+
+
+    def imagesShow(self,UUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Subscription).\
+                filter(model.Subscription.identifier == UUID )
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelists found')
+            return None
+        imagelist = query_imagelists.one()
+        outModel = {
+                u'dc:identifier' : imagelist.identifier
+            }
+        return json.dumps(outModel,sort_keys=True, indent=2)
+        
+        
 def main():
     """Runs program and handles command line options"""
     p = optparse.OptionParser(version = "%prog " + version)
     p.add_option('-d', '--database', action ='store', help='Database conection string')
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Logfile configuration file.', metavar='CFG_FILE')
-    p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.', metavar='IMAGE_UUID')
-    p.add_option('--imagelist-add', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
-    p.add_option('--imagelist-del', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.')
+    p.add_option('--imagelist-add', action ='store',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-del', action ='store',help='write to stdout the image list.', metavar='IMAGE_UUID')
     
+    p.add_option('--imagelist-show', action ='store',help='write to stdout the list images.', metavar='IMAGE_UUID')
     p.add_option('--imagelist-upload', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
     
-    p.add_option('--imagelist-show', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
     # Key value pairs to add to an image
     p.add_option('--imagelist-keys', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
     p.add_option('--imagelist-key', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
@@ -87,7 +139,7 @@ def main():
     # Set up basic variables
     logFile = None
     databaseConnectionString = None
-    
+    imagelistUUID = None
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -111,11 +163,32 @@ def main():
     log = logging.getLogger("main")
     
     # Now process command line
+    actions = []
+    if options.imagelist_list:
+        actions.append('imagelist_list')
+    if options.imagelist_add:
+        actions.append('imagelist_add')
+        imagelistUUID = options.imagelist_add
+    if options.imagelist_show:
+        actions.append('imagelist_show')
+        imagelistUUID = options.imagelist_show
+    if options.imagelist_del:
+        actions.append('imagelist_del')
+        imagelistUUID = options.imagelist_del
+    
+    
     
     if options.database:
         databaseConnectionString = options.database
     
-    print dir(options)
+    actionsLen = len(actions)
+    if actionsLen == 0:
+        log.error('No actions added')
+        sys.exit(1)
+    if actionsLen > 1:
+        log.error('To many actions added')
+        sys.exit(1)
+    
     
     # Now default unset values
     
@@ -123,10 +196,23 @@ def main():
         databaseConnectionString = 'sqlite:///dish.db'
         log.info("Defaulting DB connection to '%s'" % (databaseConnectionString))
     
-    engine = create_engine(databaseConnectionString, echo=False)
-    model.init(engine)
-    SessionFactory = sessionmaker(bind=engine)
-    Session = SessionFactory()
+    imagepub = imagelistpub(databaseConnectionString)
+    
+    if 'imagelist_list' in actions:
+        imagepub.imagesList()
+    if 'imagelist_show' in actions:
+        output = imagepub.imagesShow(imagelistUUID)
+        if output != None:
+            print output
+    
+    if 'imagelist_add' in actions:
+        imagepub.imagesAdd(imagelistUUID)
+    
+    if 'imagelist_del' in actions:
+        imagepub.imagesDel(imagelistUUID)
+    
+    
+    
     
 if __name__ == "__main__":
     main()
