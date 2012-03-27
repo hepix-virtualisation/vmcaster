@@ -53,6 +53,33 @@ def main():
     p = optparse.OptionParser(version = "%prog " + version)
     p.add_option('-d', '--database', action ='store', help='Database conection string')
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
+    p.add_option('-C', '--config-file', action ='store',help='Logfile configuration file.', metavar='CFG_FILE')
+    p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-add', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-del', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    
+    p.add_option('--imagelist-upload', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    
+    p.add_option('--imagelist-show', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    # Key value pairs to add to an image
+    p.add_option('--imagelist-keys', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
+    p.add_option('--imagelist-key', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
+    p.add_option('--imagelist-value', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
+    
+    p.add_option('--image', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-add', action ='store',help='Add image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-del', action ='store',help='Add image UUID.', metavar='CFG_LOGFILE')
+
+    # Key value pairs to add to an image
+    
+    p.add_option('--image-keys', action ='store_true',help='Show keys for image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-key', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-value', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-upload', action ='store',help='Path to image UUID.', metavar='CFG_LOGFILE')
+    
+    
+    
+    
     
     
     options, arguments = p.parse_args()
@@ -88,6 +115,7 @@ def main():
     if options.database:
         databaseConnectionString = options.database
     
+    print dir(options)
     
     # Now default unset values
     
