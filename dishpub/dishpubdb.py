@@ -49,6 +49,32 @@ class ImagelistMetadata(Base):
         return "<ImagelistMetadata('%s','%s', '%s')>" % (self.fkImageList, self.key, self.value)
 
 
+class Image(Base):
+    __tablename__ = 'Image'
+    id = Column(Integer, primary_key=True)
+    identifier = Column(String(50),nullable = False,unique=True)
+    fkImageList = Column(Integer, ForeignKey(Imagelist.id, onupdate="CASCADE", ondelete="CASCADE"))
+    def __init__(self,imagelist,identifier):
+        self.fkImageList = imagelist
+        self.identifier = identifier
+    def __repr__(self):
+        return "<Image('%s','%s', '%s')>" % (self.fkImageList, self.key, self.value)
+
+
+class ImageMetadata(Base):
+    __tablename__ = 'ImageMetadata'
+    id = Column(Integer, primary_key=True)
+    fkImage = Column(Integer, ForeignKey(Image.id, onupdate="CASCADE", ondelete="CASCADE"))
+    key = Column(String(200),nullable = False,unique=True)
+    value = Column(String(200),nullable = False)
+    def __init__(self,imagelist,key,value):
+        self.fkImageList = imagelist
+        self.key = key
+        self.value = value
+    def __repr__(self):
+        return "<ImageMetadata('%s','%s', '%s')>" % (self.fkImage, self.key, self.value)
+
+
 
 def init(engine):
     Base.metadata.create_all(engine)

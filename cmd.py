@@ -95,12 +95,25 @@ class imagelistpub:
             return None
         imagelist = query_imagelists.one()
         outModel = {}
-        query_imagelists = Session.query(model.ImagelistMetadata).\
+        query_imagelistmetadata = Session.query(model.ImagelistMetadata).\
                 filter(model.Imagelist.identifier == UUID ).\
                 filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList)
-        for item in query_imagelists:
+        for item in query_imagelistmetadata:
             outModel[item.key] = item.value
-        
+        query_imagelist_images = Session.query(model.Image).\
+                filter(model.Imagelist.identifier == UUID ).\
+                filter(model.Imagelist.id == model.Image.fkImageList)
+        if query_imagelist_images.count() > 0:
+            imagesarray = []
+            for image in query_imagelist_images:
+                imagemetadata = {u"hv:image" : str(image.identifier)}
+                query_imageMetadata = Session.query(model.ImageMetadata).\
+                    filter(model.Image.identifier ==  image.identifier).\
+                    filter(model.Image.id == model.ImageMetadata.fkImage)
+                for imageItem in query_imageMetadata:
+                    imagemetadata[imageItem.key] = imageItem.value
+                imagesarray.append(imagemetadata)
+            outModel[u'hv:images'] = imagesarray
         
         
         outModel[u'dc:identifier'] = imagelist.identifier
@@ -112,6 +125,9 @@ class imagelistpub:
                 filter(model.Imagelist.identifier == imageListUuid)
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')
+            return None
+        if imagelist_key in ['dc:identifier','hv:endorser','hv:images']:
+            self.log.warning("Reserved key '%s' cannot be added" % (imagelist_key))
             return None
         query_imagekeys = Session.query(model.ImagelistMetadata).\
                 filter(model.Imagelist.identifier == imageListUuid).\
@@ -129,6 +145,37 @@ class imagelistpub:
         Session.add(newMetaData)
         Session.commit()
         return imagelist_key_value
+    def imagelist_image_add(self,imageListUuid,ImageUUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Imagelist).\
+                filter(model.Imagelist.identifier == imageListUuid)
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelists found')
+            return None
+        query_image = Session.query(model.Image).\
+                filter(model.Image.identifier == ImageUUID)
+        if query_image.count() != 0:
+            self.log.warning('Image alreaady exists')
+            return None
+        
+        imagelist = query_imagelists.one()
+        newimage = model.Image(imagelist.id,ImageUUID)
+        Session.add(newimage)
+        Session.commit()
+    def importer(self,dictInput):
+        if not 'hv:imagelist' in dictInput.keys():
+            self.log.error("JSON is not a 'hv:imagelist'")
+            return False
+        content = dictInput['hv:imagelist']
+        if not 'dc:identifier' in content.keys():
+            self.log.error("Imagelists does nto contain a 'dc:identifier'")
+            return False
+        identifier = content['dc:identifier']
+        for key in content.keys():
+            if key in ['dc:identifier','hv:endorser','hv:images']:
+                continue
+            if isinstance(content[key], str):
+                self.imagelist_key_update(identifier, key,content[key])
         
         
 def main():
@@ -144,6 +191,8 @@ def main():
     
     p.add_option('--imagelist-show', action ='store_true',help='write to stdout the list images.', metavar='IMAGE_UUID')
     p.add_option('--imagelist-upload', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-import-smime', action ='store',help='Import an image list.', metavar='IMAGE_PATH')
+    p.add_option('--imagelist-import-json', action ='store',help='Import an image list.', metavar='IMAGE_PATH')
     
     # Key value pairs to add to an image
     p.add_option('--imagelist-keys', action ='store_true',help='Edit imagelist.', metavar='CFG_LOGFILE')
@@ -178,8 +227,9 @@ def main():
     imagelist_key_add_req = False
     imagelist_key_value = None
     imagelist_key_value_add_req = False
-
-    
+    imagelist_import_json = None
+    image_key = None
+    image_req = None
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -237,6 +287,18 @@ def main():
         imagelist_key_add_req = True
         imagelist_key_value = options.imagelist_value
     
+    if options.imagelist_import_smime:
+        actions.add('imagelist_import_smime')
+        
+        imagelist_import_smime = options.imagelist_import_smime
+    if options.imagelist_import_json:
+        actions.add('imagelist_import_json')
+        
+        imagelist_import_json = options.imagelist_import_json
+    if options.image_add:
+        actions.add('image_add')
+        image_req = True
+        image_key = options.image_add
     if options.database:
         databaseConnectionString = options.database
     
@@ -283,7 +345,29 @@ def main():
         imagepub.imagelist_key_update(imagelistUUID, imagelist_key, imagelist_key_value)
     
     
+    if 'imagelist_import_smime' in actions:
+        log.error("Not imprlements")
     
+    if 'image_add' in actions:
+        imagepub.imagelist_image_add(imagelistUUID,image_key)
+        return
+    
+    if 'imagelist_import_json' in actions:
+        
+        f = open(imagelist_import_json)
+        try:
+            candidate = json.loads(str(f.read()))
+        except ValueError:
+            log.error("Failed to parse JSON.")
+            sts.exit(20)
+            
+        if candidate == None:
+            log.error("No JSON content.")
+            sys.exit(21)
+        
+        imagepub.importer(candidate)
+        
+       
     
     
 if __name__ == "__main__":
