@@ -145,6 +145,20 @@ class imagelistpub:
         Session.add(newMetaData)
         Session.commit()
         return imagelist_key_value
+    def imagelist_key_del(self,imageListUuid, imagelist_key):
+        print imageListUuid, imagelist_key
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.ImagelistMetadata).\
+                filter(model.Imagelist.identifier == imageListUuid).\
+                filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
+                filter(model.ImagelistMetadata.key == imagelist_key)
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelist key found')
+            return None
+        newMetaData = query_imagelists.one()
+        Session.delete(newMetaData)
+        Session.commit()
+        return True
     def imagelist_image_add(self,imageListUuid,ImageUUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
@@ -207,7 +221,8 @@ def main():
     # Key value pairs to add to an image
     
     p.add_option('--image-keys', action ='store_true',help='Show keys for image UUID.', metavar='CFG_LOGFILE')
-    p.add_option('--image-key', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-key-add', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-key-del', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
     p.add_option('--image-value', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
     p.add_option('--image-upload', action ='store',help='Path to image UUID.', metavar='CFG_LOGFILE')
     
@@ -280,7 +295,11 @@ def main():
         imagelist_req = True
         imagelist_key_value_add_req = True
         imagelist_key = options.imagelist_key_add
-        
+    if options.imagelist_key_del:
+        actions.add('imagelist_key_del')
+        imagelist_req = True
+        imagelist_key = options.imagelist_key_del
+      
     if options.imagelist_value:
         actions.add('imagelist_key_update')
         imagelist_req = True
@@ -309,7 +328,6 @@ def main():
     if actionsLen > 1:
         log.error('To many actions added')
         sys.exit(1)
-    
     
     # Now default unset values
     
@@ -341,9 +359,9 @@ def main():
     if 'imagelist_del' in actions:
         imagepub.imagesDel(imagelistUUID)
     if 'imagelist_key_update' in actions:
-        #imagepub.imagesDel(imagelistUUID)
         imagepub.imagelist_key_update(imagelistUUID, imagelist_key, imagelist_key_value)
-    
+    if 'imagelist_key_del' in actions:
+        imagepub.imagelist_key_del(imagelistUUID, imagelist_key)
     
     if 'imagelist_import_smime' in actions:
         log.error("Not imprlements")
