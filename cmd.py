@@ -215,7 +215,7 @@ class imagelistpub:
             return False
         content = dictInput['hv:imagelist']
         if not 'dc:identifier' in content.keys():
-            self.log.error("Imagelists does nto contain a 'dc:identifier'")
+            self.log.error("Imagelists does not contain a 'dc:identifier'")
             return False
         identifier = content['dc:identifier']
         for key in content.keys():
@@ -223,7 +223,20 @@ class imagelistpub:
                 continue
             if isinstance(content[key], str):
                 self.imagelist_key_update(identifier, key,content[key])
-        
+        if 'hv:images' in content.keys():
+            for image in content['hv:images']:
+                if not 'hv:image' in image.keys():
+                    self.log.warning("ignoring image '%s'" % (image))
+                    continue
+                imagecontent = image['hv:image']
+                if not 'dc:identifier' in imagecontent.keys():
+                    self.log.warning("image has no ID '%s'" % (image))
+                    continue
+                imageIdentifier = imagecontent['dc:identifier']
+                for key in imagecontent.keys():
+                    if key in ['dc:identifier']:
+                        continue
+                    self.image_key_update(identifier, imageIdentifier ,key,imagecontent[key])
         
 def main():
     """Runs program and handles command line options"""
