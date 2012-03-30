@@ -175,7 +175,40 @@ class imagelistpub:
         imagelist = query_imagelists.one()
         newimage = model.Image(imagelist.id,ImageUUID)
         Session.add(newimage)
-        Session.commit()
+        Session.commit()        
+    def image_key_update(self,imageListUuid, imageUuid ,image_key, image_value):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Imagelist).\
+                filter(model.Imagelist.identifier == imageListUuid)
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelists found')
+            return None
+        query_image = Session.query(model.Image).\
+                filter(model.Image.identifier == imageUuid)
+        if query_image.count() == 0:
+            self.log.warning('Image does not exist.')
+            return None
+        query_image_metadata = Session.query(model.ImageMetadata).\
+                filter(model.Image.identifier == imageUuid).\
+                filter(model.Imagelist.identifier == imageListUuid).\
+                filter(model.Imagelist.id == model.Image.fkImageList).\
+                filter(model.Image.id == model.ImageMetadata.fkImage).\
+                filter(model.ImageMetadata.key == image_key)
+        if query_image_metadata.count() == 0:
+            image = query_image.one()
+            newmetadata = model.ImageMetadata(image.id,image_key,image_value)
+            Session.add(newmetadata)
+            Session.commit()
+            return True
+        newmetadata = query_image_metadata.one()
+        if newmetadata.value != image_value:
+            newmetadata.value = image_value
+            Session.add(newmetadata)
+            Session.commit()
+            return True
+        return True
+        
+    
     def importer(self,dictInput):
         if not 'hv:imagelist' in dictInput.keys():
             self.log.error("JSON is not a 'hv:imagelist'")
@@ -243,8 +276,12 @@ def main():
     imagelist_key_value = None
     imagelist_key_value_add_req = False
     imagelist_import_json = None
+    imageUuid = None
     image_key = None
+    image_key_req = False
     image_req = None
+    image_key_value = None
+    image_key_value_add_req = False
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -314,10 +351,27 @@ def main():
         actions.add('imagelist_import_json')
         
         imagelist_import_json = options.imagelist_import_json
+    
+    if options.image:
+        imageUuid = options.image
+    
     if options.image_add:
         actions.add('image_add')
         image_req = True
         image_key = options.image_add
+
+    if options.image_key_add:
+        actions.add('image_key_update')
+        image_req = True
+        image_key_value_add_req = True
+        image_key = options.image_key_add
+
+    if options.image_value:
+        actions.add('image_key_update')
+        image_req = True
+        image_key_req = True
+        image_key_value = options.image_value
+        
     if options.database:
         databaseConnectionString = options.database
     
@@ -369,6 +423,9 @@ def main():
     if 'image_add' in actions:
         imagepub.imagelist_image_add(imagelistUUID,image_key)
         return
+    if 'image_key_update' in actions:
+        imagepub.image_key_update(imagelistUUID, imageUuid ,image_key, image_key_value)
+
     
     if 'imagelist_import_json' in actions:
         
@@ -385,7 +442,7 @@ def main():
         
         imagepub.importer(candidate)
         
-       
+
     
     
 if __name__ == "__main__":

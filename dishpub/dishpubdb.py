@@ -67,8 +67,8 @@ class ImageMetadata(Base):
     fkImage = Column(Integer, ForeignKey(Image.id, onupdate="CASCADE", ondelete="CASCADE"))
     key = Column(String(200),nullable = False,unique=True)
     value = Column(String(200),nullable = False)
-    def __init__(self,imagelist,key,value):
-        self.fkImageList = imagelist
+    def __init__(self,image,key,value):
+        self.fkImage = image
         self.key = key
         self.value = value
     def __repr__(self):
