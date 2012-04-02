@@ -55,6 +55,92 @@ class imagelistpub:
         model.init(self.engine)
         self.SessionFactory = sessionmaker(bind=self.engine)
         #self.Session = self.SessionFactory()
+    
+    def endorserList(self):
+        Session = self.SessionFactory()
+        query_endorser = Session.query(model.Endorser)
+        if query_endorser.count() == 0:
+            self.log.warning('No endorsers found')            
+        for endorser in query_endorser:
+            print endorser.subject
+
+    def endorserAdd(self, subject):
+        Session = self.SessionFactory()
+        query_endorser = Session.query(model.Endorser).\
+            filter(model.Endorser.subject == subject)
+        if query_endorser.count() == 0:
+            newEndorser = model.Endorser(subject)
+            Session.add(newEndorser)
+            Session.commit()
+            return True
+        self.log.warning("Endorser is alrready present with this subject")
+        return False
+    def endorserDel(self, subject):
+        Session = self.SessionFactory()
+        query_endorser = Session.query(model.Endorser).\
+            filter(model.Endorser.subject == subject)
+        if query_endorser.count() == 0:
+            self.log.warning("Endorser does not exist.")
+            return False      
+        for item in query_endorser:
+            Session.delete(item)
+        Session.commit()
+        return True
+
+
+    def endorserMetadataUpdate(self, subject,key,value):
+        Session = self.SessionFactory()
+        query_endorser = Session.query(model.Endorser).\
+            filter(model.Endorser.subject == subject)
+        if query_endorser.count() == 0:
+            self.log.warning("Endorser does not exist.")
+            return False
+        SelEndorser = query_endorser.one()
+        EndorserId = SelEndorser.id
+        query_endorsermetadata = Session.query(model.EndorserMetadata).\
+            filter(model.Endorser.subject == subject).\
+            filter(model.Endorser.id == model.EndorserMetadata.fkEndorser).\
+            filter(model.EndorserMetadata.key == key)
+        if query_endorsermetadata.count() == 0:
+            self.log.warning("making new.")
+            newpetadata = model.EndorserMetadata(EndorserId, key,value)
+            Session.add(newpetadata)
+        else:
+            for item in query_endorsermetadata:
+                item.value = value
+        Session.commit()
+        return True
+        
+        
+            
+        
+        
+    def endorserMetadataDel(self, subject,key):
+        self.log.error("not implemented yet")
+    
+    def endorserDump(self, subject):
+        Session = self.SessionFactory()
+        query_endorser = Session.query(model.Endorser).\
+            filter(model.Endorser.subject == subject)
+        if query_endorser.count() == 0:
+            self.log.warning("Endorser does not exist.")
+            return None
+        SelEndorser = query_endorser.one()
+        output = {"hv:dn" : str(SelEndorser.subject)}
+        EndorserId = SelEndorser.id
+        query_endorsermetadata = Session.query(model.EndorserMetadata).\
+            filter(model.Endorser.subject == subject).\
+            filter(model.Endorser.id == model.EndorserMetadata.fkEndorser)
+        for item in query_endorsermetadata:
+            try:
+                value = int(item.value)
+            except ValueError:
+                value = str(item.value)
+            
+            output[str(item.key)] = value
+        return output
+        
+         
     def imagesList(self):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist)
@@ -253,6 +339,17 @@ def main():
     p.add_option('-d', '--database', action ='store', help='Database conection string')
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Logfile configuration file.', metavar='CFG_FILE')
+    
+    p.add_option('--endorser', action ='store',help='select endorser.', metavar='subject')
+    p.add_option('--endorser-show', action ='store_true',help='write to stdout the list images.')
+    p.add_option('--endorser-list', action ='store_true',help='write to stdout the list images.')
+    p.add_option('--endorser-add', action ='store',help='write to stdout the image list.')
+    p.add_option('--endorser-del', action ='store',help='write to stdout the image list.')
+    
+    p.add_option('--endorser-key-update', action ='store',help='write to stdout the list images.')
+    p.add_option('--endorser-key-del', action ='store_true',help='write to stdout the image list.')
+    p.add_option('--endorser-value', action ='store',help='write to stdout the image list.')
+    
     p.add_option('--imagelist', action ='store',help='select imagelist.', metavar='IMAGELIST_UUID')
     p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.')
     p.add_option('--imagelist-add', action ='store_true',help='write to stdout the image list.')
@@ -304,6 +401,13 @@ def main():
     image_req = None
     image_key_value = None
     image_key_value_add_req = False
+    endorserSub = None
+    endorser_req  = False
+    endorserKey = None
+    endorserKeyReq = False
+    
+    endorserValue = None
+    endorserValueReq = False
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -328,6 +432,39 @@ def main():
     
     # Now process command line
     actions = set([])
+    
+    
+
+    if options.endorser:
+        endorserSub = options.endorser
+
+    if options.endorser_list:
+        actions.add('endorser_list')
+        
+    if options.endorser_show:
+        actions.add('endorser_show')
+        endorser_req = True
+        
+    if options.endorser_add:
+        actions.add('endorser_add')
+        endorserSub = options.endorser_add
+
+    if options.endorser_del:
+        actions.add('endorser_del')
+        endorserSub = options.endorser_del
+
+    if options.endorser_key_update:
+        actions.add('endorser_key_update')
+        endorserKey = options.endorser_key_update
+        
+    if options.endorser_key_del:
+        actions.add('endorser_key_del')
+        endorser_req = True
+
+    if options.endorser_value:
+        endorserValue = options.endorser_value
+        endorser_req = True
+    
     if options.imagelist:
         imagelistUUID = options.imagelist
     if options.imagelist_list:
@@ -336,13 +473,13 @@ def main():
     if options.imagelist_add:
         actions.add('imagelist_add')
         imagelist_req = True
-        
-    if options.imagelist_show:
-        actions.add('imagelist_show')
-        imagelist_req = True
-        
+
     if options.imagelist_del:
         actions.add('imagelist_del')
+        imagelist_req = True
+    
+    if options.imagelist_show:
+        actions.add('imagelist_show')
         imagelist_req = True
         
     if options.imagelist_keys:
@@ -426,9 +563,27 @@ def main():
         if imageUuid == None:
             log.error('Image UUID is needed')
             sys.exit(1)
+    if endorser_req:
+        if endorserSub == None:
+            log.error('Endorser subject is needed')
+            sys.exit(1)
     # now do the work.
     
     imagepub = imagelistpub(databaseConnectionString)
+    
+    if 'endorser_list' in actions:
+        imagepub.endorserList()
+    if 'endorser_show' in actions:
+        print imagepub.endorserDump(endorserSub)
+    
+    if 'endorser_add' in actions:
+        imagepub.endorserAdd(endorserSub)
+    if 'endorser_del' in actions:
+        imagepub.endorserDel(endorserSub)
+    if 'endorser_key_update' in actions:
+        imagepub.endorserMetadataUpdate(endorserSub,endorserKey,endorserValue)
+    if 'endorser_key_del' in actions:
+        imagepub.endorserMetadataDel(endorserSub,endorserKey)
     
     if 'imagelist_list' in actions:
         imagepub.imagesList()

@@ -18,8 +18,32 @@ import datetime
 Base = declarative_base()
 
 
+class Endorser(Base):
+    __tablename__ = 'endorser'
+    id = Column(Integer, primary_key=True)
+    subject = Column(String(100),nullable = False,unique=True)
+    def __init__(self,subject):
+        self.subject = subject
+    def __repr__(self):
+        return "<Endorser('%s')>" % (self.subject)
+
+class EndorserMetadata(Base):
+    __tablename__ = 'endorserMetadata'
+    id = Column(Integer, primary_key=True)
+    fkEndorser = Column(Integer, ForeignKey(Endorser.id, onupdate="CASCADE", ondelete="CASCADE"))
+    key = Column(String(200),nullable = False,unique=True)
+    value = Column(String(200),nullable = False)
+    def __init__(self,imagelist,key,value):
+        self.fkEndorser = imagelist
+        self.key = key
+        self.value = value
+    def __repr__(self):
+        return "<EndorserMetadata('%s','%s', '%s')>" % (self.fkEndorser, self.key, self.value)
+
+
+
 class Imagelist(Base):
-    __tablename__ = 'subscription'
+    __tablename__ = 'imagelist'
     id = Column(Integer, primary_key=True)
     identifier = Column(String(50),nullable = False,unique=True)
     # Line woudl be but for inconsitancy #imagelist_latest =Column(Integer, ForeignKey('imagelist.id'))
