@@ -172,7 +172,7 @@ class imagelistpub:
 
 
 
-    def imagesShow(self,UUID):
+    def imagesShow(self,UUID,endorserSub = None):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
@@ -203,7 +203,9 @@ class imagelistpub:
         
         
         outModel[u'dc:identifier'] = imagelist.identifier
-        return json.dumps(outModel,sort_keys=True, indent=2)
+        if endorserSub != None:
+            outModel[u'hv:endorser'] = endorserDump
+        return outModel
         
     def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
         Session = self.SessionFactory()
@@ -588,7 +590,7 @@ def main():
     if 'imagelist_list' in actions:
         imagepub.imagesList()
     if 'imagelist_show' in actions:
-        output = imagepub.imagesShow(imagelistUUID)
+        output = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=2)
         if output != None:
             print output
     
