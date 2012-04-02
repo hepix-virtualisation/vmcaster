@@ -146,7 +146,6 @@ class imagelistpub:
         Session.commit()
         return imagelist_key_value
     def imagelist_key_del(self,imageListUuid, imagelist_key):
-        print imageListUuid, imagelist_key
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImagelistMetadata).\
                 filter(model.Imagelist.identifier == imageListUuid).\
@@ -207,7 +206,17 @@ class imagelistpub:
             Session.commit()
             return True
         return True
-        
+    def image_keys(self,imageListUuid, imageUuid):
+        Session = self.SessionFactory()
+        query_imagekeys = Session.query(model.ImageMetadata).\
+                filter(model.Imagelist.identifier == imageListUuid).\
+                filter(model.Imagelist.id == model.Image.fkImageList).\
+                filter(model.Image.identifier == imageUuid)
+        if query_imagekeys.count() == 0:
+            self.log.warning('no details found')
+            return None
+        for item in query_imagekeys:
+            print "'%s' : '%s'" % (item.key,item.value)
     
     def importer(self,dictInput):
         if not 'hv:imagelist' in dictInput.keys():
@@ -372,6 +381,11 @@ def main():
         actions.add('image_add')
         image_req = True
         image_key = options.image_add
+    
+    if options.image_keys:
+        actions.add('image_keys')
+        imagelist_req = True
+        image_req = True
 
     if options.image_key_add:
         actions.add('image_key_update')
@@ -408,7 +422,10 @@ def main():
         if imagelistUUID == None:
             log.error('Image list UUID is needed')
             sys.exit(1)
-    
+    if image_req:
+        if imageUuid == None:
+            log.error('Image UUID is needed')
+            sys.exit(1)
     # now do the work.
     
     imagepub = imagelistpub(databaseConnectionString)
@@ -438,6 +455,9 @@ def main():
         return
     if 'image_key_update' in actions:
         imagepub.image_key_update(imagelistUUID, imageUuid ,image_key, image_key_value)
+
+    if 'image_keys' in actions:
+        imagepub.image_keys(imagelistUUID, imageUuid)
 
     
     if 'imagelist_import_json' in actions:
