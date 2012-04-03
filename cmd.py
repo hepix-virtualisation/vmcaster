@@ -149,7 +149,7 @@ class imagelistpub:
             return False
 
         query_imagelists = Session.query(model.Imagelist).\
-            filter(model.Imagelist.identifier == UUID )
+            filter(model.Imagelist.identifier == imagelistUUID )
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')
             return False
@@ -180,7 +180,7 @@ class imagelistpub:
         if query_imagelists.count() > 0:
             self.log.warning('Imagelist already exists')
             return False
-        newImage = model.Imagelist(UUID,True)
+        newImage = model.Imagelist(UUID)
         Session.add(newImage)
         Session.commit()
         return True
@@ -194,7 +194,7 @@ class imagelistpub:
         Session.commit()
         return True
 
-    def imagesShow(self,UUID,endorserSub = None):
+    def imagesShow(self,UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
@@ -223,8 +223,26 @@ class imagelistpub:
                 imagesarray.append(imagemetadata)
             outModel[u'hv:images'] = imagesarray
         outModel[u'dc:identifier'] = imagelist.identifier
-        if endorserSub != None:
-            outModel[u'hv:endorser'] = endorserDump
+            
+        query_endorser = Session.query(model.Endorser).\
+                filter(model.Imagelist.identifier == UUID ).\
+                filter(model.Endorsement.fkImageList ==  model.Imagelist.id).\
+                filter(model.Endorsement.fkEndorser ==  model.Endorser.id)
+        endorserList = []
+        for endorser in query_endorser:
+            endorserMetadata = {}
+            query_metaData = Session.query(model.EndorserMetadata).\
+                filter(model.Endorser.id == endorser.id).\
+                filter(model.Endorsement.id ==  model.EndorserMetadata.fkEndorser)
+            for metasdata in query_metaData:
+                endorserMetadata[metasdata.key] = metasdata.value
+            endorserList.append({ 'hv:x509' : endorserMetadata })
+        if len(endorserList) > 0:
+            if len(endorserList) == 1:
+                outModel['hv:endorser'] = endorserList[0]
+            else:
+                outModel['hv:endorser'] = endorserList
+            
         return outModel
         
     def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
@@ -350,7 +368,6 @@ class imagelistpub:
                 self.imagelist_key_update(identifier, key,content[key])
         if 'hv:images' in content.keys():
             for image in content['hv:images']:
-                
                 if not 'hv:image' in image.keys():
                     self.log.warning("ignoring image '%s'" % (image))
                     continue
@@ -358,11 +375,13 @@ class imagelistpub:
                 if not 'dc:identifier' in imagecontent.keys():
                     self.log.warning("image has no ID '%s'" % (image))
                     continue
-                imageIdentifier = imagecontent['dc:identifier']
+                imageIdentifier = imagecontent['dc:identifier']               
+                print (identifier, imageIdentifier)
                 self.imagelist_image_add(identifier, imageIdentifier)
                 for key in imagecontent.keys():
                     if key in ['dc:identifier']:
                         continue
+                    self.image_key_update(identifier, imageIdentifier ,key,imagecontent[key] )
         if 'hv:endorser' in content.keys():
             # make endorsers a list under all cases.
             endorsersAll = [content['hv:endorser']]
