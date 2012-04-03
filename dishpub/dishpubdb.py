@@ -47,14 +47,13 @@ class Imagelist(Base):
     id = Column(Integer, primary_key=True)
     identifier = Column(String(50),nullable = False,unique=True)
     # Line woudl be but for inconsitancy #imagelist_latest =Column(Integer, ForeignKey('imagelist.id'))
-    imagelist_latest =Column(Integer)
     orm_metadata = relationship("ImagelistMetadata", backref="Imagelist",cascade='all, delete')
     # The data of the last update to the subscription.
     #     This is different from the creation time of the image list.
     #     It is provided only for instrumentation purposes.
     updated = Column(DateTime)
-    def __init__(self,details, authorised = False):
-        self.identifier = details[u'dc:identifier']
+    def __init__(self,identifier):
+        self.identifier = identifier
     def __repr__(self):
         return "<Imagelist('%s')>" % (self.identifier)
 
@@ -98,6 +97,15 @@ class ImageMetadata(Base):
     def __repr__(self):
         return "<ImageMetadata('%s','%s', '%s')>" % (self.fkImage, self.key, self.value)
 
+
+class Endorsement(Base):
+    __tablename__ = 'Endorsement'
+    id = Column(Integer, primary_key=True)
+    fkImageList = Column(Integer, ForeignKey(Imagelist.id, onupdate="CASCADE", ondelete="CASCADE"))
+    fkEndorser = Column(Integer, ForeignKey(Endorser.id, onupdate="CASCADE", ondelete="CASCADE"))
+    def __init__(self,imagelist,endorser):
+        self.fkImageList = imagelist
+        self.fkEndorser = endorser
 
 
 def init(engine):

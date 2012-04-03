@@ -46,7 +46,7 @@ except:
 import urlparse
 import subprocess
 import time
-
+import types
 
 class imagelistpub:
     def __init__(self,databaseConnectionString):
@@ -73,7 +73,7 @@ class imagelistpub:
             Session.add(newEndorser)
             Session.commit()
             return True
-        self.log.warning("Endorser is alrready present with this subject")
+        self.log.warning("Endorser is already present with this subject")
         return False
     def endorserDel(self, subject):
         Session = self.SessionFactory()
@@ -110,11 +110,8 @@ class imagelistpub:
                 item.value = value
         Session.commit()
         return True
-        
-        
-            
-        
-        
+
+
     def endorserMetadataDel(self, subject,key):
         self.log.error("not implemented yet")
     
@@ -139,9 +136,36 @@ class imagelistpub:
             
             output[str(item.key)] = value
         return output
-        
-         
-    def imagesList(self):
+
+    def imageListEndorserConnect(self, imagelistUUID,endorserSubject):
+        Session = self.SessionFactory()
+        queryEndorsements = Session.query(model.Endorsement).\
+            filter(model.Endorser.subject == endorserSubject).\
+            filter(model.Imagelist.identifier == imagelistUUID ).\
+            filter(model.Imagelist.id == model.Endorsement.fkImageList).\
+            filter(model.Endorser.id == model.Endorsement.fkEndorser)
+        if queryEndorsements.count() > 0:
+            self.log.warning("'%s' already endorses '%s'" % (endorserSubject,imagelistUUID))
+            return False
+
+        query_imagelists = Session.query(model.Imagelist).\
+            filter(model.Imagelist.identifier == UUID )
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelists found')
+            return False
+        query_endorser = Session.query(model.Endorser).\
+            filter(model.Endorser.subject == endorserSubject)
+        if query_endorser.count() == 0:
+            self.log.warning("Endorser does not exist.")
+            return False
+        imagelist = query_imagelists.one()
+        endorser = query_endorser.one()
+        endorsement = model.Endorsement(imagelist.id,endorser.id)
+        Session.add(endorsement)
+        Session.commit()
+        return True
+
+    def imageListList(self):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist)
         if query_imagelists.count() == 0:
@@ -149,13 +173,14 @@ class imagelistpub:
         for imagelist in query_imagelists:
             print imagelist.identifier
         
-    def imagesAdd(self,UUID):
+    def imageListAdd(self,UUID):
         Session = self.SessionFactory()
-        details = { u'dc:identifier' : str(UUID),
-            u'dc:description' : str(UUID),
-            u'hv:uri' : str(UUID),
-        }
-        newImage = model.Imagelist(details,True)
+        query_imagelists = Session.query(model.Imagelist).\
+                filter(model.Imagelist.identifier == UUID )
+        if query_imagelists.count() > 0:
+            self.log.warning('Imagelist already exists')
+            return False
+        newImage = model.Imagelist(UUID,True)
         Session.add(newImage)
         Session.commit()
         return True
@@ -168,9 +193,6 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
-
-
-
 
     def imagesShow(self,UUID,endorserSub = None):
         Session = self.SessionFactory()
@@ -200,8 +222,6 @@ class imagelistpub:
                     imagemetadata[imageItem.key] = imageItem.value
                 imagesarray.append(imagemetadata)
             outModel[u'hv:images'] = imagesarray
-        
-        
         outModel[u'dc:identifier'] = imagelist.identifier
         if endorserSub != None:
             outModel[u'hv:endorser'] = endorserDump
@@ -233,6 +253,7 @@ class imagelistpub:
         Session.add(newMetaData)
         Session.commit()
         return imagelist_key_value
+
     def imagelist_key_del(self,imageListUuid, imagelist_key):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImagelistMetadata).\
@@ -246,6 +267,7 @@ class imagelistpub:
         Session.delete(newMetaData)
         Session.commit()
         return True
+
     def imagelist_image_add(self,imageListUuid,ImageUUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
@@ -263,6 +285,8 @@ class imagelistpub:
         newimage = model.Image(imagelist.id,ImageUUID)
         Session.add(newimage)
         Session.commit()        
+        return True
+
     def image_key_update(self,imageListUuid, imageUuid ,image_key, image_value):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
@@ -273,6 +297,7 @@ class imagelistpub:
         query_image = Session.query(model.Image).\
                 filter(model.Image.identifier == imageUuid)
         if query_image.count() == 0:
+            print imageListUuid, imageUuid ,image_key, image_value
             self.log.warning('Image does not exist.')
             return None
         query_image_metadata = Session.query(model.ImageMetadata).\
@@ -294,6 +319,7 @@ class imagelistpub:
             Session.commit()
             return True
         return True
+
     def image_keys(self,imageListUuid, imageUuid):
         Session = self.SessionFactory()
         query_imagekeys = Session.query(model.ImageMetadata).\
@@ -305,7 +331,8 @@ class imagelistpub:
             return None
         for item in query_imagekeys:
             print "'%s' : '%s'" % (item.key,item.value)
-    
+        return True
+
     def importer(self,dictInput):
         if not 'hv:imagelist' in dictInput.keys():
             self.log.error("JSON is not a 'hv:imagelist'")
@@ -315,6 +342,7 @@ class imagelistpub:
             self.log.error("Imagelists does not contain a 'dc:identifier'")
             return False
         identifier = content['dc:identifier']
+        self.imageListAdd(identifier)
         for key in content.keys():
             if key in ['dc:identifier','hv:endorser','hv:images']:
                 continue
@@ -322,6 +350,7 @@ class imagelistpub:
                 self.imagelist_key_update(identifier, key,content[key])
         if 'hv:images' in content.keys():
             for image in content['hv:images']:
+                
                 if not 'hv:image' in image.keys():
                     self.log.warning("ignoring image '%s'" % (image))
                     continue
@@ -330,11 +359,33 @@ class imagelistpub:
                     self.log.warning("image has no ID '%s'" % (image))
                     continue
                 imageIdentifier = imagecontent['dc:identifier']
+                self.imagelist_image_add(identifier, imageIdentifier)
                 for key in imagecontent.keys():
                     if key in ['dc:identifier']:
                         continue
-                    self.image_key_update(identifier, imageIdentifier ,key,imagecontent[key])
-        
+        if 'hv:endorser' in content.keys():
+            # make endorsers a list under all cases.
+            endorsersAll = [content['hv:endorser']]
+            if type(content['hv:endorser']) is types.ListType:
+                endorsersAll = content['hv:endorser']
+            for endorser in endorsersAll:
+                if not 'hv:x509' in endorser.keys():
+                    self.log.error("Error processing '%s' so ignoring" % (endorser))
+                    continue
+                endorserDetails = endorser['hv:x509']
+                if not 'hv:dn' in endorserDetails.keys():
+                    self.log.error("Error finding DN in '%s' so ignoring" % (endorserDetails))
+                    continue
+                endorserSubject = endorserDetails['hv:dn']
+                self.endorserAdd(endorserSubject)
+                self.imageListEndorserConnect(identifier,endorserSubject)
+                for key in endorserDetails.keys():
+                    if key in ['hv:dn']:
+                        continue
+                    value = endorserDetails[key]
+                    self.endorserMetadataUpdate(endorserSubject,key,value)
+        return True        
+
 def main():
     """Runs program and handles command line options"""
     p = optparse.OptionParser(version = "%prog " + version)
@@ -351,6 +402,9 @@ def main():
     p.add_option('--endorser-key-update', action ='store',help='write to stdout the list images.')
     p.add_option('--endorser-key-del', action ='store_true',help='write to stdout the image list.')
     p.add_option('--endorser-value', action ='store',help='write to stdout the image list.')
+    
+    p.add_option('--connect', action ='store_true',help='write to stdout the image list.')
+    p.add_option('--disconnect', action ='store_true',help='write to stdout the image list.')
     
     p.add_option('--imagelist', action ='store',help='select imagelist.', metavar='IMAGELIST_UUID')
     p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.')
@@ -466,6 +520,14 @@ def main():
     if options.endorser_value:
         endorserValue = options.endorser_value
         endorser_req = True
+    if options.connect:
+        endorser_req = True
+        imagelist_req = True
+        actions.add('connect')
+    if options.disconnect:
+        endorser_req = True
+        imagelist_req = True
+        actions.add('connect')
     
     if options.imagelist:
         imagelistUUID = options.imagelist
@@ -587,15 +649,21 @@ def main():
     if 'endorser_key_del' in actions:
         imagepub.endorserMetadataDel(endorserSub,endorserKey)
     
+    if 'connect' in actions:
+        imagepub.imageListEndorserConnect(imagelistUUID,endorserSub)
+
+    if 'disconnect' in actions:
+        imagepub.imageListEndorserConnect(imagelistUUID,endorserSub)
+    
     if 'imagelist_list' in actions:
-        imagepub.imagesList()
+        imagepub.imageListList()
     if 'imagelist_show' in actions:
         output = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=2)
         if output != None:
             print output
     
     if 'imagelist_add' in actions:
-        imagepub.imagesAdd(imagelistUUID)
+        imagepub.imageListAdd(imagelistUUID)
     
     if 'imagelist_del' in actions:
         imagepub.imagesDel(imagelistUUID)
