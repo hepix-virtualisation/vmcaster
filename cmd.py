@@ -164,6 +164,21 @@ class imagelistpub:
         Session.add(endorsement)
         Session.commit()
         return True
+    def imageListEndorserDisconnect(self, imagelistUUID,endorserSubject):
+        Session = self.SessionFactory()
+        queryEndorsements = Session.query(model.Endorsement).\
+            filter(model.Endorser.subject == endorserSubject).\
+            filter(model.Imagelist.identifier == imagelistUUID ).\
+            filter(model.Imagelist.id == model.Endorsement.fkImageList).\
+            filter(model.Endorser.id == model.Endorsement.fkEndorser)
+        if queryEndorsements.count() == 0:
+            self.log.warning("'%s' does not endorse '%s'" % (endorserSubject,imagelistUUID))
+            return False
+        for item in queryEndorsements:
+            Session.delete(item)
+            
+        Session.commit()
+        return True
 
     def imageListList(self):
         Session = self.SessionFactory()
@@ -230,12 +245,18 @@ class imagelistpub:
                 filter(model.Endorsement.fkEndorser ==  model.Endorser.id)
         endorserList = []
         for endorser in query_endorser:
+            endosersID = int(endorser.id)
             endorserMetadata = {}
             query_metaData = Session.query(model.EndorserMetadata).\
-                filter(model.Endorser.id == endorser.id).\
-                filter(model.Endorsement.id ==  model.EndorserMetadata.fkEndorser)
+                filter(model.Imagelist.identifier == UUID ).\
+                filter(model.Endorser.id == endosersID ).\
+                filter(model.Endorsement.fkImageList ==  model.Imagelist.id).\
+                filter(model.Endorsement.fkEndorser ==  model.Endorser.id).\
+                filter(model.EndorserMetadata.fkEndorser == model.Endorser.id)
+                
             for metasdata in query_metaData:
                 endorserMetadata[metasdata.key] = metasdata.value
+            endorserMetadata["hv:dn"] = endorser.subject
             endorserList.append({ 'hv:x509' : endorserMetadata })
         if len(endorserList) > 0:
             if len(endorserList) == 1:
@@ -546,7 +567,7 @@ def main():
     if options.disconnect:
         endorser_req = True
         imagelist_req = True
-        actions.add('connect')
+        actions.add('disconnect')
     
     if options.imagelist:
         imagelistUUID = options.imagelist
@@ -672,7 +693,7 @@ def main():
         imagepub.imageListEndorserConnect(imagelistUUID,endorserSub)
 
     if 'disconnect' in actions:
-        imagepub.imageListEndorserConnect(imagelistUUID,endorserSub)
+        imagepub.imageListEndorserDisconnect(imagelistUUID,endorserSub)
     
     if 'imagelist_list' in actions:
         imagepub.imageListList()
