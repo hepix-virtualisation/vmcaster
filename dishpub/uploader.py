@@ -41,8 +41,8 @@ class uploaderFacade(object):
                 self._uploaderImp = uploaderDcap.uploaderDcap()
                 
             else:
-                self._uploaderImp = None
-            if self._uploaderImp != None:
+                del(self._uploaderImp)
+            if hasattr(self, '_uploaderImp'):
                 self._uploaderImp.remotePrefix = self.remotePrefix
             
             
@@ -53,11 +53,14 @@ class uploaderFacade(object):
         pass
     
     def download(self,localpath,remotepath):
-        return self._uploaderImp.download(localpath,remotepath)
+        if hasattr(self, '_uploaderImp'):
+            return self._uploaderImp.download(localpath,remotepath)
     def upload(self,localpath,remotepath):
-        return self._uploaderImp.upload(localpath,remotepath)
+        if hasattr(self, '_uploaderImp'):
+            return self._uploaderImp.upload(localpath,remotepath)
     def replace(self,localpath,remotepath):
-        return self._uploaderImp.replace(localpath,remotepath)
+        if hasattr(self, '_uploaderImp'):
+            return self._uploaderImp.replace(localpath,remotepath)
 
     
     

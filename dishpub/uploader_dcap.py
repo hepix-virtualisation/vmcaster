@@ -1,9 +1,7 @@
-class uploaderDcap:
-    def __init__(self):
-        self.remotePrefix = None
-    def upload(self,localpath,remotepath):
-        print "prefix = %s" %( self.remotePrefix)
-        print (self,localpath,remotepath)
+import urlparse 
+import subprocess
+import time
+import logging
 
 def runpreloadcommand(cmd,timeout,preload):
     newenv = dict(os.environ)
@@ -60,3 +58,31 @@ def gsiDcapCopy(src,dest,timeout = 60):
     if processRc != 0:
         print cmd
     return (processRc,stdout,stderr)
+
+
+
+class uploaderDcap:
+    def __init__(self):
+        self.remotePrefix = None
+    def _getfilepath(self,remotePath):
+        if self.remotePrefix != None:
+            return self.remotePrefix + remotePath
+        else:
+            return remotePath
+    def upload(self,localpath,remotepath):
+        return gsiDcapCopy(localpath,self._getfilepath(remotepath))
+
+    def replace(localpath,gsipath):
+        cmd = "unlink %s" % (gsipath)
+        timeout = 10
+        preload = "/usr/lib64/libpdcap.so.1"
+        rc,stdout,stderr = runpreloadcommand(cmd,timeout,preload)
+        if rc != 0:
+            print stderr
+            return (rc,stdout,stderr)
+        rc,stdout,stderr = gsiDcapCopy(localpath,gsipath,timeout)
+        print rc
+        if rc != 0:
+            print stderr
+            return (rc,stdout,stderr)
+        return (rc,stdout,stderr)
