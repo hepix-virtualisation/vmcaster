@@ -26,6 +26,58 @@ import subprocess
 import time
 import types
 
+
+def checkVoms(requiredExtensions):
+    log = logging.getLogger("vomscheck")
+    cmd = "voms-proxy-info  --all"
+    process = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    processRc = None
+    handleprocess = True
+    counter = 0
+    stdout = ''
+    stderr = ''
+    while handleprocess:
+        counter += 1
+        time.sleep(1)
+        cout,cerr = process.communicate()
+        stdout += cout
+        stderr += cerr
+        process.poll()
+        processRc = process.returncode
+        if processRc != None:
+            break
+        if counter == timeout:
+            os.kill(process.pid, signal.SIGQUIT)
+        if counter > timeout:
+            os.kill(process.pid, signal.SIGKILL)
+            processRc = -9
+            break
+    
+    if processRc != 0:
+        log.error("Failed to run voms-proxy-info sucessfully")
+        log.info("stdout:%s" % (stdout))
+        log.info("stderr:%s" % (stderr))
+        return False
+    vomsInfo = {}
+    foundVos = set([])
+    issuer = None
+    identity = None
+    for lineUnclean in stdout.split('\n'):
+        foundPos = lineUnclean.find(':')
+        if foundPos > 0:
+            head = lineUnclean[:foundPos].strip(' \t\n\r')
+            tail = lineUnclean[(foundPos +1):].strip(' \t\n\r')
+            if head == 'timeleft':
+                if tail == '0:00:00':
+                    log.error("Proxy expired.")
+                    return False
+            if head == 'VO':
+                foundVos.add(tail)
+            if head == 'identity':
+                identity = tail
+    print foundVos,identity
+
+
 def main():
     """Runs program and handles command line options"""
     p = optparse.OptionParser(version = "%prog " + version)
@@ -62,6 +114,7 @@ def main():
     p.add_option('--imagelist-key-del', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
     p.add_option('--imagelist-value', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
     
+    p.add_option('--image-list', action ='store_true',help='Edit image UUID.', metavar='CFG_LOGFILE')    
     p.add_option('--image', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
     p.add_option('--image-add', action ='store',help='Add image UUID.', metavar='CFG_LOGFILE')
     p.add_option('--image-del', action ='store',help='Add image UUID.', metavar='CFG_LOGFILE')
@@ -214,7 +267,8 @@ def main():
         actions.add('imagelist_import_json')
         
         imagelist_import_json = options.imagelist_import_json
-    
+    if options.image_list:
+        actions.add('image_list')
     if options.image:
         imageUuid = options.image
     
@@ -239,6 +293,8 @@ def main():
         image_req = True
         image_key_req = True
         image_key_value = options.image_value
+    if options.image_upload:
+        actions.add('image_upload')
         
     if options.database:
         databaseConnectionString = options.database
@@ -314,7 +370,10 @@ def main():
     
     if 'imagelist_import_smime' in actions:
         log.error("Not imprlements")
-    
+    if 'image_list' in actions:
+        images = imagepub.imageList()
+        for item in images:
+            print item
     if 'image_add' in actions:
         imagepub.imagelist_image_add(imagelistUUID,image_key)
         return
@@ -323,16 +382,17 @@ def main():
 
     if 'image_keys' in actions:
         imagepub.image_keys(imagelistUUID, imageUuid)
+    if 'image_upload' in actions:
+        checkVoms(['desy'])
 
     
     if 'imagelist_import_json' in actions:
-        
         f = open(imagelist_import_json)
         try:
             candidate = json.loads(str(f.read()))
         except ValueError:
             log.error("Failed to parse JSON.")
-            sts.exit(20)
+            sys.exit(20)
             
         if candidate == None:
             log.error("No JSON content.")
