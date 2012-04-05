@@ -49,6 +49,7 @@ class uploaderFacade(object):
         def fdel(self):
             del self._uploader
         return locals()
+
     def __init__(self) :
         pass
     
@@ -62,7 +63,9 @@ class uploaderFacade(object):
         if hasattr(self, '_uploaderImp'):
             return self._uploaderImp.replace(localpath,remotepath)
 
-    
+    def delete(self,remotepath):
+        if hasattr(self, '_uploaderImp'):
+            return self._uploaderImp.delete(remotepath)
     
     
 

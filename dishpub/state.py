@@ -329,7 +329,15 @@ class imagelistpub:
         Session.add(newimage)
         Session.commit()        
         return True
-
+    def imageList(self):
+        output = []
+        Session = self.SessionFactory()
+        query_image = Session.query(model.Image)
+        for item in query_image:
+            output.append(str(item.identifier))
+        return output
+        
+        
     def image_key_update(self,imageListUuid, imageUuid ,image_key, image_value):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\

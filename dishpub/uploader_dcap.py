@@ -2,8 +2,9 @@ import urlparse
 import subprocess
 import time
 import logging
+import os
 
-def runpreloadcommand(cmd,timeout,preload):
+def runpreloadcommand(cmd,timeout,preload = 60):
     newenv = dict(os.environ)
     newenv["LD_PRELOAD"] = preload
     process = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,env=newenv)
@@ -69,14 +70,18 @@ class uploaderDcap:
             return self.remotePrefix + remotePath
         else:
             return remotePath
-    def upload(self,localpath,remotepath):
-        return gsiDcapCopy(localpath,self._getfilepath(remotepath))
 
-    def replace(localpath,gsipath):
-        cmd = "unlink %s" % (gsipath)
+    def delete(self,remotePath):
+        cmd = "unlink %s" % (self._getfilepath(remotePath))
         timeout = 10
         preload = "/usr/lib64/libpdcap.so.1"
-        rc,stdout,stderr = runpreloadcommand(cmd,timeout,preload)
+        return runpreloadcommand(cmd,timeout,preload)
+        
+    def upload(self,localpath,remotePath):
+        return gsiDcapCopy(localpath,self._getfilepath(remotePath))
+
+    def replace(localpath,remotePath):
+        (rc,stdout,stderr) = self.delete(remotePath)
         if rc != 0:
             print stderr
             return (rc,stdout,stderr)
