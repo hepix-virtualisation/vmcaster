@@ -27,7 +27,7 @@ import time
 import types
 
 
-def checkVoms(requiredExtensions):
+def checkVoms(requiredExtensions = set([])):
     log = logging.getLogger("vomscheck")
     cmd = "voms-proxy-info  --all"
     process = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -57,7 +57,7 @@ def checkVoms(requiredExtensions):
         log.error("Failed to run voms-proxy-info sucessfully")
         log.info("stdout:%s" % (stdout))
         log.info("stderr:%s" % (stderr))
-        return False
+        return None
     vomsInfo = {}
     foundVos = set([])
     issuer = None
@@ -70,12 +70,15 @@ def checkVoms(requiredExtensions):
             if head == 'timeleft':
                 if tail == '0:00:00':
                     log.error("Proxy expired.")
-                    return False
+                    return None
             if head == 'VO':
                 foundVos.add(tail)
             if head == 'identity':
                 identity = tail
-    print foundVos,identity
+    if len(requiredExtensions.difference(foundVos)) > 0:
+        log.error("not all extensions found")
+        return None
+    return identity
 
 
 def main():
@@ -157,6 +160,9 @@ def main():
     
     endorserValue = None
     endorserValueReq = False
+    
+    imageFileLocal = None
+    
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -295,7 +301,7 @@ def main():
         image_key_value = options.image_value
     if options.image_upload:
         actions.add('image_upload')
-        
+        imageFileLocal = options.image_upload
     if options.database:
         databaseConnectionString = options.database
     
@@ -383,8 +389,13 @@ def main():
     if 'image_keys' in actions:
         imagepub.image_keys(imagelistUUID, imageUuid)
     if 'image_upload' in actions:
-        checkVoms(['desy'])
-
+        identity = checkVoms(set(['desy']))
+        if identity == None:
+            log.error("No identiy found aborting")
+            sys.exit(31)
+        log.error("not implemented")
+        log.info("Uploading '%s' with identiy '%s'" % (imageFileLocal,identity))
+        
     
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
