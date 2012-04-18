@@ -1,0 +1,17 @@
+virt-install -n hudson-slave-vm06.desy.de \
+  -r 2048 \
+  --vcpus=1 \
+  --os-variant=rhel5.4 \
+  --accelerate -v \
+  -w bridge:bridge0 \
+  --disk path=/var/lib/libvirt/images/hudson-slave-vm06.desy.de.img,size=3 \
+  --disk path=/var/lib/libvirt/images/barr,size=1 \
+  --disk path=/var/lib/libvirt/images/foo,size=1 \
+  -l http://nims.desy.de/scientific/57/x86_64/ \
+  --mac=02:11:69:22:32:16 \
+  -x "ks=http://www.desy.de/~omsynge/kickstart.cloud dns=131.169.40.200" \
+  --force  --noreboot 
+
+
+
+ vmimagemanager  -b hudson-slave-vm06.desy.de -i org.desy.config.grid-wn.tgz:/tmp/   -i puppet.ssl.tgz:/tmp  -du 
