@@ -3,6 +3,8 @@ import sys
 
 import dishpub.dishpubdb as model
 import dishpub.state as dishpubstate
+import dishpub.uploader as uploader
+
 
 import os.path
 import logging
@@ -86,11 +88,11 @@ def main():
     p = optparse.OptionParser(version = "%prog " + version)
     p.add_option('-d', '--database', action ='store', help='Database conection string')
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
-    p.add_option('-C', '--config-file', action ='store',help='Logfile configuration file.', metavar='CFG_FILE')
+    p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
     
     p.add_option('--endorser', action ='store',help='select endorser.', metavar='subject')
     p.add_option('--endorser-show', action ='store_true',help='write to stdout the list images.')
-    p.add_option('--endorser-list', action ='store_true',help='write to stdout the list images.')
+    p.add_option('--endorser-list', action ='store_true',help='write to stdout the endorsers list.')
     p.add_option('--endorser-add', action ='store',help='write to stdout the image list.')
     p.add_option('--endorser-del', action ='store',help='write to stdout the image list.')
     
@@ -395,8 +397,11 @@ def main():
             sys.exit(31)
         log.error("not implemented")
         log.info("Uploading '%s' with identiy '%s'" % (imageFileLocal,identity))
-        
-    
+        upload = uploader.uploaderFacade()
+        print dir(upload)
+        upload.uploader = 'gsidcap'
+        upload.remotePrefix = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/"
+        upload.download('test', '/tmp/doof')
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
         try:

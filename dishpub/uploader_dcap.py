@@ -91,3 +91,7 @@ class uploaderDcap:
             print stderr
             return (rc,stdout,stderr)
         return (rc,stdout,stderr)
+    def download(self,remotePath,localpath):
+        print "remotePath=%s" % (remotePath)
+        print "localpath=%s" % (localpath)
+        return gsiDcapCopy(self._getfilepath(remotePath),localpath)

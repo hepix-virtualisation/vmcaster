@@ -18,6 +18,13 @@ class uploaderFacade(object):
         doc = "The person's name"
 
         def fget(self):
+            if hasattr(self, '_uploaderImp'):
+                if self._uploaderImp != None:
+                    if hasattr(self._uploaderImp,'remotePrefix'):
+                        return self._uploaderImp.remotePrefix
+                    else:
+                        return None
+                
             return self._remotePrefix
 
         def fset(self, name):
@@ -39,7 +46,6 @@ class uploaderFacade(object):
             self._uploader = name
             if name == "gsidcap":
                 self._uploaderImp = uploaderDcap.uploaderDcap()
-                
             else:
                 del(self._uploaderImp)
             if hasattr(self, '_uploaderImp'):
