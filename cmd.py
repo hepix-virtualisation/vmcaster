@@ -400,8 +400,8 @@ def main():
         upload = uploader.uploaderFacade()
         print dir(upload)
         upload.uploader = 'gsidcap'
-        upload.remotePrefix = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/"
-        upload.download('test', '/tmp/doof')
+        upload.remotePrefix = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
+        upload.download('testing.smime', '/tmp/doof')
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
         try:

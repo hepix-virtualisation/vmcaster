@@ -57,7 +57,8 @@ def gsiDcapCopy(src,dest,timeout = 60):
             processRc = -9
             break
     if processRc != 0:
-        print cmd
+        log = logging.getLogger("gsiDcapCopy")
+        log.error("failed to execute command '%s'" % (cmd))
     return (processRc,stdout,stderr)
 
 
@@ -65,6 +66,7 @@ def gsiDcapCopy(src,dest,timeout = 60):
 class uploaderDcap:
     def __init__(self):
         self.remotePrefix = None
+        self.log = logging.getLogger("uploaderGsiDcap")
     def _getfilepath(self,remotePath):
         if self.remotePrefix != None:
             return self.remotePrefix + remotePath
@@ -92,6 +94,8 @@ class uploaderDcap:
             return (rc,stdout,stderr)
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
-        print "remotePath=%s" % (remotePath)
-        print "localpath=%s" % (localpath)
-        return gsiDcapCopy(self._getfilepath(remotePath),localpath)
+        rc,stdout,stderr = gsiDcapCopy(self._getfilepath(remotePath),localpath)
+        if rc != 0:
+            for errorLine in stderr.split('\n'):
+                self.log.error("stderr:'%s'" % (errorLine))
+        return rc,stdout,stderr
