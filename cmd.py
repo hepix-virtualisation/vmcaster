@@ -27,7 +27,9 @@ import urlparse
 import subprocess
 import time
 import types
-
+# needed for the signing of images.
+import M2Crypto.SMIME
+import M2Crypto.BIO
 
 def checkVoms(requiredExtensions = set([])):
     log = logging.getLogger("vomscheck")
@@ -377,7 +379,31 @@ def main():
         imagepub.imagelist_key_del(imagelistUUID, imagelist_key)
     
     if 'imagelist_import_smime' in actions:
-        log.error("Not imprlements")
+        
+        
+        fp = open (imagelist_import_smime)
+        inportText = fp.read()
+        buf = M2Crypto.BIO.MemoryBuffer(str(inportText))
+        try:
+            p7, data = M2Crypto.SMIME.smime_load_pkcs7_bio(buf)
+        except AttributeError, e:
+            log.error("Failed to load SMIME")
+            raise e
+        readData = data.read()
+        try:
+            candidate = json.loads(str(readData))
+        except ValueError:
+            log.error("Failed to parse JSON.")
+            sys.exit(20)
+            
+        if candidate == None:
+            log.error("No JSON content.")
+            sys.exit(21)
+        
+        imagepub.importer(candidate)
+        
+        
+        
     if 'image_list' in actions:
         images = imagepub.imageList()
         for item in images:
