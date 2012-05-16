@@ -88,7 +88,7 @@ class ImageMetadata(Base):
     __tablename__ = 'ImageMetadata'
     id = Column(Integer, primary_key=True)
     fkImage = Column(Integer, ForeignKey(Image.id, onupdate="CASCADE", ondelete="CASCADE"))
-    key = Column(String(200),nullable = False,unique=True)
+    key = Column(String(200),nullable = False)
     value = Column(String(200),nullable = False)
     def __init__(self,image,key,value):
         self.fkImage = image
