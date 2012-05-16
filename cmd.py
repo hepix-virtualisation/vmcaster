@@ -364,7 +364,7 @@ def main():
     if 'imagelist_list' in actions:
         imagepub.imageListList()
     if 'imagelist_show' in actions:
-        output = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=2)
+        output = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=4)
         if output != None:
             print output
     
