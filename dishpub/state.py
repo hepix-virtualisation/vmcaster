@@ -233,13 +233,16 @@ class imagelistpub:
         if query_imagelist_images.count() > 0:
             imagesarray = []
             for image in query_imagelist_images:
-                imagemetadata = {u"hv:image" : str(image.identifier)}
+                imagemetadata = {u"dc:identifier" : str(image.identifier)}
                 query_imageMetadata = Session.query(model.ImageMetadata).\
                     filter(model.Image.identifier ==  image.identifier).\
                     filter(model.Image.id == model.ImageMetadata.fkImage)
                 for imageItem in query_imageMetadata:
-                    imagemetadata[imageItem.key] = imageItem.value
-                imagesarray.append(imagemetadata)
+                    if imageItem.key in ["hv:size"]:
+                        imagemetadata[imageItem.key] = int(imageItem.value)
+                    else:
+                        imagemetadata[imageItem.key] = imageItem.value
+                imagesarray.append({u'hv:image' : imagemetadata})
             outModel[u'hv:images'] = imagesarray
         outModel[u'dc:identifier'] = imagelist.identifier
             
@@ -268,7 +271,7 @@ class imagelistpub:
             else:
                 outModel['hv:endorser'] = endorserList
             
-        return outModel
+        return {'hv:imagelist' : outModel}
         
     def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
         Session = self.SessionFactory()
