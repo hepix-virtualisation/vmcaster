@@ -15,6 +15,9 @@ from sqlalchemy import Sequence
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
+
+from sqlalchemy.schema import UniqueConstraint
+
 Base = declarative_base()
 
 
@@ -33,6 +36,8 @@ class EndorserMetadata(Base):
     fkEndorser = Column(Integer, ForeignKey(Endorser.id, onupdate="CASCADE", ondelete="CASCADE"))
     key = Column(String(200),nullable = False,unique=True)
     value = Column(String(200),nullable = False)
+    # explicit/composite unique constraint.  'name' is optional.
+    UniqueConstraint('fkEndorser', 'key')
     def __init__(self,imagelist,key,value):
         self.fkEndorser = imagelist
         self.key = key
@@ -64,6 +69,7 @@ class ImagelistMetadata(Base):
     fkImageList = Column(Integer, ForeignKey(Imagelist.id, onupdate="CASCADE", ondelete="CASCADE"))
     key = Column(String(200),nullable = False,unique=True)
     value = Column(String(200),nullable = False)
+    UniqueConstraint('fkImageList', 'key')
     def __init__(self,imagelist,key,value):
         self.fkImageList = imagelist
         self.key = key
