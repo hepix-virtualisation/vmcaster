@@ -4,7 +4,7 @@ wget https://dish.desy.de:2880/testing.smime  --no-check-certificate
 
 Import it.
 
-$python cmd.py   --imagelist-import-smime testing.smime 
+$python pubblisher.py   --imagelist-import-smime testing.smime 
 INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
@@ -13,13 +13,13 @@ WARNING:imagelistpub:making new.
 WARNING:imagelistpub:making new.
 
 
-python cmd.py  --imagelist-list    
+python pubblisher.py  --imagelist-list    
 
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
 
 
-$python cmd.py --image-list  
+$python pubblisher.py --image-list  
 INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 5f00fec3-4f2a-4fa0-a965-d52115606044
 7b1aea46-8776-4447-9450-00e720fc042c
@@ -27,9 +27,9 @@ INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 
 To delete an Image:
 
-python cmd.py  --imagelist-del   --imagelist  9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+python pubblisher.py  --imagelist-del   --imagelist  9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 
 
 
-python cmd.py    --image-upload    --image 7b1aea46-8776-4447-9450-00e720fc042c
+python pubblisher.py    --image-upload    --image 7b1aea46-8776-4447-9450-00e720fc042c
