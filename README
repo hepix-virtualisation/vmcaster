@@ -4,7 +4,7 @@ wget https://dish.desy.de:2880/testing.smime  --no-check-certificate
 
 Import it.
 
-$python pubblisher.py   --imagelist-import-smime testing.smime 
+   python pubblisher.py   --imagelist-import-smime testing.smime 
 INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
@@ -13,7 +13,7 @@ WARNING:imagelistpub:making new.
 WARNING:imagelistpub:making new.
 
 
-python pubblisher.py  --imagelist-list    
+   python pubblisher.py  --imagelist-list    
 
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
@@ -25,11 +25,73 @@ INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 7b1aea46-8776-4447-9450-00e720fc042c
 
 
+Endorser management
+~~~~~~~~~~~~~~~~~~~
+
+List endortsers,
+
+   python pubblisher.py  --endorser-list
+
+Show JSON for endorsers.
+
+   python pubblisher.py   --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'  --endorser-show
+
+Add endorser 
+
+python pubblisher.py   --imagelist-add        --endorser ting
+
+Addd Key pair for endorser.
+
+python pubblisher.py    --endorser ting  --endorser-key-update 'hv:email' --endorser-value 'owen.synge@desy.de'
+
+Binding endorser to an imagelist
+
+    python pubblisher.py   --connect --endorser ting  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+
+Unbinding endorser to an imagelist
+
+    python pubblisher.py    --disconnect  --endorser ting  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+
+
 To delete an Image:
+~~~~~~~~~~~~~~~~~~
 
 python pubblisher.py  --imagelist-del   --imagelist  9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 
 
 
-python pubblisher.py    --image-upload    --image 7b1aea46-8776-4447-9450-00e720fc042c
+
+
+To update an Image:
+~~~~~~~~~~~~~~~~~~~
+
+python pubblisher.py \
+ --image-upload    /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
+ --image 7b1aea46-8776-4447-9450-00e720fc042c
+
+
+What it should do. 
+Check user is in database, 
+Compresses file, 
+uplaods it, 
+bumps the image version number in the database.
+
+
+python pubblisher.py  --endorser-show    --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'
+{'hv:email': 'owen.synge@desy.de', 'dc:creator': 'Owen Synge', 'hv:ca': '/C=DE/O=GermanGrid/CN=GridKa-CA', 'hv:dn': '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'}
+
+
+Shows the image list as it woudl be made.
+
+
+python pubblisher.py  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
+
+
+# To update and sign image list.
+
+python pubblisher.py  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --update
+
+# to update an image.
+
+
