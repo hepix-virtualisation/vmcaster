@@ -92,47 +92,50 @@ def main():
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
     
-    p.add_option('--endorser', action ='store',help='select endorser.', metavar='ENDORSER')
-    p.add_option('--endorser-show', action ='store_true',help='write to stdout the endorser.')
-    p.add_option('--endorser-list', action ='store_true',help='write to stdout the endorsers list.')
+    p.add_option('--endorser', action ='store',help='Select endorser.', metavar='ENDORSER_UUID')
+    p.add_option('--endorser-show', action ='store_true',help='Write to stdout the endorser.')
+    p.add_option('--endorser-list', action ='store_true',help='Write to stdout the endorsers list.')
     p.add_option('--endorser-add', action ='store',help='Endorser create.')
     p.add_option('--endorser-del', action ='store',help='Endorser delete .')
     
-    p.add_option('--endorser-key-update', action ='store',help='Endorser metadata key to create/overwrite.')
+    p.add_option('--endorser-keys', action ='store',help='List endorser metadata keys.')
+    p.add_option('--endorser-key-set', action ='store',help='Endorser metadata key to create/overwrite.')
     p.add_option('--endorser-key-del', action ='store_true',help='Endorser metadata key to delete.')
-    p.add_option('--endorser-value', action ='store',help='write to stdout the image list.')
+    p.add_option('--endorser-value', action ='store',help='Endorser metadata value to set.')
     
     p.add_option('--connect', action ='store_true',help='Bind Endorser to imagelist.')
     p.add_option('--disconnect', action ='store_true',help='Unbind Endorser to imagelist.')
     
-    p.add_option('--imagelist', action ='store',help='select imagelist.', metavar='IMAGELIST_UUID')
-    p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.')
-    p.add_option('--imagelist-add', action ='store_true',help='write to stdout the image list.')
-    p.add_option('--imagelist-del', action ='store_true',help='write to stdout the image list.')
+    p.add_option('--imagelist', action ='store',help='Select imagelist.', metavar='IMAGELIST_UUID')
+    p.add_option('--imagelist-list', action ='store_true',help='Write to stdout the list images.')
+    p.add_option('--imagelist-add', action ='store_true',help='Imagelist create.')
+    p.add_option('--imagelist-del', action ='store_true',help='Imagelist delete.')
     
-    p.add_option('--imagelist-show', action ='store_true',help='write to stdout the list images.', metavar='IMAGE_UUID')
-    p.add_option('--imagelist-upload', action ='store_true',help='write to stdout the image list.', metavar='IMAGE_UUID')
-    p.add_option('--imagelist-import-smime', action ='store',help='Import an image list.', metavar='IMAGE_PATH')
-    p.add_option('--imagelist-import-json', action ='store',help='Import an image list.', metavar='IMAGE_PATH')
+    p.add_option('--imagelist-show', action ='store_true',help='Write to stdout the selected imagelist.')
+    p.add_option('--imagelist-upload', action ='store_true',help='Update imagelist.', metavar='IMAGE_UUID')
+    p.add_option('--imagelist-import-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
+    p.add_option('--imagelist-import-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
     
     # Key value pairs to add to an image
-    p.add_option('--imagelist-keys', action ='store_true',help='Edit imagelist.', metavar='CFG_LOGFILE')
-    p.add_option('--imagelist-key-add', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
-    p.add_option('--imagelist-key-del', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
-    p.add_option('--imagelist-value', action ='store',help='Edit imagelist.', metavar='CFG_LOGFILE')
+    p.add_option('--imagelist-keys', action ='store_true',help='List imagelist metadata keys.')
+    p.add_option('--imagelist-key-set', action ='store',help='Imagelist metadata key to create/overwrite.')
+    p.add_option('--imagelist-key-del', action ='store',help='Imagelist metadata key to delete.')
+    p.add_option('--imagelist-value', action ='store',help='Imagelist metadata value to set.')
     
-    p.add_option('--image-list', action ='store_true',help='Edit image UUID.', metavar='CFG_LOGFILE')    
-    p.add_option('--image', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
-    p.add_option('--image-add', action ='store',help='Add image UUID.', metavar='CFG_LOGFILE')
-    p.add_option('--image-del', action ='store',help='Add image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image', action ='store',help='Select image by UUID', metavar='IMAGELIST_UUID')
+    p.add_option('--image-show', action ='store_true',help='Show image metadata.')    
+    p.add_option('--image-list', action ='store_true',help='list Images.')    
+    p.add_option('--image-add', action ='store',help='Image create.')
+    p.add_option('--image-del', action ='store',help='Image delete.')
 
     # Key value pairs to add to an image
     
-    p.add_option('--image-keys', action ='store_true',help='Show keys for image UUID.', metavar='CFG_LOGFILE')
-    p.add_option('--image-key-add', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
-    p.add_option('--image-key-del', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
-    p.add_option('--image-value', action ='store',help='Edit image UUID.', metavar='CFG_LOGFILE')
-    p.add_option('--image-upload', action ='store',help='Path to image UUID.', metavar='CFG_LOGFILE')
+    p.add_option('--image-keys', action ='store_true',help='List image metadata keys.')
+    p.add_option('--image-key-set', action ='store',help='Image metadata key to create/overwrite.')
+    p.add_option('--image-key-del', action ='store',help='Image metadata key to delete.')
+    p.add_option('--image-value', action ='store',help='Image metadata value to set.')
+    
+    p.add_option('--image-upload', action ='store',help='Path to image.')
     
     
     
