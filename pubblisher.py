@@ -92,18 +92,18 @@ def main():
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
     
-    p.add_option('--endorser', action ='store',help='select endorser.', metavar='subject')
-    p.add_option('--endorser-show', action ='store_true',help='write to stdout the list images.')
+    p.add_option('--endorser', action ='store',help='select endorser.', metavar='ENDORSER')
+    p.add_option('--endorser-show', action ='store_true',help='write to stdout the endorser.')
     p.add_option('--endorser-list', action ='store_true',help='write to stdout the endorsers list.')
-    p.add_option('--endorser-add', action ='store',help='write to stdout the image list.')
-    p.add_option('--endorser-del', action ='store',help='write to stdout the image list.')
+    p.add_option('--endorser-add', action ='store',help='Endorser create.')
+    p.add_option('--endorser-del', action ='store',help='Endorser delete .')
     
-    p.add_option('--endorser-key-update', action ='store',help='write to stdout the list images.')
-    p.add_option('--endorser-key-del', action ='store_true',help='write to stdout the image list.')
+    p.add_option('--endorser-key-update', action ='store',help='Endorser metadata key to create/overwrite.')
+    p.add_option('--endorser-key-del', action ='store_true',help='Endorser metadata key to delete.')
     p.add_option('--endorser-value', action ='store',help='write to stdout the image list.')
     
-    p.add_option('--connect', action ='store_true',help='write to stdout the image list.')
-    p.add_option('--disconnect', action ='store_true',help='write to stdout the image list.')
+    p.add_option('--connect', action ='store_true',help='Bind Endorser to imagelist.')
+    p.add_option('--disconnect', action ='store_true',help='Unbind Endorser to imagelist.')
     
     p.add_option('--imagelist', action ='store',help='select imagelist.', metavar='IMAGELIST_UUID')
     p.add_option('--imagelist-list', action ='store_true',help='write to stdout the list images.')
@@ -424,10 +424,12 @@ def main():
         log.error("not implemented")
         log.info("Uploading '%s' with identiy '%s'" % (imageFileLocal,identity))
         upload = uploader.uploaderFacade()
-        print dir(upload)
         upload.uploader = 'gsidcap'
         upload.remotePrefix = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
-        upload.download('testing.smime', '/tmp/doof')
+        #upload.download('testing.smime', '/tmp/doof')
+        #upload.upload('/tmp/doof','fooo')
+        #upload.delete('fooo')
+        
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
         try:
