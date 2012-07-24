@@ -18,6 +18,10 @@ import datetime
 
 from sqlalchemy.schema import UniqueConstraint
 
+
+##########################################
+# makes key value tables to increase flexibility.
+
 Base = declarative_base()
 
 
@@ -34,7 +38,7 @@ class EndorserMetadata(Base):
     __tablename__ = 'endorserMetadata'
     id = Column(Integer, primary_key=True)
     fkEndorser = Column(Integer, ForeignKey(Endorser.id, onupdate="CASCADE", ondelete="CASCADE"))
-    key = Column(String(200),nullable = False,unique=True)
+    key = Column(String(200),nullable = False)
     value = Column(String(200),nullable = False)
     # explicit/composite unique constraint.  'name' is optional.
     UniqueConstraint('fkEndorser', 'key')
@@ -67,7 +71,7 @@ class ImagelistMetadata(Base):
     __tablename__ = 'ImagelistMetadata'
     id = Column(Integer, primary_key=True)
     fkImageList = Column(Integer, ForeignKey(Imagelist.id, onupdate="CASCADE", ondelete="CASCADE"))
-    key = Column(String(200),nullable = False,unique=True)
+    key = Column(String(200),nullable = False)
     value = Column(String(200),nullable = False)
     UniqueConstraint('fkImageList', 'key')
     def __init__(self,imagelist,key,value):
