@@ -125,3 +125,6 @@ if __name__ == "__main__":
     result = bumpVersion("0.0.1a", 3)
     if None != result:
         print "Fail"
+    result = bumpVersion("0.0.9", 0)
+    if "0.0.10" != result:
+        print "Fail"
