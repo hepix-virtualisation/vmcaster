@@ -20,9 +20,9 @@ class InputError(Error):
 
 
 
-class process:
+class hostUploader:
     def __init__(self,cfgFile):
-        self.log = logging.getLogger("process")
+        self.log = logging.getLogger("hostUploader")
         self.config = ConfigParser.ConfigParser()
         self.config.read(cfgFile)
         self.allHosts = {}
@@ -78,6 +78,6 @@ class process:
         
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
-    obj = process('publisher.cfg')
+    obj = hostUploader('publisher.cfg')
     #obj.uploadFile('/etc/fstab','dish.desy.de','dfsdfsdf')
     obj.delete('dfsdfsdf')
