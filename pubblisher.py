@@ -150,7 +150,7 @@ def main():
     imagelistUUID = None
     imagelist_req = False
     imagelist_key = None
-    imagelist_key_add_req = False
+    imagelist_key_set_req = False
     imagelist_key_value = None
     imagelist_key_value_add_req = False
     imagelist_import_json = None
@@ -215,9 +215,9 @@ def main():
         actions.add('endorser_del')
         endorserSub = options.endorser_del
 
-    if options.endorser_key_update:
-        actions.add('endorser_key_update')
-        endorserKey = options.endorser_key_update
+    if options.endorser_key_set:
+        actions.add('endorser_key_set')
+        endorserKey = options.endorser_key_set
         
     if options.endorser_key_del:
         actions.add('endorser_key_del')
@@ -256,11 +256,11 @@ def main():
         actions.add('imagelist_keys')
         imagelist_req = True
         
-    if options.imagelist_key_add:
+    if options.imagelist_key_set:
         actions.add('imagelist_key_update')
         imagelist_req = True
         imagelist_key_value_add_req = True
-        imagelist_key = options.imagelist_key_add
+        imagelist_key = options.imagelist_key_set
     if options.imagelist_key_del:
         actions.add('imagelist_key_del')
         imagelist_req = True
@@ -269,7 +269,7 @@ def main():
     if options.imagelist_value:
         actions.add('imagelist_key_update')
         imagelist_req = True
-        imagelist_key_add_req = True
+        imagelist_key_set_req = True
         imagelist_key_value = options.imagelist_value
     
     if options.imagelist_import_smime:
@@ -295,11 +295,11 @@ def main():
         imagelist_req = True
         image_req = True
 
-    if options.image_key_add:
+    if options.image_key_set:
         actions.add('image_key_update')
         image_req = True
         image_key_value_add_req = True
-        image_key = options.image_key_add
+        image_key = options.image_key_set
 
     if options.image_value:
         actions.add('image_key_update')
@@ -353,7 +353,7 @@ def main():
         imagepub.endorserAdd(endorserSub)
     if 'endorser_del' in actions:
         imagepub.endorserDel(endorserSub)
-    if 'endorser_key_update' in actions:
+    if 'endorser_key_set' in actions:
         imagepub.endorserMetadataUpdate(endorserSub,endorserKey,endorserValue)
     if 'endorser_key_del' in actions:
         imagepub.endorserMetadataDel(endorserSub,endorserKey)
