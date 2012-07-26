@@ -272,6 +272,19 @@ class imagelistpub:
                 outModel['hv:endorser'] = endorserList
             
         return {'hv:imagelist' : outModel}
+    def imagelist_key_get(self,imageListUuid, imagelist_key):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.ImagelistMetadata).\
+                filter(model.Imagelist.identifier == imageListUuid).\
+                filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
+                filter(model.ImagelistMetadata.key == imagelist_key)
+        if query_imagelists.count() == 0:
+            self.log.warning('No imagelist key found')
+            return None
+        newMetaData = query_imagelists.one()
+        output = newMetaData.value
+        return str(output)
+        
         
     def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
         Session = self.SessionFactory()
