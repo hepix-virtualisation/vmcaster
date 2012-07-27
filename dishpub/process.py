@@ -51,13 +51,21 @@ class hostUploader:
             else:
                 self.log.error("Section '%s' is missing a 'readprefix' config setting." % (section))
                 continue
-            
             self.allHosts[serverName] = {'serverName' : serverName,
                 'writeProto' : writeProto,
                 'writePrefix' : writePrefix,
                 'readPrefix' : readPrefix}
             
+    def replaceFile(self,localPath,remoteHost,remotePath):
+        if not remoteHost in self.allHosts:
+            raise InputError("Host '%s' is not known" % remoteHost)
         
+        if not os.path.isfile(localPath):
+            raise InputError("file not found at localpath '%s'" % localPath)
+        u1 = uploader.uploaderFacade()
+        u1.uploader = self.allHosts[remoteHost]["writeProto"]
+        u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
+        return u1.replace(localPath,remotePath)   
     def uploadFile(self,localPath,remoteHost,remotePath):
         if not remoteHost in self.allHosts:
             raise InputError("Host '%s' is not known" % remoteHost)
