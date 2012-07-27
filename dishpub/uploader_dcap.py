@@ -4,6 +4,9 @@ import time
 import logging
 import os
 
+
+
+
 def runpreloadcommand(cmd,timeout,preload = 60):
     newenv = dict(os.environ)
     newenv["LD_PRELOAD"] = preload
@@ -72,7 +75,12 @@ class uploaderDcap:
             return self.remotePrefix + remotePath
         else:
             return remotePath
-
+    def exists(self,remotePath):
+        cmd = "stat %s" % (self._getfilepath(remotePath))
+        timeout = 10
+        preload = "/usr/lib64/libpdcap.so.1"
+        return runpreloadcommand(cmd,timeout,preload)
+        
     def delete(self,remotePath):
         cmd = "unlink %s" % (self._getfilepath(remotePath))
         timeout = 10
@@ -80,15 +88,18 @@ class uploaderDcap:
         return runpreloadcommand(cmd,timeout,preload)
         
     def upload(self,localpath,remotePath):
-        return gsiDcapCopy(localpath,self._getfilepath(remotePath))
+        path = self._getfilepath(remotePath)
+        return gsiDcapCopy(localpath,path)
 
-    def replace(localpath,remotePath):
-        (rc,stdout,stderr) = self.delete(remotePath)
-        if rc != 0:
-            print stderr
-            return (rc,stdout,stderr)
-        rc,stdout,stderr = gsiDcapCopy(localpath,gsipath,timeout)
-        print rc
+    def replace(self,localpath,remotePath):
+        path = self._getfilepath(remotePath)
+        (rc,stdout,stderr) =  self.exists(path)
+        if rc == 0:
+            (rc,stdout,stderr) = self.delete(path)
+            if rc != 0:
+                print stderr
+                return (rc,stdout,stderr)
+        rc,stdout,stderr = gsiDcapCopy(localpath,path)
         if rc != 0:
             print stderr
             return (rc,stdout,stderr)
