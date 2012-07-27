@@ -278,11 +278,13 @@ class imagelistpub:
                 filter(model.Imagelist.identifier == imageListUuid).\
                 filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
                 filter(model.ImagelistMetadata.key == imagelist_key)
+                
         if query_imagelists.count() == 0:
             self.log.warning('No imagelist key found')
             return None
         newMetaData = query_imagelists.one()
         output = newMetaData.value
+        print 'ssss', newMetaData
         return str(output)
         
         
@@ -352,7 +354,19 @@ class imagelistpub:
         for item in query_image:
             output.append(str(item.identifier))
         return output
-        
+    
+    
+    def image_get_imagelist(self,imageUuid):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Imagelist.identifier).\
+            filter(model.Imagelist.id == model.Image.fkImageList).\
+            filter(model.Image.identifier == imageUuid)
+        output = []
+        for item in query_imagelists:
+            print item.identifier
+            output.append(str(item.identifier))
+        return output
+                
         
     def image_key_update(self,imageListUuid, imageUuid ,image_key, image_value):
         Session = self.SessionFactory()

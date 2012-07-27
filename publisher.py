@@ -4,7 +4,8 @@ import sys
 import dishpub.dishpubdb as model
 import dishpub.state as dishpubstate
 import dishpub.uploader as uploader
-
+from dishpub.versioning import bumpVersion
+from dishpub.process import hostUploader 
 
 import os.path
 import logging
@@ -30,6 +31,33 @@ import types
 # needed for the signing of images.
 import M2Crypto.SMIME
 import M2Crypto.BIO
+import tempfile
+import urlparse
+import M2Crypto.SMIME
+import M2Crypto.BIO
+import M2Crypto.SMIME
+def uglyUriParser(uri):
+    parsedUri = urlparse.urlsplit(uri)
+    if isinstance(parsedUri, tuple):
+        # We are probably python 2.4
+        networklocation = parsedUri[1].split(':')
+        hostname = networklocation[0]
+        port = ""
+        if len (networklocation) > 1:
+            port = networklocation[1]
+        return { "scheme" : parsedUri[0],
+            "path" : parsedUri[2],
+            "hostname" : hostname,
+            "port" : port,
+        }
+    if isinstance(parsedUri,urlparse.SplitResult):
+        # We are probably python 2.6
+        return { "scheme" : parsedUri.scheme,
+            "path" : parsedUri.path,
+            "hostname" : parsedUri.hostname,
+            "port" : parsedUri.port,
+        }
+
 
 def checkVoms(requiredExtensions = set([])):
     log = logging.getLogger("vomscheck")
@@ -107,12 +135,12 @@ def main():
     p.add_option('--disconnect', action ='store_true',help='Unbind Endorser to imagelist.')
     
     p.add_option('--imagelist', action ='store',help='Select imagelist.', metavar='IMAGELIST_UUID')
+    p.add_option('--imagelist-upload', action ='store_true',help='Upload selected item.')
     p.add_option('--imagelist-list', action ='store_true',help='Write to stdout the list images.')
     p.add_option('--imagelist-add', action ='store_true',help='Imagelist create.')
     p.add_option('--imagelist-del', action ='store_true',help='Imagelist delete.')
     
     p.add_option('--imagelist-show', action ='store_true',help='Write to stdout the selected imagelist.')
-    p.add_option('--imagelist-upload', action ='store_true',help='Update imagelist.', metavar='IMAGE_UUID')
     p.add_option('--imagelist-import-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
     p.add_option('--imagelist-import-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
     
@@ -169,12 +197,14 @@ def main():
     endorserValueReq = False
     
     imageFileLocal = None
-    
+    dishCfg = 'publisher.cfg'
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
     if 'DISH_RDBMS' in os.environ:
         databaseConnectionString = os.environ['VMILS_RDBMS']
+    if 'DISH_CFG' in os.environ:
+        dishCfg = os.environ['DISH_CFG']
     
     
     # Set up log file
@@ -195,7 +225,8 @@ def main():
     # Now process command line
     actions = set([])
     
-    
+    if options.endorser:
+        endorserSub = options.endorser
 
     if options.endorser:
         endorserSub = options.endorser
@@ -239,7 +270,9 @@ def main():
         imagelistUUID = options.imagelist
     if options.imagelist_list:
         actions.add('imagelist_list')
-        
+    if options.imagelist_upload:
+        actions.add('imagelist_upload')
+        imagelist_req = True
     if options.imagelist_add:
         actions.add('imagelist_add')
         imagelist_req = True
@@ -311,6 +344,10 @@ def main():
         imageFileLocal = options.image_upload
     if options.database:
         databaseConnectionString = options.database
+    if options.config_file:
+        dishCfg = options.config_file
+    
+    
     
     actionsLen = len(actions)
     if actionsLen == 0:
@@ -340,8 +377,13 @@ def main():
         if endorserSub == None:
             log.error('Endorser subject is needed')
             sys.exit(1)
-    # now do the work.
     
+    if not os.path.isfile(dishCfg):
+        log.error("Configuration file '%s'" % dishCfg)
+        sys.exit(1)
+    
+    # now do the work.
+
     imagepub = dishpubstate.imagelistpub(databaseConnectionString)
     
     if 'endorser_list' in actions:
@@ -420,18 +462,55 @@ def main():
     if 'image_keys' in actions:
         imagepub.image_keys(imagelistUUID, imageUuid)
     if 'image_upload' in actions:
-        identity = checkVoms(set(['desy']))
-        if identity == None:
-            log.error("No identiy found aborting")
-            sys.exit(31)
-        log.error("not implemented")
-        log.info("Uploading '%s' with identiy '%s'" % (imageFileLocal,identity))
-        upload = uploader.uploaderFacade()
-        upload.uploader = 'gsidcap'
-        upload.remotePrefix = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
-        #upload.download('testing.smime', '/tmp/doof')
-        #upload.upload('/tmp/doof','fooo')
-        #upload.delete('fooo')
+        listOfImagelists = imagepub.image_get_imagelist(imageUuid)
+        if len(listOfImagelists) == 0:
+            log.error("No matching image list found")
+            sys.exit(45)
+        ThisImageListUuid = str(listOfImagelists[0])
+        print 'sssssssssssss',ThisImageListUuid 
+        #ThisImageListUuid = '9b6fad19-d913-4cca-b77d-c4b4fcd9dc36'
+        uri = imagepub.imagelist_key_get(ThisImageListUuid,"hv:uri")
+        print uri
+        parsedUri = uglyUriParser(uri)
+        print parsedUri
+        mytempdir = tempfile.mkdtemp()
+        tmpfilePath = os.path.join(mytempdir,"uncompressed")
+        shutil.copyfile(imageFileLocal,tmpfilePath )
+        rc,output = commands.getstatusoutput('gzip %s' % tmpfilePath)
+        if rc != 0 :
+            print output
+            sys.exit(1)
+        combinedNamesList = []
+        for filename in os.listdir(mytempdir):
+            combainedName = os.path.join(mytempdir,filename)
+            if os.path.isfile(combainedName):
+                combinedNamesList.append(filename)
+        uploadablefileName = ""
+        if len(combinedNamesList) > 1:
+            print "unknown file found"
+            sys.exit(1)
+        if len(combinedNamesList) == 0:
+            print "compresed file not found"
+            sys.exit(1)
+        imageName = combinedNamesList[0]
+        localPath = os.path.join(mytempdir,imageName)
+        uploadpath = os.path.join("images" , imageUuid)
+        timeout = 10000
+        uploader = hostUploader(dishCfg)
+        uploader.replaceFile(localPath,parsedUri['hostname'],uploadpath)
+        
+        m = hashlib.sha512()
+        filelength = 0
+        for line in open(localPath,'r'):
+            filelength += len(line)
+            m.update(line)
+        imagepub.image_key_update(ThisImageListUuid,imageUuid,u'hv:size',filelength)
+        imagepub.image_key_update(ThisImageListUuid,imageUuid,u'sl:checksum:sha512',m.hexdigest())
+        
+        versionOld = imagepub.image_key_get(ThisImageListUuid,imagelistUUID, "hv:version")
+        versionNew = bumpVersion(versionOld)
+        imagepub.image_key_update(ThisImageListUuid,imageUuid, "hv:version",versionNew)
+        
         
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
@@ -447,8 +526,39 @@ def main():
         
         imagepub.importer(candidate)
         
-
-    
-    
+    if 'imagelist_upload' in actions:
+        
+        versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
+        versionNew = bumpVersion(versionOld)
+        imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
+        uri = imagepub.imagelist_key_get(imagelistUUID,"hv:uri")
+        parsedUri = uglyUriParser(uri)
+        mytempdir = tempfile.mkdtemp()
+        tmpfilePath = os.path.join(mytempdir,"signed_file")
+        
+        smime = M2Crypto.SMIME.SMIME()
+        signer_key = "/home/omsynge/.globus/userkey.pem"
+        signer_cert = "/home/omsynge/.globus/usercert.pem"
+        
+        smime.load_key(signer_key,signer_cert)
+        fp = open(str(tmpfilePath),'w')
+        
+        content = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=4)
+        
+        buf = M2Crypto.BIO.MemoryBuffer(content)
+        p7 = smime.sign(buf,M2Crypto.SMIME.PKCS7_DETACHED)
+        buf = M2Crypto.BIO.MemoryBuffer(content)
+        out = M2Crypto.BIO.MemoryBuffer()
+        smime.write(out, p7, buf)
+        message_signed = str(out.read())
+        
+        
+        
+        fp.write(message_signed)
+        fp.close()
+        uploader = hostUploader(dishCfg)
+        uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
+        uploader.replaceFile(tmpfilePath,parsedUri['hostname'],parsedUri['path'])
+        
 if __name__ == "__main__":
     main()
