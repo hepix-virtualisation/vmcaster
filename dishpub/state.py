@@ -284,7 +284,6 @@ class imagelistpub:
             return None
         newMetaData = query_imagelists.one()
         output = newMetaData.value
-        print 'ssss', newMetaData
         return str(output)
         
         
@@ -363,7 +362,6 @@ class imagelistpub:
             filter(model.Image.identifier == imageUuid)
         output = []
         for item in query_imagelists:
-            print item.identifier
             output.append(str(item.identifier))
         return output
                 
@@ -449,7 +447,6 @@ class imagelistpub:
                     self.log.warning("image has no ID '%s'" % (image))
                     continue
                 imageIdentifier = imagecontent['dc:identifier']               
-                print (identifier, imageIdentifier)
                 self.imagelist_image_add(identifier, imageIdentifier)
                 for key in imagecontent.keys():
                     if key in ['dc:identifier']:
