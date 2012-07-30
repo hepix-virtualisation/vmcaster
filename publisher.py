@@ -58,6 +58,27 @@ def uglyUriParser(uri):
             "port" : parsedUri.port,
         }
 
+def uglyUriBuilder(components):
+    if not isinstance(components, dict):
+        #We only process dictionaries
+        return None
+    if not 'scheme' in components:
+        #Need the protocol
+        return None
+    if not 'hostname' in components:
+        #Need the hostname
+        return None
+    output = "%s://%s" % (components['scheme'],components['hostname'])
+    if 'port' in components:
+        output += ":%s" % (components['port'])
+    if 'path' in components:
+        output +=  "/%s" % (components['path'])
+    return output
+    
+        
+        
+    
+
 
 def checkVoms(requiredExtensions = set([])):
     log = logging.getLogger("vomscheck")
@@ -467,18 +488,15 @@ def main():
             log.error("No matching image list found")
             sys.exit(45)
         ThisImageListUuid = str(listOfImagelists[0])
-        print 'sssssssssssss',ThisImageListUuid 
-        #ThisImageListUuid = '9b6fad19-d913-4cca-b77d-c4b4fcd9dc36'
         uri = imagepub.imagelist_key_get(ThisImageListUuid,"hv:uri")
-        print uri
         parsedUri = uglyUriParser(uri)
-        print parsedUri
+        
         mytempdir = tempfile.mkdtemp()
         tmpfilePath = os.path.join(mytempdir,"uncompressed")
         shutil.copyfile(imageFileLocal,tmpfilePath )
         rc,output = commands.getstatusoutput('gzip %s' % tmpfilePath)
         if rc != 0 :
-            print output
+            log.error(output)
             sys.exit(1)
         combinedNamesList = []
         for filename in os.listdir(mytempdir):
@@ -494,7 +512,10 @@ def main():
             sys.exit(1)
         imageName = combinedNamesList[0]
         localPath = os.path.join(mytempdir,imageName)
-        uploadpath = os.path.join("images" , imageUuid)
+        curtime = datetime.datetime.utcnow()
+        imageName = "%s_%s.img" % (imageUuid,curtime.strftime("%Y-%M-%d_%H-%m-%S"))
+        uploadpath = os.path.join("images" , imageName)
+        parsedUri['path'] = uploadpath
         timeout = 10000
         uploader = hostUploader(dishCfg)
         uploader.replaceFile(localPath,parsedUri['hostname'],uploadpath)
@@ -512,6 +533,11 @@ def main():
         imagepub.image_key_update(imageUuid, "hv:version",versionNew)
         
         
+        
+        
+        uri = uglyUriBuilder(parsedUri)
+        
+        imagepub.image_key_update(imageUuid,  "hv:uri", uri)
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
         try:
@@ -562,3 +588,4 @@ def main():
         
 if __name__ == "__main__":
     main()
+    
