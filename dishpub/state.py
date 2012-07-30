@@ -367,14 +367,25 @@ class imagelistpub:
             output.append(str(item.identifier))
         return output
                 
-        
-    def image_key_update(self,imageListUuid, imageUuid ,image_key, image_value):
+    def image_key_get(self,imageUuid,image_key):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Imagelist).\
-                filter(model.Imagelist.identifier == imageListUuid)
+        query_imagelists = Session.query(model.ImageMetadata).\
+                filter(model.Image.identifier == imageUuid).\
+                filter(model.Image.id == model.ImageMetadata.fkImage).\
+                filter(model.ImageMetadata.key == image_key)
+                
         if query_imagelists.count() == 0:
-            self.log.warning('No imagelists found')
+            self.log.warning('No image meta data found found')
             return None
+        if query_imagelists.count() > 1:
+            self.log.warning('To  much image metadata found')
+            return None
+        outputRow = query_imagelists.one()
+        return str(outputRow.value)
+        
+    def image_key_update(self, imageUuid ,image_key, image_value):
+        Session = self.SessionFactory()
+        
         query_image = Session.query(model.Image).\
                 filter(model.Image.identifier == imageUuid)
         if query_image.count() == 0:
@@ -383,7 +394,6 @@ class imagelistpub:
             return None
         query_image_metadata = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
-                filter(model.Imagelist.identifier == imageListUuid).\
                 filter(model.Imagelist.id == model.Image.fkImageList).\
                 filter(model.Image.id == model.ImageMetadata.fkImage).\
                 filter(model.ImageMetadata.key == image_key)

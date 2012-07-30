@@ -504,12 +504,12 @@ def main():
         for line in open(localPath,'r'):
             filelength += len(line)
             m.update(line)
-        imagepub.image_key_update(ThisImageListUuid,imageUuid,u'hv:size',filelength)
-        imagepub.image_key_update(ThisImageListUuid,imageUuid,u'sl:checksum:sha512',m.hexdigest())
+        imagepub.image_key_update(imageUuid,u'hv:size',filelength)
+        imagepub.image_key_update(imageUuid,u'sl:checksum:sha512',m.hexdigest())
         
-        versionOld = imagepub.image_key_get(ThisImageListUuid,imagelistUUID, "hv:version")
+        versionOld = imagepub.image_key_get(imageUuid, "hv:version")
         versionNew = bumpVersion(versionOld)
-        imagepub.image_key_update(ThisImageListUuid,imageUuid, "hv:version",versionNew)
+        imagepub.image_key_update(imageUuid, "hv:version",versionNew)
         
         
     if 'imagelist_import_json' in actions:
