@@ -557,6 +557,20 @@ def main():
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
         versionNew = bumpVersion(versionOld)
         imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
+        
+        now = datetime.datetime.utcnow()
+        servicelength = datetime.timedelta(weeks=4)
+        expiry = now + servicelength
+        time_format_definition = "%Y-%m-%dT%H:%M:%SZ"
+        dateNow = now.strftime(time_format_definition)
+        dateExpires = expiry.strftime(time_format_definition)
+        imagepub.imagelist_key_update(imagelistUUID, "dc:date:created",dateNow)
+        imagepub.imagelist_key_update(imagelistUUID, "dc:date:expires",dateExpires)
+        
+        imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
+        
+        
+        
         uri = imagepub.imagelist_key_get(imagelistUUID,"hv:uri")
         parsedUri = uglyUriParser(uri)
         mytempdir = tempfile.mkdtemp()
