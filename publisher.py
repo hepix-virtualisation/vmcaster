@@ -478,7 +478,7 @@ def main():
         imagepub.imagelist_image_add(imagelistUUID,image_key)
         return
     if 'image_key_update' in actions:
-        imagepub.image_key_update(imagelistUUID, imageUuid ,image_key, image_key_value)
+        imagepub.image_key_update(imageUuid ,image_key, image_key_value)
 
     if 'image_keys' in actions:
         imagepub.image_keys(imagelistUUID, imageUuid)

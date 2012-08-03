@@ -451,7 +451,7 @@ class imagelistpub:
                 for key in imagecontent.keys():
                     if key in ['dc:identifier']:
                         continue
-                    self.image_key_update(identifier, imageIdentifier ,key,imagecontent[key] )
+                    self.image_key_update( imageIdentifier ,key,imagecontent[key] )
         if 'hv:endorser' in content.keys():
             # make endorsers a list under all cases.
             endorsersAll = [content['hv:endorser']]
