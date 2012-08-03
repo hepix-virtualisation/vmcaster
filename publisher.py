@@ -513,7 +513,7 @@ def main():
         imageName = combinedNamesList[0]
         localPath = os.path.join(mytempdir,imageName)
         curtime = datetime.datetime.utcnow()
-        imageName = "%s_%s.img" % (imageUuid,curtime.strftime("%Y-%M-%d_%H-%m-%S"))
+        imageName = "%s_%s.img.gz" % (imageUuid,curtime.strftime("%Y-%M-%d_%H-%m-%S"))
         uploadpath = os.path.join("images" , imageName)
         parsedUri['path'] = uploadpath
         timeout = 10000
