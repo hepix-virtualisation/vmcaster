@@ -493,8 +493,9 @@ def main():
         
         mytempdir = tempfile.mkdtemp()
         tmpfilePath = os.path.join(mytempdir,"uncompressed")
-        shutil.copyfile(imageFileLocal,tmpfilePath )
-        rc,output = commands.getstatusoutput('gzip %s' % tmpfilePath)
+        #shutil.copyfile(imageFileLocal,tmpfilePath )
+        cmd = ('cat imageFileLocal | gzip -c > %s.gz' % tmpfilePath)
+        rc,output = commands.getstatusoutput('cat %s | gzip -c > %s.gz' % (imageFileLocal,tmpfilePath))
         if rc != 0 :
             log.error(output)
             sys.exit(1)
