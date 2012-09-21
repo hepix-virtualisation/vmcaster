@@ -1,6 +1,7 @@
 # Makes things in right format.
 
-import ConfigParser, os
+import ConfigParserJson, os
+
 import logging
 import uploader
 
@@ -23,31 +24,31 @@ class InputError(Error):
 class hostUploader:
     def __init__(self,cfgFile):
         self.log = logging.getLogger("hostUploader")
-        self.config = ConfigParser.ConfigParser()
+        self.config = ConfigParserJson.ConfigParser()
         self.config.read(cfgFile)
         self.allHosts = {}
         for section in self.config.sections():
             writeProto = None
             if self.config.has_option(section, 'writeprotocol'):
-                writeProto = self.config.get(section,'writeprotocol')
+                writeProto = self.config.getJson(section,'writeprotocol')
             else:
                 self.log.error("Section '%s' is missing a 'writeprotocol' config setting." % (section))
                 continue
             serverName = None
             if self.config.has_option(section, 'server'):
-                serverName = self.config.get(section,'server')
+                serverName = self.config.getJson(section,'server')
             else:
                 self.log.error("Section '%s' is missing a 'server' config setting." % (section))
                 continue
             writePrefix = None
             if self.config.has_option(section, 'writeprefix'):
-                writePrefix = self.config.get(section,'writeprefix')
+                writePrefix = self.config.getJson(section,'writeprefix')
             else:
                 self.log.error("Section '%s' is missing a 'writeprefix' config setting." % (section))
                 continue
             readPrefix = None
             if self.config.has_option(section, 'readprefix'):
-                readPrefix = self.config.get(section,'readprefix')
+                readPrefix = self.config.getJson(section,'readprefix')
             else:
                 self.log.error("Section '%s' is missing a 'readprefix' config setting." % (section))
                 continue
