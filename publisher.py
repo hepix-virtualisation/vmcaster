@@ -556,6 +556,9 @@ def main():
     if 'imagelist_upload' in actions:
         
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
+        if versionOld == None:
+            log.error("Image list has not attribute 'hv:version', image upload aborted.")
+            sys.exit(20)
         versionNew = bumpVersion(versionOld)
         imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
         
@@ -573,6 +576,9 @@ def main():
         
         
         uri = imagepub.imagelist_key_get(imagelistUUID,"hv:uri")
+        if uri == None:
+            log.error("Image list has no attribute 'hv:uri', image upload aborted.")
+            sys.exit(20)
         parsedUri = uglyUriParser(uri)
         mytempdir = tempfile.mkdtemp()
         tmpfilePath = os.path.join(mytempdir,"signed_file")
