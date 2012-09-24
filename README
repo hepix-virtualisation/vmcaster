@@ -1,3 +1,10 @@
+This software is not yet feature complete.
+
+Vmcaster is a simple tool for managing and updating your published image lists.
+It is based on a simple sql database, typically sqllight for storing image lists
+and facard of uploaders so that image list updates can be done in a transfer 
+protocol neutral way.
+
 First get a image list:
 
 wget https://dish.desy.de:2880/testing.smime  --no-check-certificate
