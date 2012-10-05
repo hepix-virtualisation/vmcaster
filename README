@@ -1,5 +1,3 @@
-This software is not yet feature complete.
-
 Vmcaster is a simple tool for managing and updating your published image lists.
 It is based on a simple sql database, typically sqllight for storing image lists
 and facard of uploaders so that image list updates can be done in a transfer 
@@ -32,8 +30,8 @@ INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 7b1aea46-8776-4447-9450-00e720fc042c
 
 
-Endorser management
-~~~~~~~~~~~~~~~~~~~
+Basic image list management
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 List endortsers,
 
@@ -43,28 +41,42 @@ Show JSON for endorsers.
 
    python publisher.py   --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'  --endorser-show
 
-Add endorser 
+Create an endorser 
 
-python publisher.py   --imagelist-add        --endorser ting
+   python publisher.py  --endorser-add "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
-Addd Key pair for endorser.
+Add Key pair for endorser.
 
-python publisher.py    --endorser ting  --endorser-key-update 'hv:email' --endorser-value 'owen.synge@desy.de'
+   python publisher.py    --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  \
+      --endorser-key-set 'hv:email' --endorser-value 'owen.synge@desy.de' 
+
+Create an image list.
+
+   python publisher.py  --imagelist-add e38a3fd2-0ed8-11e2-873a-001cc0beb420
+
+To display your image list.
+
+   python publisher.py    --imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  --imagelist-show
 
 Binding endorser to an imagelist
 
-    python publisher.py   --connect --endorser ting  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+   python publisher.py   --connect --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 
 Unbinding endorser to an imagelist
 
-    python publisher.py    --disconnect  --endorser ting  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+   python publisher.py    --disconnect  --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+
+
+Add attributes to an image list
+
+   python publisher.py    --imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
+      --imagelist-key-set "dc:description"  \
+      --imagelist-value  "DESY Image List SHaring service" 
 
 
 To delete an Image:
-~~~~~~~~~~~~~~~~~~
 
-python publisher.py  --imagelist-del   --imagelist  9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
-INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
+   python publisher.py  --imagelist-del   --imagelist  9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 
 
 
