@@ -1,0 +1,15 @@
+[x61]
+server = localhost
+writeprotocol = local
+readprefix = https://x61.yokel.org:2880/
+writeprefix = /tmp/tonggoo
+
+
+[dish.desy.de]
+server = dish.desy.de
+writeprotocol = gsidcap
+readprefix = https://dish.desy.de:2880/
+writeprefix = gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/
+
+
+
