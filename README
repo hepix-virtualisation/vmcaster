@@ -1,7 +1,14 @@
 Vmcaster is a simple tool for managing and updating your published image lists.
 It is based on a simple sql database, typically sqllight for storing image lists
-and facard of uploaders so that image list updates can be done in a transfer 
+and facade of up loaders so that image list updates can be done in a transfer 
 protocol neutral way.
+
+vmcaster was designed with the realization that users typically create new 
+virtual machines images rarely but update them frequently. Most other tools 
+for marking up image lists don't minimize the amount of data entry for 
+updates. vmcaster attempts to be the first of a new generation of image 
+list publishers.
+
 
 First get a image list:
 
@@ -33,7 +40,7 @@ INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 Basic image list management
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-List endortsers,
+List endorsers,
 
    python publisher.py  --endorser-list
 
@@ -93,7 +100,7 @@ python publisher.py \
 What it should do. 
 Check user is in database, 
 Compresses file, 
-uplaods it, 
+uploads it, 
 bumps the image version number in the database.
 
 
@@ -101,7 +108,7 @@ python publisher.py  --endorser-show    --endorser '/C=DE/O=GermanGrid/OU=DESY/C
 {'hv:email': 'owen.synge@desy.de', 'dc:creator': 'Owen Synge', 'hv:ca': '/C=DE/O=GermanGrid/CN=GridKa-CA', 'hv:dn': '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'}
 
 
-Shows the image list as it woudl be made.
+Shows the image list as it would be made.
 
 
 python publisher.py  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
