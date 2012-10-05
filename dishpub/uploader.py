@@ -2,6 +2,9 @@
 import types
 import dishpub.uploader_dcap as uploaderDcap
 
+from uploader_scp import uploaderScp
+
+
 def Property(func):
     return property(**func())
 
@@ -46,6 +49,8 @@ class uploaderFacade(object):
             self._uploader = name
             if name == "gsidcap":
                 self._uploaderImp = uploaderDcap.uploaderDcap()
+            elif name == "scp":
+                self._uploaderImp = uploaderScp()
             else:
                 del(self._uploaderImp)
             if hasattr(self, '_uploaderImp'):
