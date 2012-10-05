@@ -1,6 +1,7 @@
 # Makes things in right format.
 
-import ConfigParserJson, os
+from  ConfigParserJson import jsonConfigParser as ConfigParser
+import os
 
 import logging
 import uploader
@@ -24,7 +25,7 @@ class InputError(Error):
 class hostUploader:
     def __init__(self,cfgFile):
         self.log = logging.getLogger("hostUploader")
-        self.config = ConfigParserJson.ConfigParser()
+        self.config = ConfigParser()
         self.config.read(cfgFile)
         self.allHosts = {}
         for section in self.config.sections():
@@ -70,7 +71,6 @@ class hostUploader:
     def uploadFile(self,localPath,remoteHost,remotePath):
         if not remoteHost in self.allHosts:
             raise InputError("Host '%s' is not known" % remoteHost)
-        
         if not os.path.isfile(localPath):
             raise InputError("file not found at localpath '%s'" % localPath)
         u1 = uploader.uploaderFacade()
