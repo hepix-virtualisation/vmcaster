@@ -36,6 +36,10 @@ import urlparse
 import M2Crypto.SMIME
 import M2Crypto.BIO
 import M2Crypto.SMIME
+
+
+
+
 def uglyUriParser(uri):
     parsedUri = urlparse.urlsplit(uri)
     if isinstance(parsedUri, tuple):
@@ -218,7 +222,7 @@ def main():
     endorserValueReq = False
     
     imageFileLocal = None
-    dishCfg = 'publisher.cfg'
+    dishCfg = 'vmcaster.cfg'
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -604,7 +608,11 @@ def main():
         fp.write(message_signed)
         fp.close()
         uploader = hostUploader(dishCfg)
-        uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
+        try:
+            uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
+        except dishpub.process.InputError, E:
+            log.error(E.msg)
+            sys.exit(21)
         uploader.replaceFile(tmpfilePath,parsedUri['hostname'],parsedUri['path'])
         
 if __name__ == "__main__":
