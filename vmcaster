@@ -180,7 +180,7 @@ def main():
     p.add_option('--image-show', action ='store_true',help='Show image metadata.')    
     p.add_option('--image-list', action ='store_true',help='list Images.')    
     p.add_option('--image-add', action ='store',help='Image create.')
-    p.add_option('--image-del', action ='store',help='Image delete.')
+    p.add_option('--image-del', action ='store_true',help='Image delete.')
 
     # Key value pairs to add to an image
     
@@ -359,6 +359,15 @@ def main():
         actions.add('image_add')
         image_req = True
         image_key = options.image_add
+        
+        
+    if options.image_del:
+        actions.add('image_del')
+        image_req = True
+    
+    if options.image_show:
+        actions.add('image_show')
+        image_req = True
     
     if options.image_keys:
         actions.add('image_keys')
@@ -493,6 +502,15 @@ def main():
     if 'image_add' in actions:
         imagepub.imagelist_image_add(imagelistUUID,image_key)
         return
+    if 'image_show' in actions:
+        log.error("not implemented")
+        return
+    if 'image_del' in actions:
+        log.error("not implemented")
+        return
+    
+    
+    
     if 'image_key_update' in actions:
         imagepub.image_key_update(imageUuid ,image_key, image_key_value)
 
