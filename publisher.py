@@ -38,6 +38,7 @@ import M2Crypto.BIO
 import M2Crypto.SMIME
 
 
+import optparse
 
 
 def uglyUriParser(uri):
@@ -222,6 +223,11 @@ def main():
     endorserValueReq = False
     
     imageFileLocal = None
+    
+    signingPathDefaultKey = None
+    signingPathDefaultCert = None
+    signingPathHome = None
+    
     dishCfg = 'vmcaster.cfg'
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
@@ -230,6 +236,12 @@ def main():
         databaseConnectionString = os.environ['VMILS_RDBMS']
     if 'DISH_CFG' in os.environ:
         dishCfg = os.environ['DISH_CFG']
+    if 'DISH_CERT' in os.environ:
+        signingPathDefaultCert = os.environ['DISH_CERT']
+    if 'DISH_KEY' in os.environ:
+        signingPathDefaultKey = os.environ['DISH_KEY']
+    if 'HOME' in os.environ:
+        signingPathHome = os.environ['HOME']
     
     
     # Set up log file
@@ -404,7 +416,7 @@ def main():
             sys.exit(1)
     
     if not os.path.isfile(dishCfg):
-        log.error("Configuration file '%s'" % dishCfg)
+        log.error("Configuration file '%s' was not found." % dishCfg)
         sys.exit(1)
     
     # now do the work.
@@ -558,11 +570,39 @@ def main():
         imagepub.importer(candidate)
         
     if 'imagelist_upload' in actions:
+        signer_key = "/home/omsynge/.globus/userkey.pem"
+        signer_cert = "/home/omsynge/.globus/usercert.pem"
+        signer_key = None
+        signer_cert = None
+        if signingPathDefaultCert != None:
+            signer_cert = signingPathDefaultCert
+        if signingPathDefaultKey != None:
+            signer_key = signingPathDefaultKey
+        if (signer_key == None) and (signingPathHome != None):
+            defaultKey = ".globus/userkey.pem"
+            signer_key = os.path.join(signingPathHome,defaultKey)
+        if (signer_cert == None) and (signingPathHome != None):
+            defaultCert = ".globus/usercert.pem"
+            signer_cert = os.path.join(signingPathHome,defaultCert)
+        if (signer_key == None):
+            log.error("Cannot find a path to try to find the key to sign imagelist.")
+            sys.exit(22)
+        if (signer_cert == None):
+            log.error("Cannot find a path to try to find the cerificate to check the signature of your signed imagelist.")
+            sys.exit(23)
+        
+        if not os.path.isfile(signer_key):
+            log.error("Cannot find a the key to signed imagelists when looking here '%s'." % (signer_key))
+            sys.exit(24)
+        
+        if not os.path.isfile(signer_cert):
+            log.error("Cannot find a the certificate to verify the signed imagelist when looking here '%s'." % (signer_cert))
+            sys.exit(25)
         
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
         if versionOld == None:
             log.error("Image list has not attribute 'hv:version', image upload aborted.")
-            sys.exit(20)
+            sys.exit(26)
         versionNew = bumpVersion(versionOld)
         imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
         
@@ -588,8 +628,7 @@ def main():
         tmpfilePath = os.path.join(mytempdir,"signed_file")
         
         smime = M2Crypto.SMIME.SMIME()
-        signer_key = "/home/omsynge/.globus/userkey.pem"
-        signer_cert = "/home/omsynge/.globus/usercert.pem"
+        
         
         smime.load_key(signer_key,signer_cert)
         fp = open(str(tmpfilePath),'w')
