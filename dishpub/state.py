@@ -473,4 +473,9 @@ class imagelistpub:
                         continue
                     value = endorserDetails[key]
                     self.endorserMetadataUpdate(endorserSubject,key,value)
+        for key in content.keys():
+            if key in ['hv:endorser' , 'hv:images' ,'dc:identifier']:
+                continue
+            value = content[key]
+            self.imagelist_key_update(identifier,key,value)
         return True        
