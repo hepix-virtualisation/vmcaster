@@ -11,7 +11,6 @@ import os.path
 import logging
 import optparse
 from vmcasterpub.__version__ import version
-import dishpub
 import urllib2
 import urllib
 import hashlib
@@ -228,7 +227,9 @@ def main():
     signingPathDefaultCert = None
     signingPathHome = None
     
-    dishCfg = 'vmcaster.cfg'
+    
+    
+    dishCfg = None
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -395,6 +396,7 @@ def main():
     
     
     
+    
     actionsLen = len(actions)
     if actionsLen == 0:
         log.error('No actions added')
@@ -423,7 +425,13 @@ def main():
         if endorserSub == None:
             log.error('Endorser subject is needed')
             sys.exit(1)
-    
+    if dishCfg == None:
+        dishCfg = os.path.join(signingPathHome,".vmcaster.cfg")
+        if not os.path.isfile(dishCfg):
+            dishCfg = "/etc/vmcaster/vmcaster.cfg"
+            
+        
+
     if not os.path.isfile(dishCfg):
         log.error("Configuration file '%s' was not found." % dishCfg)
         sys.exit(1)
