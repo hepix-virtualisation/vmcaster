@@ -182,26 +182,33 @@ def main():
     
     p.add_option('--del-imagelist', action ='store_true',help='Imagelist delete. This option requires an "imagelist" selection.')
     p.add_option('--del-image', action ='store_true',help='Image delete. This option requires an "image" selection.')
-    p.add_option('--del-endorser', action ='store',help='Endorser delete .')
+    p.add_option('--del-endorser', action ='store',help='Endorser delete.')
     
-    p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind Endorser to imagelist.')
-    p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind Endorser to imagelist.')
+    p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind Endorser to imagelist. This option requires an "imagelist" and an "endorser" selection.')
+    p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind Endorser to imagelist. This option requires an "imagelist" and an "endorser" selection.')
     
-    p.add_option('--keys-endorser', action ='store',help='List endorser metadata keys.')
-    p.add_option('--keys-imagelist', action ='store_true',help='List imagelist metadata keys.')
-    p.add_option('--keys-image', action ='store_true',help='List image metadata keys.')
+    p.add_option('--keys-imagelist', action ='store_true',help='List imagelist metadata keys. . This option requires an "image" selection.')
+    p.add_option('--keys-image', action ='store_true',help='List image metadata keys. This option requires an "image" selection.')
+    p.add_option('--keys-endorser', action ='store',help='List endorser metadata keys. This option requires an "endorser" selection.')
+    
 
-    p.add_option('--key-set-endorser', action ='store',help='Endorser metadata key to create/overwrite.')
-    p.add_option('--key-set-imagelist', action ='store',help='Imagelist metadata key to create/overwrite.')
-    p.add_option('--key-set-image', action ='store',help='Image metadata key to create/overwrite.')
+    p.add_option('--key-set-endorser', action ='store',help="""Endorser metadata key to create/overwrite. 
+As Guidence Keys should follow a pattern of "namespace:type".
+This option requires an "endorser" selection and a "--key-value-endorser" """)
+    p.add_option('--key-set-imagelist', action ='store',help="""Imagelist metadata key to create/overwrite.
+As Guidence Keys should follow a pattern of "namespace:type".
+This option requires an "imagelist" selection and a "--key-value-imagelist" paramer.""")
+    p.add_option('--key-set-image', action ='store',help="""Image metadata key to create/overwrite.
+As Guidence Keys should follow a pattern of "namespace:type".
+This option requires an "image" selection and a "--key-value-image" paramer.""")
     
-    p.add_option('--key-del-endorser', action ='store_true',help='Endorser metadata key to delete.')
-    p.add_option('--key-del-imagelist', action ='store',help='Imagelist metadata key to delete.')
-    p.add_option('--key-del-image', action ='store',help='Image metadata key to delete.')
+    p.add_option('--key-del-imagelist', action ='store',help='Imagelist metadata key to delete. This option requires an "image" selection.')
+    p.add_option('--key-del-image', action ='store',help='Image metadata key to delete. This option requires an "image" selection.')
+    p.add_option('--key-del-endorser', action ='store_true',help='Endorser metadata key to delete. This option requires an "endorser" selection.')
     
-    p.add_option('--key-value-endorser', action ='store',help='Endorser metadata value to set.')
-    p.add_option('--key-value-imagelist', action ='store',help='Imagelist metadata value to set.')
-    p.add_option('--key-value-image', action ='store',help='Image metadata value to set.')
+    p.add_option('--key-value-imagelist', action ='store',help='Imagelist metadata value to set. This option requires an "imagelist" selection and a "--key-set-imagelist" paramer.')
+    p.add_option('--key-value-image', action ='store',help='Image metadata value to set. This option requires an "image" selection and a "--key-set-image" paramer.')
+    p.add_option('--key-value-endorser', action ='store',help='Endorser metadata value to set.This option requires an "endorser" selection and a "--key-set-endorser" paramer.')
     
     
     

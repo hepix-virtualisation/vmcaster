@@ -216,9 +216,10 @@ class imagelistpub:
         query_imagelist_images = Session.query(model.Image).\
                 filter(model.Image.identifier == UUID )
         count = query_imagelist_images.count()
-        outModel = {}
+        
+        imagesarray = []
         if query_imagelist_images.count() > 0:
-            imagesarray = []
+            
             for image in query_imagelist_images:
                 imagemetadata = {u"dc:identifier" : str(image.identifier)}
                 query_imageMetadata = Session.query(model.ImageMetadata).\
@@ -229,9 +230,8 @@ class imagelistpub:
                         imagemetadata[imageItem.key] = int(imageItem.value)
                     else:
                         imagemetadata[imageItem.key] = imageItem.value
-                imagesarray.append({u'hv:image' : imagemetadata})
-            outModel[u'hv:images'] = imagesarray
-        return outModel
+                return imagemetadata
+        return None
         
         
     def imageListShow(self,UUID):
