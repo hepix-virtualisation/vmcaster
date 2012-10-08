@@ -125,7 +125,30 @@ specializes in storing very large quantities of data at the lowest price possibl
 This is another example of a configuration section that is updated using the scp protocol,
 rather than the "gsidcap" protocol previously described.
 
+Enviroment Variables.
+~~~~~~~~~~~~~~~~~~~~~
 
+* HOME *
+
+Used as a prefix for configuration fiels and certificates.
+
+* DISH_KEY *
+
+Path to the private key for the signing of image lists.
+
+* DISH_CERT *
+
+Path to the certificate for the signing of image lists.
+
+* DISH_CFG *
+
+Path to the configuration file for vmcaster.
+
+* DISH_RDBMS *
+
+Sqllight based connection string, Typically defaulting to 'sqlite:///dish.db'.
+This URL refures to the current workign directory, to use an absolute path with 
+sqllight, add an extra slash to the URL like syntax.
 
 To update an Image:
 ~~~~~~~~~~~~~~~~~~~
