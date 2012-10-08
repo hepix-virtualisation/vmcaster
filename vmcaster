@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 import sys
 
-import dishpub.dishpubdb as model
-import dishpub.state as dishpubstate
-import dishpub.uploader as uploader
-from dishpub.versioning import bumpVersion
-from dishpub.process import hostUploader 
+import vmcasterpub.dishpubdb as model
+import vmcasterpub.state as dishpubstate
+import vmcasterpub.uploader as uploader
+from vmcasterpub.versioning import bumpVersion
+from vmcasterpub.process import hostUploader 
 
 import os.path
 import logging
 import optparse
-from dishpub.__version__ import version
+from vmcasterpub.__version__ import version
 import dishpub
 import urllib2
 import urllib
@@ -667,7 +667,7 @@ def main():
         uploader = hostUploader(dishCfg)
         try:
             uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
-        except dishpub.process.InputError, E:
+        except vmcasterpub.process.InputError, E:
             log.error(E.msg)
             sys.exit(21)
         uploader.replaceFile(tmpfilePath,parsedUri['hostname'],parsedUri['path'])
