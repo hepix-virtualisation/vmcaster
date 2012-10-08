@@ -367,22 +367,21 @@ class imagelistpub:
         Session.add(newimage)
         Session.commit()        
         return True
-    def imagelist_image_delete(self,imageListUuid,ImageUUID):
+
+    def imagelist_image_delete(self,ImageUUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Image).\
-                filter(model.Imagelist.identifier == imageListUuid).\
-                filter(model.Image.identifier == ImageUUID)
+               filter(model.Image.identifier == ImageUUID)
         NoItems = True
         for item in query_imagelists:
             NoItems = False
-            session.delete(item)
+            Session.delete(item)
         if not NoItems:
-            session.commit()
+            Session.commit()
             return True
         else:
             self.log.info("No items deleted")
         return False
-        
                 
     def imageList(self):
         output = []
@@ -391,7 +390,6 @@ class imagelistpub:
         for item in query_image:
             output.append(str(item.identifier))
         return output
-    
     
     def image_get_imagelist(self,imageUuid):
         Session = self.SessionFactory()
@@ -402,14 +400,14 @@ class imagelistpub:
         for item in query_imagelists:
             output.append(str(item.identifier))
         return output
-                
+
     def image_key_get(self,imageUuid,image_key):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
                 filter(model.Image.id == model.ImageMetadata.fkImage).\
                 filter(model.ImageMetadata.key == image_key)
-                
+
         if query_imagelists.count() == 0:
             self.log.warning('No image meta data found found')
             return None

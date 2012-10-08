@@ -141,60 +141,79 @@ def checkVoms(requiredExtensions = set([])):
 def main():
     """Runs program and handles command line options"""
     p = optparse.OptionParser(version = "%prog " + version)
-    p.add_option('-d', '--database', action ='store', help='Database conection string')
-    p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
-    p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
-    
-    p.add_option('--endorser', action ='store',help='Select endorser.', metavar='ENDORSER_UUID')
-    p.add_option('--endorser-show', action ='store_true',help='Write to stdout the endorser.')
-    p.add_option('--endorser-list', action ='store_true',help='Write to stdout the endorsers list.')
-    p.add_option('--endorser-add', action ='store',help='Endorser create.')
-    p.add_option('--endorser-del', action ='store',help='Endorser delete .')
-    
-    p.add_option('--endorser-keys', action ='store',help='List endorser metadata keys.')
-    p.add_option('--endorser-key-set', action ='store',help='Endorser metadata key to create/overwrite.')
-    p.add_option('--endorser-key-del', action ='store_true',help='Endorser metadata key to delete.')
-    p.add_option('--endorser-value', action ='store',help='Endorser metadata value to set.')
-    
-    p.add_option('--connect', action ='store_true',help='Bind Endorser to imagelist.')
-    p.add_option('--disconnect', action ='store_true',help='Unbind Endorser to imagelist.')
-    
-    p.add_option('--imagelist', action ='store',help='Select imagelist.', metavar='IMAGELIST_UUID')
-    p.add_option('--imagelist-upload', action ='store_true',help='Upload selected item.')
-    p.add_option('--imagelist-list', action ='store_true',help='Write to stdout the list images.')
-    p.add_option('--imagelist-add', action ='store_true',help='Imagelist create.')
-    p.add_option('--imagelist-del', action ='store_true',help='Imagelist delete.')
-    
-    p.add_option('--imagelist-show', action ='store_true',help='Write to stdout the selected imagelist.')
-    p.add_option('--imagelist-import-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
-    p.add_option('--imagelist-import-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
     
     # Key value pairs to add to an image
-    p.add_option('--imagelist-keys', action ='store_true',help='List imagelist metadata keys.')
-    p.add_option('--imagelist-key-set', action ='store',help='Imagelist metadata key to create/overwrite.')
-    p.add_option('--imagelist-key-del', action ='store',help='Imagelist metadata key to delete.')
-    p.add_option('--imagelist-value', action ='store',help='Imagelist metadata value to set.')
+
+
     
-    p.add_option('--image', action ='store',help='Select image by UUID', metavar='IMAGELIST_UUID')
-    p.add_option('--image-show', action ='store_true',help='Show image metadata.')    
-    p.add_option('--image-list', action ='store_true',help='list Images.')    
-    p.add_option('--image-add', action ='store',help='Image create.')
-    p.add_option('--image-del', action ='store_true',help='Image delete.')
+    
+    
+    
+    
 
     # Key value pairs to add to an image
     
-    p.add_option('--image-keys', action ='store_true',help='List image metadata keys.')
-    p.add_option('--image-key-set', action ='store',help='Image metadata key to create/overwrite.')
-    p.add_option('--image-key-del', action ='store',help='Image metadata key to delete.')
-    p.add_option('--image-value', action ='store',help='Image metadata value to set.')
-    
-    p.add_option('--image-upload', action ='store',help='Path to image.')
     
     
     
     
     
+    p.add_option('--list-imagelist', action ='store_true',help='list imageslists by "dc:identifier".')
+    p.add_option('--list-image', action ='store_true',help='list Images by "dc:identifier".')    
+    p.add_option('--list-endorser', action ='store_true',help='list Endorsers by "hv:dn".')
     
+    p.add_option('--import-imagelist-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
+    p.add_option('--import-imagelist-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
+        
+    p.add_option('--upload-image', action ='store',help='Path to image.')
+    p.add_option('--upload-imagelist', action ='store_true',help='Upload selected item.')
+    
+    p.add_option('--select-imagelist', action ='store',help='Select "imagelist" by "dc:identifier".', metavar='IMAGELIST_UUID')
+    p.add_option('--select-image', action ='store',help='Select "image" by "dc:identifier"', metavar='IMAGELIST_UUID')
+    p.add_option('--select-endorser', action ='store',help='Select "endorser" by "hv:dn".', metavar='ENDORSER_UUID')
+    
+    p.add_option('--show-imagelist', action ='store_true',help='Write json imagelist. This option requires an "imagelist" selection.')
+    p.add_option('--show-image', action ='store_true',help='Write json image metadata. This option requires an "image" selection.')        
+    p.add_option('--show-endorser', action ='store_true',help='Write json endorser metadata by "hv:dn". This option requires an "endorser" selection.')
+        
+    p.add_option('--add-imagelist', action ='store_true',help='Imagelist create. This option requires an "imagelist" selection.')
+    p.add_option('--add-image', action ='store',help='Image create.')
+    p.add_option('--add-endorser', action ='store',help='Endorser create.')
+    
+    p.add_option('--del-imagelist', action ='store_true',help='Imagelist delete. This option requires an "imagelist" selection.')
+    p.add_option('--del-image', action ='store_true',help='Image delete. This option requires an "image" selection.')
+    p.add_option('--del-endorser', action ='store',help='Endorser delete .')
+    
+    p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind Endorser to imagelist.')
+    p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind Endorser to imagelist.')
+    
+    p.add_option('--keys-endorser', action ='store',help='List endorser metadata keys.')
+    p.add_option('--keys-imagelist', action ='store_true',help='List imagelist metadata keys.')
+    p.add_option('--keys-image', action ='store_true',help='List image metadata keys.')
+
+    p.add_option('--key-set-endorser', action ='store',help='Endorser metadata key to create/overwrite.')
+    p.add_option('--key-set-imagelist', action ='store',help='Imagelist metadata key to create/overwrite.')
+    p.add_option('--key-set-image', action ='store',help='Image metadata key to create/overwrite.')
+    
+    p.add_option('--key-del-endorser', action ='store_true',help='Endorser metadata key to delete.')
+    p.add_option('--key-del-imagelist', action ='store',help='Imagelist metadata key to delete.')
+    p.add_option('--key-del-image', action ='store',help='Image metadata key to delete.')
+    
+    p.add_option('--key-value-endorser', action ='store',help='Endorser metadata value to set.')
+    p.add_option('--key-value-imagelist', action ='store',help='Imagelist metadata value to set.')
+    p.add_option('--key-value-image', action ='store',help='Image metadata value to set.')
+    
+    
+    
+    
+    
+    p.add_option('-d', '--database', action ='store', help='Database conection string, Defaults to "sqlite:///dish.db"')
+    p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
+    p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
+    
+    
+    
+        
     options, arguments = p.parse_args()
     
     # Set up basic variables
@@ -263,132 +282,129 @@ def main():
     # Now process command line
     actions = set([])
     
-    if options.endorser:
-        endorserSub = options.endorser
+    if options.select_endorser:
+        endorserSub = options.select_endorser
 
-    if options.endorser:
-        endorserSub = options.endorser
-
-    if options.endorser_list:
+    if options.list_endorser:
         actions.add('endorser_list')
         
-    if options.endorser_show:
+    if options.show_endorser:
         actions.add('endorser_show')
         endorser_req = True
         
-    if options.endorser_add:
+    if options.add_endorser:
         actions.add('endorser_add')
-        endorserSub = options.endorser_add
+        endorserSub = add_options.endorser
 
-    if options.endorser_del:
+    if options.del_endorser:
         actions.add('endorser_del')
-        endorserSub = options.endorser_del
+        endorserSub = options.del_endorser
 
-    if options.endorser_key_set:
+    if options.key_set_endorser:
         actions.add('endorser_key_set')
-        endorserKey = options.endorser_key_set
+        endorserKey = options.key_set_endorser
         
-    if options.endorser_key_del:
+    if options.key_del_endorser:
         actions.add('endorser_key_del')
         endorser_req = True
 
-    if options.endorser_value:
-        endorserValue = options.endorser_value
+    if options.key_value_endorser:
+        endorserValue = options.key_value_endorser
         endorser_req = True
-    if options.connect:
+    if options.imagelist_add_endorser:
         endorser_req = True
         imagelist_req = True
         actions.add('connect')
-    if options.disconnect:
+    if options.imagelist_del_endorser:
         endorser_req = True
         imagelist_req = True
         actions.add('disconnect')
     
-    if options.imagelist:
-        imagelistUUID = options.imagelist
-    if options.imagelist_list:
+    if options.select_imagelist:
+        imagelistUUID = options.select_imagelist
+    if options.list_imagelist:
         actions.add('imagelist_list')
-    if options.imagelist_upload:
+    if options.upload_imagelist:
         actions.add('imagelist_upload')
         imagelist_req = True
-    if options.imagelist_add:
+    if options.add_imagelist:
         actions.add('imagelist_add')
         imagelist_req = True
 
-    if options.imagelist_del:
+    if options.del_imagelist:
         actions.add('imagelist_del')
         imagelist_req = True
     
-    if options.imagelist_show:
+    if options.show_imagelist:
         actions.add('imagelist_show')
         imagelist_req = True
         
-    if options.imagelist_keys:
+    if options.keys_imagelist:
         actions.add('imagelist_keys')
         imagelist_req = True
         
-    if options.imagelist_key_set:
+    if options.key_set_imagelist:
         actions.add('imagelist_key_update')
         imagelist_req = True
         imagelist_key_value_add_req = True
-        imagelist_key = options.imagelist_key_set
-    if options.imagelist_key_del:
+        imagelist_key = options.key_set_imagelist
+    if options.key_del_imagelist:
         actions.add('imagelist_key_del')
         imagelist_req = True
-        imagelist_key = options.imagelist_key_del
+        imagelist_key = options.key_del_imagelist
       
-    if options.imagelist_value:
+    if options.key_value_imagelist:
         actions.add('imagelist_key_update')
         imagelist_req = True
         imagelist_key_set_req = True
-        imagelist_key_value = options.imagelist_value
+        imagelist_key_value = options.key_value_imagelist
     
-    if options.imagelist_import_smime:
+    if options.import_imagelist_smime:
         actions.add('imagelist_import_smime')
         
-        imagelist_import_smime = options.imagelist_import_smime
-    if options.imagelist_import_json:
+        imagelist_import_smime = options.import_imagelist_smime
+    if options.import_imagelist_json:
         actions.add('imagelist_import_json')
         
-        imagelist_import_json = options.imagelist_import_json
-    if options.image_list:
+        imagelist_import_json = options.import_imagelist_json
+    if options.list_image:
         actions.add('image_list')
-    if options.image:
-        imageUuid = options.image
+    if options.select_image:
+        imageUuid = options.select_image
     
-    if options.image_add:
+    if options.add_image:
         actions.add('image_add')
         image_req = True
-        image_key = options.image_add
+        image_key = options.add_image
         
         
-    if options.image_del:
+    if options.del_image:
         actions.add('image_del')
         image_req = True
     
-    if options.image_show:
+    if options.show_image:
         actions.add('image_show')
         image_req = True
     
-    if options.image_keys:
+    if options.keys_image:
         actions.add('image_keys')
         imagelist_req = True
         image_req = True
 
-    if options.image_key_set:
+    if options.key_set_image:
         actions.add('image_key_update')
         image_req = True
         image_key_value_add_req = True
-        image_key = options.image_key_set
+        image_key = options.key_set_image
 
-    if options.image_value:
+    if options.key_value_image:
         actions.add('image_key_update')
         image_req = True
         image_key_req = True
-        image_key_value = options.image_value
-    if options.image_upload:
+        image_key_value = options.key_value_image
+    if options.upload_image:
         actions.add('image_upload')
-        imageFileLocal = options.image_upload
+        imageFileLocal = options.upload_image
     if options.database:
         databaseConnectionString = options.database
     if options.config_file:
@@ -508,7 +524,7 @@ def main():
         for item in images:
             print item
     if 'image_add' in actions:
-        imagepub.imagelist_image_add(imagelistUUID,image_key)
+        imagepub.imagelist_image_add(imagelistUUID,imageUuid)
         return
     if 'image_show' in actions:
         output = json.dumps(imagepub.imageShow(imageUuid),sort_keys=True, indent=4)
@@ -516,7 +532,7 @@ def main():
             print output
         
     if 'image_del' in actions:
-        imagepub.imagelist_image_delete(imagelistUUID,image_key)
+        imagepub.imagelist_image_delete(imageUuid)
         return
     
     
