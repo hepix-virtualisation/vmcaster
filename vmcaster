@@ -503,8 +503,10 @@ def main():
         imagepub.imagelist_image_add(imagelistUUID,image_key)
         return
     if 'image_show' in actions:
-        log.error("not implemented")
-        return
+        output = json.dumps(imagepub.imageShow(imageUuid),sort_keys=True, indent=4)
+        if output != None:
+            print output
+        
     if 'image_del' in actions:
         imagepub.imagelist_image_delete(imagelistUUID,image_key)
         return

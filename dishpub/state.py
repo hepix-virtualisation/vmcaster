@@ -212,7 +212,29 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
-
+    def imageShow(self,UUID):
+        Session = self.SessionFactory()
+        query_imagelist_images = Session.query(model.Image).\
+                filter(model.Image.identifier == UUID )
+        count = query_imagelist_images.count()
+        outModel = {}
+        if query_imagelist_images.count() > 0:
+            imagesarray = []
+            for image in query_imagelist_images:
+                imagemetadata = {u"dc:identifier" : str(image.identifier)}
+                query_imageMetadata = Session.query(model.ImageMetadata).\
+                    filter(model.Image.identifier ==  image.identifier).\
+                    filter(model.Image.id == model.ImageMetadata.fkImage)
+                for imageItem in query_imageMetadata:
+                    if imageItem.key in ["hv:size"]:
+                        imagemetadata[imageItem.key] = int(imageItem.value)
+                    else:
+                        imagemetadata[imageItem.key] = imageItem.value
+                imagesarray.append({u'hv:image' : imagemetadata})
+            outModel[u'hv:images'] = imagesarray
+        return outModel
+        
+        
     def imageListShow(self,UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
