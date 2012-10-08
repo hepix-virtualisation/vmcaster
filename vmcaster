@@ -506,7 +506,7 @@ def main():
         log.error("not implemented")
         return
     if 'image_del' in actions:
-        log.error("not implemented")
+        imagepub.imagelist_image_delete(imagelistUUID,image_key)
         return
     
     

@@ -346,6 +346,23 @@ class imagelistpub:
         Session.add(newimage)
         Session.commit()        
         return True
+    def imagelist_image_delete(self,imageListUuid,ImageUUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Image).\
+                filter(model.Imagelist.identifier == imageListUuid).\
+                filter(model.Image.identifier == ImageUUID)
+        NoItems = True
+        for item in query_imagelists:
+            NoItems = False
+            session.delete(item)
+        if not NoItems:
+            session.commit()
+            return True
+        else:
+            self.log.info("No items deleted")
+        return False
+        
+                
     def imageList(self):
         output = []
         Session = self.SessionFactory()
