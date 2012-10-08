@@ -213,7 +213,7 @@ class imagelistpub:
         Session.commit()
         return True
 
-    def imagesShow(self,UUID):
+    def imageListShow(self,UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
