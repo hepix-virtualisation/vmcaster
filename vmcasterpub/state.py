@@ -25,13 +25,12 @@ if sys.version_info < (2, 5):
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import dishpub.dishpubdb as model
+import vmcasterpub.dishpubdb as model
 
 import os.path
 import logging
 import optparse
-from dishpub.__version__ import version
-import dishpub
+from __version__ import version
 import urllib2
 import urllib
 import hashlib

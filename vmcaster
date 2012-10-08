@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 import sys
 
-import dishpub.dishpubdb as model
-import dishpub.state as dishpubstate
-import dishpub.uploader as uploader
-from dishpub.versioning import bumpVersion
-from dishpub.process import hostUploader 
+import vmcasterpub.dishpubdb as model
+import vmcasterpub.state as dishpubstate
+import vmcasterpub.uploader as uploader
+from vmcasterpub.versioning import bumpVersion
+from vmcasterpub.process import hostUploader 
 
 import os.path
 import logging
 import optparse
-from dishpub.__version__ import version
-import dishpub
+from vmcasterpub.__version__ import version
 import urllib2
 import urllib
 import hashlib
@@ -228,7 +227,9 @@ def main():
     signingPathDefaultCert = None
     signingPathHome = None
     
-    dishCfg = 'vmcaster.cfg'
+    
+    
+    dishCfg = None
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -395,6 +396,7 @@ def main():
     
     
     
+    
     actionsLen = len(actions)
     if actionsLen == 0:
         log.error('No actions added')
@@ -423,7 +425,13 @@ def main():
         if endorserSub == None:
             log.error('Endorser subject is needed')
             sys.exit(1)
-    
+    if dishCfg == None:
+        dishCfg = os.path.join(signingPathHome,".vmcaster.cfg")
+        if not os.path.isfile(dishCfg):
+            dishCfg = "/etc/vmcaster/vmcaster.cfg"
+            
+        
+
     if not os.path.isfile(dishCfg):
         log.error("Configuration file '%s' was not found." % dishCfg)
         sys.exit(1)
@@ -669,7 +677,7 @@ def main():
         uploader = hostUploader(dishCfg)
         try:
             uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
-        except dishpub.process.InputError, E:
+        except vmcasterpub.process.InputError, E:
             log.error(E.msg)
             sys.exit(21)
         uploader.replaceFile(tmpfilePath,parsedUri['hostname'],parsedUri['path'])

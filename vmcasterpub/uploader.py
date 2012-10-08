@@ -1,6 +1,6 @@
     
 import types
-import dishpub.uploader_dcap as uploaderDcap
+import uploader_dcap as uploaderDcap
 
 from uploader_scp import uploaderScp
 

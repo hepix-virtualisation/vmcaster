@@ -16,7 +16,7 @@ wget https://dish.desy.de:2880/testing.smime  --no-check-certificate
 
 Import it.
 
-   python publisher.py   --imagelist-import-smime testing.smime 
+   $ vmcaster   --imagelist-import-smime testing.smime 
 INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
@@ -25,13 +25,13 @@ WARNING:imagelistpub:making new.
 WARNING:imagelistpub:making new.
 
 
-   python publisher.py  --imagelist-list    
+   $ vmcaster  --imagelist-list    
 
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
 (u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
 
 
-$python publisher.py --image-list  
+$$ vmcaster --image-list  
 INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
 5f00fec3-4f2a-4fa0-a965-d52115606044
 7b1aea46-8776-4447-9450-00e720fc042c
@@ -42,57 +42,118 @@ Basic image list management
 
 List endorsers,
 
-   python publisher.py  --endorser-list
+   $ vmcaster  --endorser-list
 
 Show JSON for endorsers.
 
-   python publisher.py   --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'  --endorser-show
+   $ vmcaster   --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'  --endorser-show
 
 Create an endorser 
 
-   python publisher.py  --endorser-add "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
+   $ vmcaster  --endorser-add "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
 Add Key pair for endorser.
 
-   python publisher.py    --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  \
+   $ vmcaster    --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  \
       --endorser-key-set 'hv:email' --endorser-value 'owen.synge@desy.de' 
 
 Create an image list.
 
-   python publisher.py  --imagelist-add e38a3fd2-0ed8-11e2-873a-001cc0beb420
+   $ vmcaster  --imagelist-add e38a3fd2-0ed8-11e2-873a-001cc0beb420
 
 To display your image list.
 
-   python publisher.py    --imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  --imagelist-show
+   $ vmcaster    --imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  --imagelist-show
 
 Binding endorser to an imagelist
 
-   python publisher.py   --connect --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+   $ vmcaster   --connect --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 
 Unbinding endorser to an imagelist
 
-   python publisher.py    --disconnect  --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+   $ vmcaster    --disconnect  --endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 
 
 Add attributes to an image list
 
-   python publisher.py    --imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
+   $ vmcaster    --imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
       --imagelist-key-set "dc:description"  \
       --imagelist-value  "DESY Image List SHaring service" 
 
 
 To delete an Image:
 
-   python publisher.py  --imagelist-del   --imagelist  9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
+   $ vmcaster  --imagelist-del   --imagelist  9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 
 
+Configuration file.
+~~~~~~~~~~~~~~~~~~
+
+The configuration file for vmcaster is used to define the hosts and parameters 
+needed to update images and imagelists on the servers publishing the image list.
+
+The configuration file is expected system wide at "/etc/vmcaster/vmcaster.cfg" or per 
+user at "~/.vmcaster.cfg". The image list is in ini/cfg format with all values being 
+stored as json. Each section will map to one or more image lists and provides the 
+necessary information to "vmcaster" to update and upload image lists.
+
+The following section is taken from my image list management configuration.
+
+   [dish.desy.de]
+   server = "dish.desy.de"
+   writeprotocol = "gsidcap"
+   readprefix = "https://dish.desy.de:2880/"
+   writeprefix = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
+
+This states that all image lists to be published on the server "dish.desy.de",
+should be updated using the "gsidcap" protocol, and that all writes corresponding 
+with a prefix of "https://dish.desy.de:2880/" should be updatd using a prefix of
+"gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/".
+
+The following write protocols are currently supported: "scp" this is the standard 
+file transfer tool from the openssh project. "gsidcap" for a long time this was the 
+standard posix like write protocol for a file storage server called dCache which 
+specializes in storing very large quantities of data at the lowest price possible.
 
 
+   [foo]
+   server = "gridvirt.desy.de"
+   writeprotocol = "scp"
+   readprefix = "https://gridvirt.desy.de/"
+   writeprefix = "root@vmic-virt-grid:/tmp/"
+
+This is another example of a configuration section that is updated using the scp protocol,
+rather than the "gsidcap" protocol previously described.
+
+Enviroment Variables.
+~~~~~~~~~~~~~~~~~~~~~
+
+* HOME *
+
+Used as a prefix for configuration fiels and certificates.
+
+* DISH_KEY *
+
+Path to the private key for the signing of image lists.
+
+* DISH_CERT *
+
+Path to the certificate for the signing of image lists.
+
+* DISH_CFG *
+
+Path to the configuration file for vmcaster.
+
+* DISH_RDBMS *
+
+Sqllight based connection string, Typically defaulting to 'sqlite:///dish.db'.
+This URL refures to the current workign directory, to use an absolute path with 
+sqllight, add an extra slash to the URL like syntax.
 
 To update an Image:
 ~~~~~~~~~~~~~~~~~~~
 
-python publisher.py \
+   $ vmcaster \
  --image-upload    /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
  --image 7b1aea46-8776-4447-9450-00e720fc042c
 
@@ -104,19 +165,19 @@ uploads it,
 bumps the image version number in the database.
 
 
-python publisher.py  --endorser-show    --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'
+   $ vmcaster  --endorser-show    --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'
 {'hv:email': 'owen.synge@desy.de', 'dc:creator': 'Owen Synge', 'hv:ca': '/C=DE/O=GermanGrid/CN=GridKa-CA', 'hv:dn': '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'}
 
 
 Shows the image list as it would be made.
 
 
-python publisher.py  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
+   $ vmcaster  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
 
 
 # To update and sign image list.
 
-python publisher.py  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --update
+   $ vmcaster  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --update
 
 # to update an image.
 
