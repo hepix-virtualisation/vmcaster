@@ -459,7 +459,9 @@ def main():
     if 'endorser_list' in actions:
         imagepub.endorserList()
     if 'endorser_show' in actions:
-        print imagepub.endorserDump(endorserSub)
+        output = json.dumps(imagepub.endorserDump(endorserSub),sort_keys=True, indent=4)
+        if output != None:
+            print output
     
     if 'endorser_add' in actions:
         imagepub.endorserAdd(endorserSub)
