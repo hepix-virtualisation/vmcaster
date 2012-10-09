@@ -181,4 +181,10 @@ Shows the image list as it would be made.
 
 # to update an image.
 
+Roadmap
+~~~~~~~
+
+The database should be restructured so that images are not dependent on imagelists as this would 
+make it possible to chare image metadata across imagelists and so image tests and production 
+imagelists easier.
 
