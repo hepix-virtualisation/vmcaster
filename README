@@ -3,38 +3,51 @@ It is based on a simple sql database, typically sqllight for storing image lists
 and facade of up loaders so that image list updates can be done in a transfer 
 protocol neutral way.
 
+Users of this application shoudl read "security-related policy requirements for 
+the generation and endorsement of trusted virtual machine (VM) images for use on 
+the Grid". The URL is shown below.
+
+https://edms.cern.ch/document/1080777
+
 vmcaster was designed with the realization that users typically create new 
 virtual machines images rarely but update them frequently. Most other tools 
 for marking up image lists don't minimize the amount of data entry for 
 updates. vmcaster attempts to be the first of a new generation of image 
-list publishers.
+list publishers. the tasks of updating an image and uploading a fresh signed 
+imagelist have been made as painless as possible as these are the most common 
+tasks.
 
+
+To update an Image:
+~~~~~~~~~~~~~~~~~~~
 
 First get a image list:
 
-wget https://dish.desy.de:2880/testing.smime  --no-check-certificate
+   $ wget https://dish.desy.de:2880/testing.smime  --no-check-certificate
 
 Import it.
 
-   $ vmcaster   --imagelist-import-smime testing.smime 
-INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
-(u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
-(u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
-WARNING:imagelistpub:making new.
-WARNING:imagelistpub:making new.
-WARNING:imagelistpub:making new.
+   $ vmcaster   --imagelist-import-smime testing.smime
 
+Now we can select an image to update.
+
+   $ vmcaster \
+ --upload-image /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
+ --select-image 7b1aea46-8776-4447-9450-00e720fc042c
+
+   
+Shows the image list as it would be made.
+
+   $ vmcaster  --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
+
+# To update and sign image list.
+
+   $ vmcaster  --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --upload-imagelist
+
+# to list stored imagelists.
 
    $ vmcaster  --imagelist-list    
 
-(u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'5f00fec3-4f2a-4fa0-a965-d52115606044')
-(u'9b6fad19-d913-4cca-b77d-c4b4fcd9dc36', u'7b1aea46-8776-4447-9450-00e720fc042c')
-
-
-$$ vmcaster --image-list  
-INFO:main:Defaulting DB connection to 'sqlite:///dish.db'
-5f00fec3-4f2a-4fa0-a965-d52115606044
-7b1aea46-8776-4447-9450-00e720fc042c
 
 
 Basic image list management
@@ -149,32 +162,6 @@ Path to the configuration file for vmcaster.
 Sqllight based connection string, Typically defaulting to 'sqlite:///dish.db'.
 This URL refures to the current workign directory, to use an absolute path with 
 sqllight, add an extra slash to the URL like syntax.
-
-To update an Image:
-~~~~~~~~~~~~~~~~~~~
-
-   $ vmcaster \
- --image-upload /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
- --image 7b1aea46-8776-4447-9450-00e720fc042c
-
-What it should do. 
-Check user is in database, 
-Compresses file, 
-uploads it, 
-bumps the image version number in the database.
-
-   $ vmcaster  --endorser-show    --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'
-{'hv:email': 'owen.synge@desy.de', 'dc:creator': 'Owen Synge', 'hv:ca': '/C=DE/O=GermanGrid/CN=GridKa-CA', 'hv:dn': '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'}
-
-Shows the image list as it would be made.
-
-   $ vmcaster  --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
-
-# To update and sign image list.
-
-   $ vmcaster  --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --upload-imagelist
-
-# to update an image.
 
 Roadmap
 ~~~~~~~
