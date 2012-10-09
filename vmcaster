@@ -141,23 +141,7 @@ def checkVoms(requiredExtensions = set([])):
 def main():
     """Runs program and handles command line options"""
     p = optparse.OptionParser(version = "%prog " + version)
-    
-    # Key value pairs to add to an image
-
-
-    
-    
-    
-    
-    
-
-    # Key value pairs to add to an image
-    
-    
-    
-    
-    
-    
+   
     p.add_option('--list-imagelist', action ='store_true',help='list imageslists by "dc:identifier".')
     p.add_option('--list-image', action ='store_true',help='list Images by "dc:identifier".')    
     p.add_option('--list-endorser', action ='store_true',help='list Endorsers by "hv:dn".')
@@ -165,8 +149,10 @@ def main():
     p.add_option('--import-imagelist-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
     p.add_option('--import-imagelist-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
         
-    p.add_option('--upload-image', action ='store',help='Path to image.')
-    p.add_option('--upload-imagelist', action ='store_true',help='Upload selected item.')
+    p.add_option('--upload-image', action ='store',help='Path for image to be uploaded. The image format should be detected automatically and compresed if needed.')
+    p.add_option('--upload-imagelist', action ='store_true',help="""Update the image list with a newly signed image list. 
+Expect to type in your grid certificate password to sign a new imagelist, and then transfer the new imagewlist 
+and replace the master copy.""")
     
     p.add_option('--select-imagelist', action ='store',help='Select "imagelist" by "dc:identifier".', metavar='IMAGELIST_UUID')
     p.add_option('--select-image', action ='store',help='Select "image" by "dc:identifier"', metavar='IMAGELIST_UUID')
