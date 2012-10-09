@@ -7,6 +7,10 @@ the Grid". The URL is shown below.
 
    https://edms.cern.ch/document/1080777
 
+This tool is designed to aid "endorsers" as defiend in the security policy, 
+and anyone who wants to publish virtual machine images in a way where 
+tampering will be detected.
+
 vmcaster was designed with the realisation that users typically create new 
 virtual machines images rarely but update them frequently. Most other tools 
 for marking up image lists don't minimise the amount of data entry for 
@@ -171,5 +175,7 @@ Road map
 
 The database should be restructured so that images are not dependent on imagelists
 as this would make it possible to share image metadata across imagelists and so 
-image tests and production imagelists easier.
+image tests and production imagelists easier. The code should also be publishable 
+into a message Queue service provided by a cloud provider allowing unpublished 
+images to be shared.
 
