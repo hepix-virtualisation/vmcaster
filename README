@@ -154,9 +154,8 @@ To update an Image:
 ~~~~~~~~~~~~~~~~~~~
 
    $ vmcaster \
- --image-upload    /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
+ --image-upload /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
  --image 7b1aea46-8776-4447-9450-00e720fc042c
-
 
 What it should do. 
 Check user is in database, 
@@ -164,20 +163,16 @@ Compresses file,
 uploads it, 
 bumps the image version number in the database.
 
-
    $ vmcaster  --endorser-show    --endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'
 {'hv:email': 'owen.synge@desy.de', 'dc:creator': 'Owen Synge', 'hv:ca': '/C=DE/O=GermanGrid/CN=GridKa-CA', 'hv:dn': '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge'}
 
-
 Shows the image list as it would be made.
 
-
-   $ vmcaster  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
-
+   $ vmcaster  --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --imagelist-show      
 
 # To update and sign image list.
 
-   $ vmcaster  --imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --update
+   $ vmcaster  --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  --upload-imagelist
 
 # to update an image.
 
