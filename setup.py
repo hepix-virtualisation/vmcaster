@@ -1,4 +1,5 @@
 from sys import version_info
+from vmcasterpub.__version__ import version
 if version_info < (2, 6):
 	from distutils.core import setup
 else:
@@ -11,7 +12,7 @@ else:
 
 
 setup(name='dish-updator',
-    version=version_info,
+    version=version,
     description="Updates image lists.",
     long_description="""A tool for updating image lists using a local db to store state.""",
     author="O M Synge",
@@ -31,8 +32,8 @@ setup(name='dish-updator',
         'Operating System :: POSIX',
         'Programming Language :: Python',
         ],
-
-    scripts=['publisher.py'],
-    data_files=[('/usr/share/doc/hardwaremon-client',['README']),
-        ('/etc/dish-updator',['publisher.cfg'])]
+    packages=['vmcasterpub'],
+    scripts=['vmcaster'],
+    data_files=[('/usr/share/doc/vmcaster',['README']),
+        ('/etc/vmcaster',['vmcaster.cfg.template'])],
     )
