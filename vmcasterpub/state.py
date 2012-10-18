@@ -309,7 +309,11 @@ class imagelistpub:
                     filter(model.Image.id == model.ImageMetadata.fkImage)
                 for imageItem in query_imageMetadata:
                     if imageItem.key in ["hv:size"]:
-                        imagemetadata[imageItem.key] = int(imageItem.value)
+                        try:
+                            imagemetadata[imageItem.key] = int(imageItem.value)
+                        except:
+                            self.log.warning("Invalid value for 'hv:size'")
+                            imagemetadata[imageItem.key] = imageItem.value
                     else:
                         imagemetadata[imageItem.key] = imageItem.value
                 imagesarray.append({u'hv:image' : imagemetadata})
@@ -568,6 +572,9 @@ class imagelistpub:
 
     def checkMissingFields(self,imagelistUUID):
         content = self.imageListShow(imagelistUUID)
+        if content == None:
+            self.log.error("Image list '%s' could not be retrived." % (imagelistUUID))
+            return False
         if not 'hv:imagelist' in content.keys():
             self.log.error("Image list is not well defined for '%s'" % (imagelistUUID))
             return False
@@ -599,4 +606,5 @@ class imagelistpub:
                     for item in missingImageMetaData:
                         self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,imageIdentifier))
                     return False
+        
         return True
