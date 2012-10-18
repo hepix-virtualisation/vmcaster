@@ -163,7 +163,7 @@ and replace the master copy.""")
     p.add_option('--show-endorser', action ='store_true',help='Write json endorser metadata by "hv:dn". This option requires an "endorser" selection.')
         
     p.add_option('--add-imagelist', action ='store_true',help='Imagelist create. This option requires an "imagelist" selection.')
-    p.add_option('--add-image', action ='store',help='Image create.')
+    p.add_option('--add-image', action ='store_true',help='Image create.')
     p.add_option('--add-endorser', action ='store',help='Endorser create.')
     
     p.add_option('--del-imagelist', action ='store_true',help='Imagelist delete. This option requires an "imagelist" selection.')
@@ -351,7 +351,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         imagelist_req = True
         imagelist_key_set_req = True
         imagelist_key_value = options.key_value_imagelist
-    
+
     if options.import_imagelist_smime:
         actions.add('imagelist_import_smime')
         
@@ -368,7 +368,6 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     if options.add_image:
         actions.add('image_add')
         image_req = True
-        image_key = options.add_image
         
         
     if options.del_image:
@@ -609,8 +608,6 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         imagepub.importer(candidate)
         
     if 'imagelist_upload' in actions:
-        signer_key = "/home/omsynge/.globus/userkey.pem"
-        signer_cert = "/home/omsynge/.globus/usercert.pem"
         signer_key = None
         signer_cert = None
         if signingPathDefaultCert != None:
@@ -665,6 +662,11 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         parsedUri = uglyUriParser(uri)
         mytempdir = tempfile.mkdtemp()
         tmpfilePath = os.path.join(mytempdir,"signed_file")
+        
+        
+        if not imagepub.checkMissingFields(imagelistUUID):
+            log.error("Image list has required attribute missing.")
+            sys.exit(20)
         
         smime = M2Crypto.SMIME.SMIME()
         

@@ -50,6 +50,55 @@ import types
 
 
 
+# Taken from earlier vmlitrustlib
+
+time_required_metadata = [u'dc:date:created',
+        u'dc:date:expires',
+    ]
+time_required_metadata_set = set(time_required_metadata)
+
+endorser_required_metadata = [u'hv:ca',
+        u'hv:dn',
+        u'hv:email',
+        u'dc:creator',
+    ]
+endorser_required_metadata_set = set(endorser_required_metadata)
+
+image_required_metadata = [u'dc:title',
+        u'dc:description',
+        u'hv:size',
+        u'sl:checksum:sha512',
+        u'sl:arch',
+        u'hv:uri',
+        u'dc:identifier',
+        u'sl:os',
+        u'sl:osversion',
+        u'sl:comments',
+        u'hv:hypervisor',
+        u'hv:version',
+    ]
+image_required_metadata_set = set(image_required_metadata)
+
+
+imagelist_required_metadata = [u'dc:date:created',
+        u'dc:date:expires',
+        u'dc:identifier',
+        u'dc:description',
+        u'dc:title',
+        u'dc:source',
+        u'hv:version',
+        u'hv:uri',
+    ]
+imagelist_required_metadata_set = set(imagelist_required_metadata)
+
+imagelist_required_metadata_types = [u'hv:endorser',
+        u'hv:images',
+    ]
+imagelist_required_metadata_types_set = set(imagelist_required_metadata_types)
+
+
+
+
 
 class imagelistpub:
     def __init__(self,databaseConnectionString):
@@ -301,7 +350,7 @@ class imagelistpub:
                 filter(model.ImagelistMetadata.key == imagelist_key)
                 
         if query_imagelists.count() == 0:
-            self.log.warning('No imagelist key found')
+            self.log.warning("No imagelist key '%s' found" % (imagelist_key))
             return None
         newMetaData = query_imagelists.one()
         output = newMetaData.value
@@ -342,7 +391,7 @@ class imagelistpub:
                 filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
                 filter(model.ImagelistMetadata.key == imagelist_key)
         if query_imagelists.count() == 0:
-            self.log.warning('No imagelist key found')
+            self.log.warning('No imagelist key "%s" found' % (imagelist_key))
             return None
         newMetaData = query_imagelists.one()
         Session.delete(newMetaData)
@@ -515,3 +564,39 @@ class imagelistpub:
             value = content[key]
             self.imagelist_key_update(identifier,key,value)
         return True        
+
+
+    def checkMissingFields(self,imagelistUUID):
+        content = self.imageListShow(imagelistUUID)
+        if not 'hv:imagelist' in content.keys():
+            self.log.error("Image list is not well defined for '%s'" % (imagelistUUID))
+            return False
+        imageliststuff = content['hv:imagelist']
+        imagelistKeys = imageliststuff.keys()
+        missingImageListMetaData = imagelist_required_metadata_set.difference(imagelistKeys)
+        if len(missingImageListMetaData) > 0:
+            self.log.error("Image list metadata was missing for '%s'." % (imagelistUUID))
+            for item in missingImageListMetaData:
+                self.log.error("Please add '%s' to the image list metadata." % (item))
+            return False
+        if "hv:images" in imagelistKeys:
+            # We have images
+            imagesfromImageList = imageliststuff["hv:images"]
+            for imageRawDetails in imagesfromImageList:
+                if not 'hv:image' in imageRawDetails.keys():
+                    self.log.error("Image has an invalid format.")
+                    return False
+                imageDetails = imageRawDetails['hv:image']
+                imageKeys = imageDetails.keys()
+                if not "dc:identifier" in imageKeys:
+                    self.log.error("Image list has an image without an identifier.")
+                    print imageKeys
+                    return False
+                imageIdentifier = imageDetails["dc:identifier"]
+                missingImageMetaData = image_required_metadata_set.difference(imageKeys)
+                if len(missingImageMetaData) > 0:
+                    self.log.error("Image metadata is missing for '%s'." % (imageIdentifier))
+                    for item in missingImageMetaData:
+                        self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,imageIdentifier))
+                    return False
+        return True
