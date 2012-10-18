@@ -28,13 +28,11 @@ import subprocess
 import time
 import types
 # needed for the signing of images.
-import M2Crypto.SMIME
 import M2Crypto.BIO
+import M2Crypto.SMIME
+import M2Crypto.X509
 import tempfile
 import urlparse
-import M2Crypto.SMIME
-import M2Crypto.BIO
-import M2Crypto.SMIME
 
 
 import optparse
@@ -164,7 +162,7 @@ and replace the master copy.""")
         
     p.add_option('--add-imagelist', action ='store_true',help='Imagelist create. This option requires an "imagelist" selection.')
     p.add_option('--add-image', action ='store_true',help='Image create.')
-    p.add_option('--add-endorser', action ='store',help='Endorser create.')
+    p.add_option('--add-endorser', action ='store_true',help='Endorser create.')
     
     p.add_option('--del-imagelist', action ='store_true',help='Imagelist delete. This option requires an "imagelist" selection.')
     p.add_option('--del-image', action ='store_true',help='Image delete. This option requires an "image" selection.')
@@ -287,7 +285,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         
     if options.add_endorser:
         actions.add('endorser_add')
-        endorserSub = add_options.endorser
+        
 
     if options.del_endorser:
         actions.add('endorser_del')
@@ -663,10 +661,18 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         mytempdir = tempfile.mkdtemp()
         tmpfilePath = os.path.join(mytempdir,"signed_file")
         
+        x509 = M2Crypto.X509.load_cert(signer_cert)
+        issuerSubject = x509.get_issuer()
+        subject = x509.get_subject()
         
-        if not imagepub.checkMissingFields(imagelistUUID):
+        if not imagepub.checkMissingFields(imagelistUUID,subject,issuerSubject):
             log.error("Image list has required attribute missing.")
             sys.exit(20)
+        
+        
+        
+        
+        
         
         smime = M2Crypto.SMIME.SMIME()
         

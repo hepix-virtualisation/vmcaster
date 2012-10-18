@@ -570,7 +570,7 @@ class imagelistpub:
         return True        
 
 
-    def checkMissingFields(self,imagelistUUID):
+    def checkMissingFields(self,imagelistUUID,subject,issuerSub):
         content = self.imageListShow(imagelistUUID)
         if content == None:
             self.log.error("Image list '%s' could not be retrived." % (imagelistUUID))
@@ -606,5 +606,33 @@ class imagelistpub:
                     for item in missingImageMetaData:
                         self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,imageIdentifier))
                     return False
-        
+        if not "hv:endorser" in imagelistKeys:
+            self.log.error("No endorsers found in '%s'." % (imagelistUUID))
+            return False
+        else:
+            #we have endorsers
+            endorserUntypedList = imageliststuff["hv:endorser"]
+            
+            if type(endorserUntypedList) is dict:
+                endorserUntypedList = [endorserUntypedList]
+            if len(endorserUntypedList) == 0:
+                self.log.error("No endorsers found.")
+                return False
+            foundEndorser = False
+            for endorserItem in endorserUntypedList:
+                if not 'hv:x509' in endorserItem.keys():
+                    self.log.error("Enderser is invalid '%s'." % (endorserItem))
+                    return False
+                endorserDetails = endorserItem["hv:x509"]
+                reqMetaData = endorser_required_metadata_set.difference(endorserDetails.keys())
+                if len(reqMetaData) > 0:
+                    self.log.error("Image metadata is missing for '%s'." % (endorserDetails))
+                    for item in reqMetaData:
+                        self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,endorserDetails))
+                    return False
+                if endorserDetails["hv:dn"] == subject and endorserDetails["hv:ca"] == issuerSub:
+                    foundEndorser = True
+            if not foundEndorser:
+                self.log.error("Could not find an endorser matching your certificate '%s' issued by '%s'." % (subject,issuerSub))
+                return False
         return True
