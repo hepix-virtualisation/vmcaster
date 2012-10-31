@@ -7,22 +7,22 @@ the Grid". The URL is shown below.
 
    https://edms.cern.ch/document/1080777
 
-This tool is designed to aid "endorsers" as defiend in the security policy, 
+This tool is designed to aid "endorsers" as defined in the security policy, 
 and anyone who wants to publish virtual machine images in a way where 
 tampering will be detected.
 
-vmcaster was designed with the realisation that users typically create new 
+vmcaster was designed with the realization that users typically create new 
 virtual machines images rarely but update them frequently. Most other tools 
-for marking up image lists don't minimise the amount of data entry for 
+for marking up image lists don't minimize the amount of data entry for 
 updates. vmcaster attempts to be the first of a new generation of image 
 list publishers. the tasks of updating an image and uploading a fresh signed 
 imagelist have been made as painless as possible as these are the most common 
 tasks.
 
 Internally the application uses a simple sql database, sqlight for storing 
-image lists and multiple back ends managing uploading of images / imageslists 
+image lists and multiple back ends managing uploading of images / images lists 
 using a facade pattern. This allows transfer protocol to be derived from the 
-metadata of the image list and a configuration file, updates need less effort.
+meta data of the image list and a configuration file, updates need less effort.
 
 
 To update an Image:
@@ -133,7 +133,7 @@ with a prefix of "https://dish.desy.de:2880/" should be updated using a prefix o
 The following write protocols are currently supported: "scp" this is the standard 
 file transfer tool from the openssh project. "gsidcap" for a long time this was the 
 standard posix like write protocol for a file storage server called dCache which 
-specialises in storing very large quantities of data at the lowest price possible.
+specializes in storing very large quantities of data at the lowest price possible.
 
 
    [foo]
@@ -179,3 +179,13 @@ image tests and production imagelists easier. The code should also be publishabl
 into a message Queue service provided by a cloud provider allowing unpublished 
 images to be shared.
 
+Appendix
+~~~~~~~
+
+If this application is not suitable for your use case it should not be forgotten that 
+SMIME and json are common standards and can be created in many ways. Below is an 
+example of how to sign a message using SMIME.
+
+   $ openssl smime her-cert.pem -encrypt -in my-message.txt
+   
+This may prove useful in the long term.
