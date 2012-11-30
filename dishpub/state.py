@@ -288,6 +288,7 @@ class imagelistpub:
         
         
     def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
+        self.log.debug("start:imagelist_key_update %s - %s - %s" % (imageListUuid, imagelist_key, imagelist_key_value))
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == imageListUuid)
