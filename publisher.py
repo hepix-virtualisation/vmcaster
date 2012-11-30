@@ -140,6 +140,9 @@ def main():
     p.add_option('-d', '--database', action ='store', help='Database conection string')
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
+    p.add_option('--x509-dir', action ='store',help='Directory for x.509 certificates and keys.', metavar='DISH_X509_DIR')
+    p.add_option('--x509-cert', action ='store',help='Path of x.509 Certificate.', metavar='DISH_X509_CERT')
+    p.add_option('--x509-key', action ='store',help='Path of x.509 Key.', metavar='DISH_X509_KEY')
     
     p.add_option('--endorser', action ='store',help='Select endorser.', metavar='ENDORSER_UUID')
     p.add_option('--endorser-show', action ='store_true',help='Write to stdout the endorser.')
@@ -219,6 +222,10 @@ def main():
     
     imageFileLocal = None
     dishCfg = 'publisher.cfg'
+    applicationHome = None
+    pathX509Key = None
+    pathX509Cert = None
+    
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -226,6 +233,15 @@ def main():
         databaseConnectionString = os.environ['VMILS_RDBMS']
     if 'DISH_CFG' in os.environ:
         dishCfg = os.environ['DISH_CFG']
+    if 'HOME' in os.environ:
+        applicationHome = os.environ['HOME']
+    
+    if 'DISH_X509_DIR' in os.environ:
+        pathX509Dir = os.environ['DISH_X509_DIR']
+    if 'DISH_X509_KEY' in os.environ:
+        pathX509Key = os.environ['DISH_X509_KEY']
+    if 'DISH_X509_CERT' in os.environ:
+        pathX509Cert = os.environ['DISH_X509_CERT']
     
     
     # Set up log file
@@ -582,12 +598,40 @@ def main():
         parsedUri = uglyUriParser(uri)
         mytempdir = tempfile.mkdtemp()
         tmpfilePath = os.path.join(mytempdir,"signed_file")
-        
+        pathX509Dir = None
         smime = M2Crypto.SMIME.SMIME()
-        signer_key = "/home/omsynge/.globus/userkey.pem"
-        signer_cert = "/home/omsynge/.globus/usercert.pem"
+        if applicationHome == None:
+            log.error("No HOME enviroment variable.")
+            sys.exit(20)
+        if pathX509Key == None or pathX509Cert == None:
+            if pathX509Dir == None:
+                
+                pathX509Dir = "%s/%s" % (applicationHome,".globus")
+                log.debug("Setting pathX509Dir=%s" % (pathX509Dir))
+            if not os.path.isdir(pathX509Dir):
+                log.warning("Directory '%s' does not exist, unable to guess certificates path." % (pathX509Dir))
+            else:
+                if pathX509Key == None:
+                    pathX509Key = "%s/%s" % (pathX509Dir,"userkey.pem")
+                    
+                if pathX509Cert == None:
+                    pathX509Cert = "%s/%s" % (pathX509Dir,"usercert.pem")
+                    
+                
+        if pathX509Key == None:
+            log.critical("Invalid Key path")
+            sys.exit(21)
+        if pathX509Cert == None:
+            log.critical("Invalid certificate path")
+            sys.exit(22)
+        if not os.path.isfile(pathX509Key):
+            log.critical("Key not found at path '%s'" % (pathX509Key))
+            sys.exit(23)
+        if not os.path.isfile(pathX509Cert):
+            log.critical("Cert not found at path '%s'" % (pathX509Cert))
+            sys.exit(23)
         
-        smime.load_key(signer_key,signer_cert)
+        smime.load_key(pathX509Key,pathX509Cert)
         fp = open(str(tmpfilePath),'w')
         
         content = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=4)
