@@ -273,6 +273,7 @@ class imagelistpub:
             
         return {'hv:imagelist' : outModel}
     def imagelist_key_get(self,imageListUuid, imagelist_key):
+        self.log.debug("start:imagelist_key_get(%s,%s,%s)" % (self,imageListUuid, imagelist_key))
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImagelistMetadata).\
                 filter(model.Imagelist.identifier == imageListUuid).\
