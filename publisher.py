@@ -600,12 +600,12 @@ def main():
         tmpfilePath = os.path.join(mytempdir,"signed_file")
         pathX509Dir = None
         smime = M2Crypto.SMIME.SMIME()
-        if applicationHome == None:
-            log.error("No HOME enviroment variable.")
-            sys.exit(20)
+        
         if pathX509Key == None or pathX509Cert == None:
             if pathX509Dir == None:
-                
+                if applicationHome == None:
+                    log.error("No HOME enviroment variable.")
+                    sys.exit(20)        
                 pathX509Dir = "%s/%s" % (applicationHome,".globus")
                 log.debug("Setting pathX509Dir=%s" % (pathX509Dir))
             if not os.path.isdir(pathX509Dir):
