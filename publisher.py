@@ -576,6 +576,8 @@ def main():
             log.error("Image list has not attribute 'hv:version', image upload aborted.")
             sys.exit(20)
         versionNew = bumpVersion(versionOld)
+        if versionNew == None:
+            versionNew = '0.0.1'
         imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
         
         now = datetime.datetime.utcnow()
