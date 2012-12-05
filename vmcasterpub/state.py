@@ -25,13 +25,12 @@ if sys.version_info < (2, 5):
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import dishpub.dishpubdb as model
+import vmcasterpub.dishpubdb as model
 
 import os.path
 import logging
 import optparse
-from dishpub.__version__ import version
-import dishpub
+from __version__ import version
 import urllib2
 import urllib
 import hashlib
@@ -48,6 +47,55 @@ import urlparse
 import subprocess
 import time
 import types
+
+
+
+# Taken from earlier vmlitrustlib
+
+time_required_metadata = [u'dc:date:created',
+        u'dc:date:expires',
+    ]
+time_required_metadata_set = set(time_required_metadata)
+
+endorser_required_metadata = [u'hv:ca',
+        u'hv:dn',
+        u'hv:email',
+        u'dc:creator',
+    ]
+endorser_required_metadata_set = set(endorser_required_metadata)
+
+image_required_metadata = [u'dc:title',
+        u'dc:description',
+        u'hv:size',
+        u'sl:checksum:sha512',
+        u'sl:arch',
+        u'hv:uri',
+        u'dc:identifier',
+        u'sl:os',
+        u'sl:osversion',
+        u'sl:comments',
+        u'hv:hypervisor',
+        u'hv:version',
+    ]
+image_required_metadata_set = set(image_required_metadata)
+
+
+imagelist_required_metadata = [u'dc:date:created',
+        u'dc:date:expires',
+        u'dc:identifier',
+        u'dc:description',
+        u'dc:title',
+        u'dc:source',
+        u'hv:version',
+        u'hv:uri',
+    ]
+imagelist_required_metadata_set = set(imagelist_required_metadata)
+
+imagelist_required_metadata_types = [u'hv:endorser',
+        u'hv:images',
+    ]
+imagelist_required_metadata_types_set = set(imagelist_required_metadata_types)
+
 
 
 
@@ -212,8 +260,30 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
-
-    def imagesShow(self,UUID):
+    def imageShow(self,UUID):
+        Session = self.SessionFactory()
+        query_imagelist_images = Session.query(model.Image).\
+                filter(model.Image.identifier == UUID )
+        count = query_imagelist_images.count()
+        
+        imagesarray = []
+        if query_imagelist_images.count() > 0:
+            
+            for image in query_imagelist_images:
+                imagemetadata = {u"dc:identifier" : str(image.identifier)}
+                query_imageMetadata = Session.query(model.ImageMetadata).\
+                    filter(model.Image.identifier ==  image.identifier).\
+                    filter(model.Image.id == model.ImageMetadata.fkImage)
+                for imageItem in query_imageMetadata:
+                    if imageItem.key in ["hv:size"]:
+                        imagemetadata[imageItem.key] = int(imageItem.value)
+                    else:
+                        imagemetadata[imageItem.key] = imageItem.value
+                return imagemetadata
+        return None
+        
+        
+    def imageListShow(self,UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
@@ -239,7 +309,11 @@ class imagelistpub:
                     filter(model.Image.id == model.ImageMetadata.fkImage)
                 for imageItem in query_imageMetadata:
                     if imageItem.key in ["hv:size"]:
-                        imagemetadata[imageItem.key] = int(imageItem.value)
+                        try:
+                            imagemetadata[imageItem.key] = int(imageItem.value)
+                        except:
+                            self.log.warning("Invalid value for 'hv:size'")
+                            imagemetadata[imageItem.key] = imageItem.value
                     else:
                         imagemetadata[imageItem.key] = imageItem.value
                 imagesarray.append({u'hv:image' : imagemetadata})
@@ -281,7 +355,7 @@ class imagelistpub:
                 filter(model.ImagelistMetadata.key == imagelist_key)
                 
         if query_imagelists.count() == 0:
-            self.log.warning('No imagelist key found')
+            self.log.warning("No imagelist key '%s' found" % (imagelist_key))
             return None
         newMetaData = query_imagelists.one()
         output = newMetaData.value
@@ -323,7 +397,7 @@ class imagelistpub:
                 filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
                 filter(model.ImagelistMetadata.key == imagelist_key)
         if query_imagelists.count() == 0:
-            self.log.warning('No imagelist key found')
+            self.log.warning('No imagelist key "%s" found' % (imagelist_key))
             return None
         newMetaData = query_imagelists.one()
         Session.delete(newMetaData)
@@ -348,6 +422,22 @@ class imagelistpub:
         Session.add(newimage)
         Session.commit()        
         return True
+
+    def imagelist_image_delete(self,ImageUUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Image).\
+               filter(model.Image.identifier == ImageUUID)
+        NoItems = True
+        for item in query_imagelists:
+            NoItems = False
+            Session.delete(item)
+        if not NoItems:
+            Session.commit()
+            return True
+        else:
+            self.log.info("No items deleted")
+        return False
+                
     def imageList(self):
         output = []
         Session = self.SessionFactory()
@@ -355,7 +445,6 @@ class imagelistpub:
         for item in query_image:
             output.append(str(item.identifier))
         return output
-    
     
     def image_get_imagelist(self,imageUuid):
         Session = self.SessionFactory()
@@ -366,14 +455,14 @@ class imagelistpub:
         for item in query_imagelists:
             output.append(str(item.identifier))
         return output
-                
+
     def image_key_get(self,imageUuid,image_key):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
                 filter(model.Image.id == model.ImageMetadata.fkImage).\
                 filter(model.ImageMetadata.key == image_key)
-                
+
         if query_imagelists.count() == 0:
             self.log.warning('No image meta data found found')
             return None
@@ -475,4 +564,77 @@ class imagelistpub:
                         continue
                     value = endorserDetails[key]
                     self.endorserMetadataUpdate(endorserSubject,key,value)
+        for key in content.keys():
+            if key in ['hv:endorser' , 'hv:images' ,'dc:identifier']:
+                continue
+            value = content[key]
+            self.imagelist_key_update(identifier,key,value)
         return True        
+
+
+    def checkMissingFields(self,imagelistUUID,subject,issuerSub):
+        content = self.imageListShow(imagelistUUID)
+        if content == None:
+            self.log.error("Image list '%s' could not be retrived." % (imagelistUUID))
+            return False
+        if not 'hv:imagelist' in content.keys():
+            self.log.error("Image list is not well defined for '%s'" % (imagelistUUID))
+            return False
+        imageliststuff = content['hv:imagelist']
+        imagelistKeys = imageliststuff.keys()
+        missingImageListMetaData = imagelist_required_metadata_set.difference(imagelistKeys)
+        if len(missingImageListMetaData) > 0:
+            self.log.error("Image list metadata was missing for '%s'." % (imagelistUUID))
+            for item in missingImageListMetaData:
+                self.log.error("Please add '%s' to the image list metadata." % (item))
+            return False
+        if "hv:images" in imagelistKeys:
+            # We have images
+            imagesfromImageList = imageliststuff["hv:images"]
+            for imageRawDetails in imagesfromImageList:
+                if not 'hv:image' in imageRawDetails.keys():
+                    self.log.error("Image has an invalid format.")
+                    return False
+                imageDetails = imageRawDetails['hv:image']
+                imageKeys = imageDetails.keys()
+                if not "dc:identifier" in imageKeys:
+                    self.log.error("Image list has an image without an identifier.")
+                    print imageKeys
+                    return False
+                imageIdentifier = imageDetails["dc:identifier"]
+                missingImageMetaData = image_required_metadata_set.difference(imageKeys)
+                if len(missingImageMetaData) > 0:
+                    self.log.error("Image metadata is missing for '%s'." % (imageIdentifier))
+                    for item in missingImageMetaData:
+                        self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,imageIdentifier))
+                    return False
+        if not "hv:endorser" in imagelistKeys:
+            self.log.error("No endorsers found in '%s'." % (imagelistUUID))
+            return False
+        else:
+            #we have endorsers
+            endorserUntypedList = imageliststuff["hv:endorser"]
+            
+            if type(endorserUntypedList) is dict:
+                endorserUntypedList = [endorserUntypedList]
+            if len(endorserUntypedList) == 0:
+                self.log.error("No endorsers found.")
+                return False
+            foundEndorser = False
+            for endorserItem in endorserUntypedList:
+                if not 'hv:x509' in endorserItem.keys():
+                    self.log.error("Enderser is invalid '%s'." % (endorserItem))
+                    return False
+                endorserDetails = endorserItem["hv:x509"]
+                reqMetaData = endorser_required_metadata_set.difference(endorserDetails.keys())
+                if len(reqMetaData) > 0:
+                    self.log.error("Image metadata is missing for '%s'." % (endorserDetails))
+                    for item in reqMetaData:
+                        self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,endorserDetails))
+                    return False
+                if endorserDetails["hv:dn"] == subject and endorserDetails["hv:ca"] == issuerSub:
+                    foundEndorser = True
+            if not foundEndorser:
+                self.log.error("Could not find an endorser matching your certificate '%s' issued by '%s'." % (subject,issuerSub))
+                return False
+        return True

@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 import sys
 
-import dishpub.dishpubdb as model
-import dishpub.state as dishpubstate
-import dishpub.uploader as uploader
-from dishpub.versioning import bumpVersion
-from dishpub.process import hostUploader 
+import vmcasterpub.dishpubdb as model
+import vmcasterpub.state as dishpubstate
+import vmcasterpub.uploader as uploader
+from vmcasterpub.versioning import bumpVersion
+from vmcasterpub.process import hostUploader 
 
 import os.path
 import logging
 import optparse
-from dishpub.__version__ import version
-import dishpub
+from vmcasterpub.__version__ import version
 import urllib2
 import urllib
 import hashlib
@@ -29,13 +28,16 @@ import subprocess
 import time
 import types
 # needed for the signing of images.
-import M2Crypto.SMIME
 import M2Crypto.BIO
+import M2Crypto.SMIME
+import M2Crypto.X509
 import tempfile
 import urlparse
-import M2Crypto.SMIME
-import M2Crypto.BIO
-import M2Crypto.SMIME
+
+
+import optparse
+
+
 def uglyUriParser(uri):
     parsedUri = urlparse.urlsplit(uri)
     if isinstance(parsedUri, tuple):
@@ -143,57 +145,63 @@ def main():
     p.add_option('--x509-dir', action ='store',help='Directory for x.509 certificates and keys.', metavar='DISH_X509_DIR')
     p.add_option('--x509-cert', action ='store',help='Path of x.509 Certificate.', metavar='DISH_X509_CERT')
     p.add_option('--x509-key', action ='store',help='Path of x.509 Key.', metavar='DISH_X509_KEY')
+    p.add_option('--list-imagelist', action ='store_true',help='list imageslists by "dc:identifier".')
+    p.add_option('--list-image', action ='store_true',help='list Images by "dc:identifier".')    
+    p.add_option('--list-endorser', action ='store_true',help='list Endorsers by "hv:dn".')
     
-    p.add_option('--endorser', action ='store',help='Select endorser.', metavar='ENDORSER_UUID')
-    p.add_option('--endorser-show', action ='store_true',help='Write to stdout the endorser.')
-    p.add_option('--endorser-list', action ='store_true',help='Write to stdout the endorsers list.')
-    p.add_option('--endorser-add', action ='store',help='Endorser create.')
-    p.add_option('--endorser-del', action ='store',help='Endorser delete .')
+    p.add_option('--import-imagelist-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
+    p.add_option('--import-imagelist-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
+        
+    p.add_option('--upload-image', action ='store',help='Path for image to be uploaded. The image format should be detected automatically and compresed if needed.')
+    p.add_option('--upload-imagelist', action ='store_true',help="""Update the image list with a newly signed image list. 
+Expect to type in your grid certificate password to sign a new imagelist, and then transfer the new imagewlist 
+and replace the master copy.""")
     
-    p.add_option('--endorser-keys', action ='store',help='List endorser metadata keys.')
-    p.add_option('--endorser-key-set', action ='store',help='Endorser metadata key to create/overwrite.')
-    p.add_option('--endorser-key-del', action ='store_true',help='Endorser metadata key to delete.')
-    p.add_option('--endorser-value', action ='store',help='Endorser metadata value to set.')
+    p.add_option('--select-imagelist', action ='store',help='Select "imagelist" by "dc:identifier".', metavar='IMAGELIST_UUID')
+    p.add_option('--select-image', action ='store',help='Select "image" by "dc:identifier"', metavar='IMAGELIST_UUID')
+    p.add_option('--select-endorser', action ='store',help='Select "endorser" by "hv:dn".', metavar='ENDORSER_UUID')
     
-    p.add_option('--connect', action ='store_true',help='Bind Endorser to imagelist.')
-    p.add_option('--disconnect', action ='store_true',help='Unbind Endorser to imagelist.')
+    p.add_option('--show-imagelist', action ='store_true',help='Write json imagelist. This option requires an "imagelist" selection.')
+    p.add_option('--show-image', action ='store_true',help='Write json image metadata. This option requires an "image" selection.')        
+    p.add_option('--show-endorser', action ='store_true',help='Write json endorser metadata by "hv:dn". This option requires an "endorser" selection.')
+        
+    p.add_option('--add-imagelist', action ='store_true',help='Imagelist create. This option requires an "imagelist" selection.')
+    p.add_option('--add-image', action ='store_true',help='Image create.')
+    p.add_option('--add-endorser', action ='store_true',help='Endorser create.')
     
-    p.add_option('--imagelist', action ='store',help='Select imagelist.', metavar='IMAGELIST_UUID')
-    p.add_option('--imagelist-upload', action ='store_true',help='Upload selected item.')
-    p.add_option('--imagelist-list', action ='store_true',help='Write to stdout the list images.')
-    p.add_option('--imagelist-add', action ='store_true',help='Imagelist create.')
-    p.add_option('--imagelist-del', action ='store_true',help='Imagelist delete.')
+    p.add_option('--del-imagelist', action ='store_true',help='Imagelist delete. This option requires an "imagelist" selection.')
+    p.add_option('--del-image', action ='store_true',help='Image delete. This option requires an "image" selection.')
+    p.add_option('--del-endorser', action ='store',help='Endorser delete.')
     
-    p.add_option('--imagelist-show', action ='store_true',help='Write to stdout the selected imagelist.')
-    p.add_option('--imagelist-import-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
-    p.add_option('--imagelist-import-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
+    p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind Endorser to imagelist. This option requires an "imagelist" and an "endorser" selection.')
+    p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind Endorser to imagelist. This option requires an "imagelist" and an "endorser" selection.')
     
-    # Key value pairs to add to an image
-    p.add_option('--imagelist-keys', action ='store_true',help='List imagelist metadata keys.')
-    p.add_option('--imagelist-key-set', action ='store',help='Imagelist metadata key to create/overwrite.')
-    p.add_option('--imagelist-key-del', action ='store',help='Imagelist metadata key to delete.')
-    p.add_option('--imagelist-value', action ='store',help='Imagelist metadata value to set.')
+    p.add_option('--keys-imagelist', action ='store_true',help='List imagelist metadata keys. . This option requires an "image" selection.')
+    p.add_option('--keys-image', action ='store_true',help='List image metadata keys. This option requires an "image" selection.')
+    p.add_option('--keys-endorser', action ='store',help='List endorser metadata keys. This option requires an "endorser" selection.')
+    p.add_option('--key-set-endorser', action ='store',help="""Endorser metadata key to create/overwrite. 
+As Guidence Keys should follow a pattern of "namespace:type".
+This option requires an "endorser" selection and a "--key-value-endorser" """)
+    p.add_option('--key-set-imagelist', action ='store',help="""Imagelist metadata key to create/overwrite.
+As Guidence Keys should follow a pattern of "namespace:type".
+This option requires an "imagelist" selection and a "--key-value-imagelist" paramer.""")
+    p.add_option('--key-set-image', action ='store',help="""Image metadata key to create/overwrite.
+As Guidence Keys should follow a pattern of "namespace:type".
+This option requires an "image" selection and a "--key-value-image" paramer.""")
     
-    p.add_option('--image', action ='store',help='Select image by UUID', metavar='IMAGELIST_UUID')
-    p.add_option('--image-show', action ='store_true',help='Show image metadata.')    
-    p.add_option('--image-list', action ='store_true',help='list Images.')    
-    p.add_option('--image-add', action ='store',help='Image create.')
-    p.add_option('--image-del', action ='store',help='Image delete.')
-
-    # Key value pairs to add to an image
+    p.add_option('--key-del-imagelist', action ='store',help='Imagelist metadata key to delete. This option requires an "image" selection.')
+    p.add_option('--key-del-image', action ='store',help='Image metadata key to delete. This option requires an "image" selection.')
+    p.add_option('--key-del-endorser', action ='store_true',help='Endorser metadata key to delete. This option requires an "endorser" selection.')
     
-    p.add_option('--image-keys', action ='store_true',help='List image metadata keys.')
-    p.add_option('--image-key-set', action ='store',help='Image metadata key to create/overwrite.')
-    p.add_option('--image-key-del', action ='store',help='Image metadata key to delete.')
-    p.add_option('--image-value', action ='store',help='Image metadata value to set.')
-    
-    p.add_option('--image-upload', action ='store',help='Path to image.')
-    
-    
-    
+    p.add_option('--key-value-imagelist', action ='store',help='Imagelist metadata value to set. This option requires an "imagelist" selection and a "--key-set-imagelist" paramer.')
+    p.add_option('--key-value-image', action ='store',help='Image metadata value to set. This option requires an "image" selection and a "--key-set-image" paramer.')
+    p.add_option('--key-value-endorser', action ='store',help='Endorser metadata value to set.This option requires an "endorser" selection and a "--key-set-endorser" paramer.')
     
     
     
+    
+    
+        
     options, arguments = p.parse_args()
     
     # Set up basic variables
@@ -225,7 +233,15 @@ def main():
     applicationHome = None
     pathX509Key = None
     pathX509Cert = None
+
     
+    signingPathDefaultKey = None
+    signingPathDefaultCert = None
+    signingPathHome = None
+    
+    
+    
+    dishCfg = None
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
         logFile = os.environ['VMILS_LOG_CONF']
@@ -242,7 +258,7 @@ def main():
         pathX509Key = os.environ['DISH_X509_KEY']
     if 'DISH_X509_CERT' in os.environ:
         pathX509Cert = os.environ['DISH_X509_CERT']
-    
+
     
     # Set up log file
     if options.logfile:
@@ -262,127 +278,133 @@ def main():
     # Now process command line
     actions = set([])
     
-    if options.endorser:
-        endorserSub = options.endorser
+    if options.select_endorser:
+        endorserSub = options.select_endorser
 
-    if options.endorser:
-        endorserSub = options.endorser
-
-    if options.endorser_list:
+    if options.list_endorser:
         actions.add('endorser_list')
         
-    if options.endorser_show:
+    if options.show_endorser:
         actions.add('endorser_show')
         endorser_req = True
         
-    if options.endorser_add:
+    if options.add_endorser:
         actions.add('endorser_add')
-        endorserSub = options.endorser_add
-
-    if options.endorser_del:
-        actions.add('endorser_del')
-        endorserSub = options.endorser_del
-
-    if options.endorser_key_set:
-        actions.add('endorser_key_set')
-        endorserKey = options.endorser_key_set
         
-    if options.endorser_key_del:
+
+    if options.del_endorser:
+        actions.add('endorser_del')
+        endorserSub = options.del_endorser
+
+    if options.key_set_endorser:
+        actions.add('endorser_key_set')
+        endorserKey = options.key_set_endorser
+        
+    if options.key_del_endorser:
         actions.add('endorser_key_del')
         endorser_req = True
 
-    if options.endorser_value:
-        endorserValue = options.endorser_value
+    if options.key_value_endorser:
+        endorserValue = options.key_value_endorser
         endorser_req = True
-    if options.connect:
+    if options.imagelist_add_endorser:
         endorser_req = True
         imagelist_req = True
         actions.add('connect')
-    if options.disconnect:
+    if options.imagelist_del_endorser:
         endorser_req = True
         imagelist_req = True
         actions.add('disconnect')
     
-    if options.imagelist:
-        imagelistUUID = options.imagelist
-    if options.imagelist_list:
+    if options.select_imagelist:
+        imagelistUUID = options.select_imagelist
+    if options.list_imagelist:
         actions.add('imagelist_list')
-    if options.imagelist_upload:
+    if options.upload_imagelist:
         actions.add('imagelist_upload')
         imagelist_req = True
-    if options.imagelist_add:
+    if options.add_imagelist:
         actions.add('imagelist_add')
         imagelist_req = True
 
-    if options.imagelist_del:
+    if options.del_imagelist:
         actions.add('imagelist_del')
         imagelist_req = True
     
-    if options.imagelist_show:
+    if options.show_imagelist:
         actions.add('imagelist_show')
         imagelist_req = True
         
-    if options.imagelist_keys:
+    if options.keys_imagelist:
         actions.add('imagelist_keys')
         imagelist_req = True
         
-    if options.imagelist_key_set:
+    if options.key_set_imagelist:
         actions.add('imagelist_key_update')
         imagelist_req = True
         imagelist_key_value_add_req = True
-        imagelist_key = options.imagelist_key_set
-    if options.imagelist_key_del:
+        imagelist_key = options.key_set_imagelist
+    if options.key_del_imagelist:
         actions.add('imagelist_key_del')
         imagelist_req = True
-        imagelist_key = options.imagelist_key_del
+        imagelist_key = options.key_del_imagelist
       
-    if options.imagelist_value:
+    if options.key_value_imagelist:
         actions.add('imagelist_key_update')
         imagelist_req = True
         imagelist_key_set_req = True
-        imagelist_key_value = options.imagelist_value
-    
-    if options.imagelist_import_smime:
+        imagelist_key_value = options.key_value_imagelist
+
+    if options.import_imagelist_smime:
         actions.add('imagelist_import_smime')
         
-        imagelist_import_smime = options.imagelist_import_smime
-    if options.imagelist_import_json:
+        imagelist_import_smime = options.import_imagelist_smime
+    if options.import_imagelist_json:
         actions.add('imagelist_import_json')
         
-        imagelist_import_json = options.imagelist_import_json
-    if options.image_list:
+        imagelist_import_json = options.import_imagelist_json
+    if options.list_image:
         actions.add('image_list')
-    if options.image:
-        imageUuid = options.image
+    if options.select_image:
+        imageUuid = options.select_image
     
-    if options.image_add:
+    if options.add_image:
         actions.add('image_add')
         image_req = True
-        image_key = options.image_add
+        
+        
+    if options.del_image:
+        actions.add('image_del')
+        image_req = True
     
-    if options.image_keys:
+    if options.show_image:
+        actions.add('image_show')
+        image_req = True
+    
+    if options.keys_image:
         actions.add('image_keys')
         imagelist_req = True
         image_req = True
 
-    if options.image_key_set:
+    if options.key_set_image:
         actions.add('image_key_update')
         image_req = True
         image_key_value_add_req = True
-        image_key = options.image_key_set
+        image_key = options.key_set_image
 
-    if options.image_value:
+    if options.key_value_image:
         actions.add('image_key_update')
         image_req = True
         image_key_req = True
-        image_key_value = options.image_value
-    if options.image_upload:
+        image_key_value = options.key_value_image
+    if options.upload_image:
         actions.add('image_upload')
-        imageFileLocal = options.image_upload
+        imageFileLocal = options.upload_image
     if options.database:
         databaseConnectionString = options.database
     if options.config_file:
         dishCfg = options.config_file
+    
     
     
     
@@ -414,9 +436,15 @@ def main():
         if endorserSub == None:
             log.error('Endorser subject is needed')
             sys.exit(1)
-    
+    if dishCfg == None:
+        dishCfg = os.path.join(signingPathHome,".vmcaster.cfg")
+        if not os.path.isfile(dishCfg):
+            dishCfg = "/etc/vmcaster/vmcaster.cfg"
+            
+        
+
     if not os.path.isfile(dishCfg):
-        log.error("Configuration file '%s'" % dishCfg)
+        log.error("Configuration file '%s' was not found." % dishCfg)
         sys.exit(1)
     
     # now do the work.
@@ -426,7 +454,9 @@ def main():
     if 'endorser_list' in actions:
         imagepub.endorserList()
     if 'endorser_show' in actions:
-        print imagepub.endorserDump(endorserSub)
+        output = json.dumps(imagepub.endorserDump(endorserSub),sort_keys=True, indent=4)
+        if output != None:
+            print output
     
     if 'endorser_add' in actions:
         imagepub.endorserAdd(endorserSub)
@@ -446,7 +476,7 @@ def main():
     if 'imagelist_list' in actions:
         imagepub.imageListList()
     if 'imagelist_show' in actions:
-        output = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=4)
+        output = json.dumps(imagepub.imageListShow(imagelistUUID),sort_keys=True, indent=4)
         if output != None:
             print output
     
@@ -491,8 +521,19 @@ def main():
         for item in images:
             print item
     if 'image_add' in actions:
-        imagepub.imagelist_image_add(imagelistUUID,image_key)
+        imagepub.imagelist_image_add(imagelistUUID,imageUuid)
         return
+    if 'image_show' in actions:
+        output = json.dumps(imagepub.imageShow(imageUuid),sort_keys=True, indent=4)
+        if output != None:
+            print output
+        
+    if 'image_del' in actions:
+        imagepub.imagelist_image_delete(imageUuid)
+        return
+    
+    
+    
     if 'image_key_update' in actions:
         imagepub.image_key_update(imageUuid ,image_key, image_key_value)
 
@@ -570,11 +611,37 @@ def main():
         imagepub.importer(candidate)
         
     if 'imagelist_upload' in actions:
+        signer_key = None
+        signer_cert = None
+        if signingPathDefaultCert != None:
+            signer_cert = signingPathDefaultCert
+        if signingPathDefaultKey != None:
+            signer_key = signingPathDefaultKey
+        if (signer_key == None) and (signingPathHome != None):
+            defaultKey = ".globus/userkey.pem"
+            signer_key = os.path.join(signingPathHome,defaultKey)
+        if (signer_cert == None) and (signingPathHome != None):
+            defaultCert = ".globus/usercert.pem"
+            signer_cert = os.path.join(signingPathHome,defaultCert)
+        if (signer_key == None):
+            log.error("Cannot find a path to try to find the key to sign imagelist.")
+            sys.exit(22)
+        if (signer_cert == None):
+            log.error("Cannot find a path to try to find the cerificate to check the signature of your signed imagelist.")
+            sys.exit(23)
+        
+        if not os.path.isfile(signer_key):
+            log.error("Cannot find a the key to signed imagelists when looking here '%s'." % (signer_key))
+            sys.exit(24)
+        
+        if not os.path.isfile(signer_cert):
+            log.error("Cannot find a the certificate to verify the signed imagelist when looking here '%s'." % (signer_cert))
+            sys.exit(25)
         
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
         if versionOld == None:
             log.error("Image list has not attribute 'hv:version', image upload aborted.")
-            sys.exit(20)
+            sys.exit(26)
         versionNew = bumpVersion(versionOld)
         if versionNew == None:
             versionNew = '0.0.1'
@@ -600,8 +667,15 @@ def main():
         parsedUri = uglyUriParser(uri)
         mytempdir = tempfile.mkdtemp()
         tmpfilePath = os.path.join(mytempdir,"signed_file")
-        pathX509Dir = None
+
         smime = M2Crypto.SMIME.SMIME()
+        x509 = M2Crypto.X509.load_cert(signer_cert)
+        issuerSubject = x509.get_issuer()
+        subject = x509.get_subject()
+        
+        if not imagepub.checkMissingFields(imagelistUUID,subject,issuerSubject):
+            log.error("Image list has required attribute missing.")
+            sys.exit(20)
         
         if pathX509Key == None or pathX509Cert == None:
             if pathX509Dir == None:
@@ -636,7 +710,7 @@ def main():
         smime.load_key(pathX509Key,pathX509Cert)
         fp = open(str(tmpfilePath),'w')
         
-        content = json.dumps(imagepub.imagesShow(imagelistUUID),sort_keys=True, indent=4)
+        content = json.dumps(imagepub.imageListShow(imagelistUUID),sort_keys=True, indent=4)
         
         buf = M2Crypto.BIO.MemoryBuffer(content)
         p7 = smime.sign(buf,M2Crypto.SMIME.PKCS7_DETACHED)
@@ -650,7 +724,11 @@ def main():
         fp.write(message_signed)
         fp.close()
         uploader = hostUploader(dishCfg)
-        uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
+        try:
+            uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
+        except vmcasterpub.process.InputError, E:
+            log.error(E.msg)
+            sys.exit(21)
         uploader.replaceFile(tmpfilePath,parsedUri['hostname'],parsedUri['path'])
         
 if __name__ == "__main__":

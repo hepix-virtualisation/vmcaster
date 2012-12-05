@@ -1,0 +1,15 @@
+Changelog
+
+
+vmcaster-0.0.3
+
+ * Made the command line parameters more consistent.
+ * Check for missing fields before uplaoding an image list.
+
+vmcaster-0.0.2
+
+ * Fixed packaging errors.
+
+vmcaster-0.0.1
+
+ * Initial release
