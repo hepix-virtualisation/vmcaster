@@ -140,7 +140,9 @@ def main():
     """Runs program and handles command line options"""
     p = optparse.OptionParser(version = "%prog " + version)
     p.add_option('-d', '--database', action ='store', help='Database conection string')
-    p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
+    p.add_option('-L', '--logcfg', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
+    p.add_option('--verbose', action ='count',help='Change global log level, increasing log output.', metavar='LOGFILE')
+    p.add_option('--quiet', action ='count',help='Change global log level, decreasing log output.', metavar='LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
     p.add_option('--x509-dir', action ='store',help='Directory for x.509 certificates and keys.', metavar='DISH_X509_DIR')
     p.add_option('--x509-cert', action ='store',help='Path of x.509 Certificate.', metavar='DISH_X509_CERT')
@@ -256,20 +258,44 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
 
     
     # Set up log file
-    if options.logfile:
-        logFile = options.logfile
+    
+    LoggingLevel = logging.WARNING
+    LoggingLevelCounter = 2
+    if options.verbose:
+        LoggingLevelCounter = LoggingLevelCounter - options.verbose
+        if options.verbose == 1:
+            LoggingLevel = logging.INFO
+        if options.verbose == 2:
+            LoggingLevel = logging.DEBUG
+    if options.quiet:
+        LoggingLevelCounter = LoggingLevelCounter + options.quiet
+    if LoggingLevelCounter <= 0:
+        LoggingLevel = logging.DEBUG
+    if LoggingLevelCounter == 1:
+        LoggingLevel = logging.INFO
+    if LoggingLevelCounter == 2:
+        LoggingLevel = logging.WARNING
+    if LoggingLevelCounter == 3:
+        LoggingLevel = logging.ERROR
+    if LoggingLevelCounter == 4:
+        LoggingLevel = logging.FATAL
+    if LoggingLevelCounter >= 5:
+        LoggingLevel = logging.CRITICAL
+    
+    if options.logcfg:
+        logFile = options.logcfg
     if logFile != None:
-        if os.path.isfile(str(options.logfile)):
-            logging.config.fileConfig(options.logfile)
+        if os.path.isfile(str(options.log_config)):
+            logging.config.fileConfig(options.log_config)
         else:
-            logging.basicConfig(level=logging.INFO)
+            logging.basicConfig(level=LoggingLevel)
             log = logging.getLogger("main")
-            log.error("Logfile configuration file '%s' was not found." % (options.logfile))
+            log.error("Logfile configuration file '%s' was not found." % (options.log_config))
             sys.exit(1)
     else:
-        logging.basicConfig(level=logging.INFO)
+        
+        logging.basicConfig(level=LoggingLevel)
     log = logging.getLogger("main")
-    
     # Now process command line
     actions = set([])
     
