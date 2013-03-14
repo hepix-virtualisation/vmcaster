@@ -60,10 +60,10 @@ class hostUploader:
             
     def replaceFile(self,localPath,remoteHost,remotePath):
         if not remoteHost in self.allHosts:
-            raise InputError("Host '%s' is not known" % remoteHost)
+            raise InputError("Host '%s' is not registered" % remoteHost)
         
         if not os.path.isfile(localPath):
-            raise InputError("file not found at localpath '%s'" % localPath)
+            raise InputError("File not found at path '%s'" % localPath)
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
         u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
