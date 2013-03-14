@@ -58,8 +58,9 @@ class hostUploader:
                 'writePrefix' : writePrefix,
                 'readPrefix' : readPrefix}
             
-    def replaceFile(self,localPath,remoteHost,remotePath):
+    def replaceFile(self,localPath,remoteHost,externalPath):
         if not remoteHost in self.allHosts:
+            self.log.info("Available hosts:" % (self.allHosts.keys()))
             raise InputError("Host '%s' is not registered" % remoteHost)
         
         if not os.path.isfile(localPath):
@@ -67,22 +68,27 @@ class hostUploader:
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
         u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
-        return u1.replace(localPath,remotePath)   
+        u1.externalPrefix = self.allHosts[remoteHost]["readPrefix"]
+        return u1.replace(localPath,externalPath)   
     def uploadFile(self,localPath,remoteHost,remotePath):
         if not remoteHost in self.allHosts:
+            self.log.info("Available hosts:" % (self.allHosts.keys()))
             raise InputError("Host '%s' is not known" % remoteHost)
         if not os.path.isfile(localPath):
             raise InputError("file not found at localpath '%s'" % localPath)
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
         u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
+        u1.externalPrefix = self.allHosts[remoteHost]["readPrefix"]
         return u1.upload(localPath,remotePath)
     def deleteFile(self,remoteHost,remotePath):
         if not remoteHost in self.allHosts:
+            self.log.info("Available hosts:" % (self.allHosts.keys()))
             raise InputError("Host '%s' is not known" % remoteHost)
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
         u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
+        u1.externalPrefix = self.allHosts[remoteHost]["readPrefix"]
         return u1.delete(remotePath)
         
 if __name__ == "__main__":
