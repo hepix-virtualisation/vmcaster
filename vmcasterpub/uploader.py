@@ -71,17 +71,20 @@ class uploaderFacade(object):
     def transforExtUri(self,externalURI):
         output = externalURI
         if self.externalPrefix == None:
-            self.log.warning("No external prefix found, this is likely causing configuration issues.")
-            self.log.info("externalURI=%s" % (externalURI))
-            self.log.info("externalPattern=%s" % (self.externalPrefix))
-            self.log.info("externalReplace=%s" % (self.remotePrefix))
+            self.log.warning("External match pattern not set. This may cause configuration issues.")
+            self.log.info("uri=%s" % (externalURI))
+            self.log.info("match=%s" % (self.externalPrefix))
+            self.log.info("replace=%s" % (self.remotePrefix))
             return output
         self.log.info("externalPrefix=%s" % (self.externalPrefix))
         self.log.info("externalURI=%s" % (externalURI))
         
         match = re.match(self.externalPrefix,externalURI)
         if match == None:
-            self.log.warning("External URI does not match external prefix.")
+            self.log.warning("External match pattern does not match the External URI.")
+            self.log.info("uri=%s" % (externalURI))
+            self.log.info("match=%s" % (self.externalPrefix))
+            self.log.info("replace=%s" % (self.remotePrefix))
             return output
         return re.sub(self.externalPrefix, self.remotePrefix, externalURI)
         
