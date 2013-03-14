@@ -72,9 +72,11 @@ def uglyUriBuilder(components):
         return None
     output = "%s://%s" % (components['scheme'],components['hostname'])
     if 'port' in components:
-        output += ":%s" % (components['port'])
+        if components['port'] != '':
+        
+            output += ":%s" % (components['port'])
     if 'path' in components:
-        output +=  "/%s" % (components['path'])
+        output +=  "%s" % (components['path'])
     return output
     
         
@@ -230,7 +232,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     applicationHome = None
     pathX509Key = None
     pathX509Cert = None
-
+    pathX509Dir = None
     
     signingPathDefaultKey = None
     signingPathDefaultCert = None
@@ -311,7 +313,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         
     if options.add_endorser:
         actions.add('endorser_add')
-        
+        endorser_req = True
 
     if options.del_endorser:
         actions.add('endorser_del')
@@ -623,39 +625,44 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         sha512 = imagepub.image_key_get(imageUuid,"sl:checksum:sha512")
         
         if sha512 == m.hexdigest():
-            log.info("Image unchanged, aborting uppdate.")
+            log.warning("Image unchanged, aborting uppdate.")
             sys.exit(0)
         
-        
-        uri = imagepub.imagelist_key_get(ThisImageListUuid,"hv:uri")
+        # Generate a new URI based on the old one.
+        uri = imagepub.image_key_get(imageUuid,"hv:uri")
         parsedUri = uglyUriParser(uri)
+        oldpath = parsedUri['path']
+        log.debug("old image path=%s" % (oldpath))
+        directory = os.path.dirname(oldpath)
+        log.debug("old base directory=%s" % (directory))
         
         curtime = datetime.datetime.utcnow()
         imageName = "%s_%s.img.gz" % (imageUuid,curtime.strftime("%Y-%m-%d_%H-%M-%S"))
-        uploadpath = os.path.join("images" , imageName)
-        parsedUri['path'] = uploadpath
+        newPath = os.path.join(directory, imageName)
+        
+        parsedUri['path'] = newPath
+        uri = uglyUriBuilder(parsedUri)
+
+        
+        
+        log.debug("new image uri=%s" % (uri))
+        
         timeout = 10000
         uploader = hostUploader(dishCfg)
         try:
-            uploader.replaceFile(localPath,parsedUri['hostname'],uploadpath)
+            uploader.replaceFile(localPath,parsedUri['hostname'],uri)
         except InputError, e:
             log.error(e.msg)
             sys.exit(99)
         
-        
         imagepub.image_key_update(imageUuid,u'hv:size',filelength)
         imagepub.image_key_update(imageUuid,u'sl:checksum:sha512',m.hexdigest())
-        
         versionOld = imagepub.image_key_get(imageUuid, "hv:version")
         versionNew = bumpVersion(versionOld)
         imagepub.image_key_update(imageUuid, "hv:version",versionNew)
-        
-        
-        
-        
         uri = uglyUriBuilder(parsedUri)
-        
         imagepub.image_key_update(imageUuid,  "hv:uri", uri)
+        
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
         try:
@@ -671,36 +678,40 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         imagepub.importer(candidate)
         
     if 'imagelist_upload' in actions:
-        signer_key = None
-        signer_cert = None
-        if signingPathDefaultCert != None:
-            signer_cert = signingPathDefaultCert
-        if signingPathDefaultKey != None:
-            signer_key = signingPathDefaultKey
-        if (signer_key == None) and (signingPathHome != None):
-            defaultKey = ".globus/userkey.pem"
-            signer_key = os.path.join(signingPathHome,defaultKey)
-        if (signer_cert == None) and (signingPathHome != None):
-            defaultCert = ".globus/usercert.pem"
-            signer_cert = os.path.join(signingPathHome,defaultCert)
-        if (signer_key == None):
-            log.error("Cannot find a path to try to find the key to sign imagelist.")
+        if pathX509Key == None or pathX509Cert == None:
+            if pathX509Dir == None:
+                if applicationHome == None:
+                    log.error("No HOME enviroment variable.")
+                    sys.exit(20)        
+                pathX509Dir = "%s/%s" % (applicationHome,".globus")
+                log.debug("Setting pathX509Dir=%s" % (pathX509Dir))
+            if not os.path.isdir(pathX509Dir):
+                log.warning("Directory '%s' does not exist, unable to guess certificates path." % (pathX509Dir))
+            else:
+                if pathX509Key == None:
+                    pathX509Key = "%s/%s" % (pathX509Dir,"userkey.pem")
+                    
+                if pathX509Cert == None:
+                    pathX509Cert = "%s/%s" % (pathX509Dir,"usercert.pem")
+                    
+                
+        if pathX509Key == None:
+            log.critical("Invalid Key path")
+            sys.exit(21)
+        if pathX509Cert == None:
+            log.critical("Invalid certificate path")
             sys.exit(22)
-        if (signer_cert == None):
-            log.error("Cannot find a path to try to find the cerificate to check the signature of your signed imagelist.")
+        if not os.path.isfile(pathX509Key):
+            log.critical("Key not found at path '%s'" % (pathX509Key))
+            sys.exit(23)
+        if not os.path.isfile(pathX509Cert):
+            log.critical("Cert not found at path '%s'" % (pathX509Cert))
             sys.exit(23)
         
-        if not os.path.isfile(signer_key):
-            log.error("Cannot find a the key to signed imagelists when looking here '%s'." % (signer_key))
-            sys.exit(24)
-        
-        if not os.path.isfile(signer_cert):
-            log.error("Cannot find a the certificate to verify the signed imagelist when looking here '%s'." % (signer_cert))
-            sys.exit(25)
         
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
         if versionOld == None:
-            log.error("Image list has not attribute 'hv:version', image upload aborted.")
+            log.error("Image list '%s' has not attribute 'hv:version', image upload aborted." % (imagelistUUID))
             sys.exit(26)
         versionNew = bumpVersion(versionOld)
         if versionNew == None:
@@ -729,9 +740,9 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         tmpfilePath = os.path.join(mytempdir,"signed_file")
 
         smime = M2Crypto.SMIME.SMIME()
-        x509 = M2Crypto.X509.load_cert(signer_cert)
-        issuerSubject = x509.get_issuer()
-        subject = x509.get_subject()
+        x509 = M2Crypto.X509.load_cert(pathX509Cert)
+        issuerSubject = str(x509.get_issuer())
+        subject = str(x509.get_subject())
         
         if not imagepub.checkMissingFields(imagelistUUID,subject,issuerSubject):
             log.error("Image list has required attribute missing.")
@@ -783,13 +794,14 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         
         fp.write(message_signed)
         fp.close()
+        
         uploader = hostUploader(dishCfg)
         try:
-            uploader.deleteFile(parsedUri['hostname'],parsedUri['path'])
-        except vmcasterpub.process.InputError, E:
+            uploader.deleteFile(parsedUri['hostname'],uri)
+        except InputError, E:
             log.error(E.msg)
             sys.exit(21)
-        uploader.replaceFile(tmpfilePath,parsedUri['hostname'],parsedUri['path'])
+        uploader.replaceFile(tmpfilePath,parsedUri['hostname'],uri)
         
 if __name__ == "__main__":
     main()
