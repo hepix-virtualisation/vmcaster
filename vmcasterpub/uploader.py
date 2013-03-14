@@ -3,8 +3,10 @@ import types
 import uploader_dcap as uploaderDcap
 
 from uploader_scp import uploaderScp
+import re
+import sys
 
-
+import logging
 def Property(func):
     return property(**func())
 
@@ -15,7 +17,11 @@ class uploaderFacade(object):
     Should be robust for setting the impleemntation or attributes
     in any order."""
     def __init__(self):
+        self.log = logging.getLogger("uploaderFacade")
         self._uploaderImp = None
+        self.externalPrefix = None
+    
+    
     @Property
     def remotePrefix():
         doc = "The person's name"
@@ -61,21 +67,42 @@ class uploaderFacade(object):
             del self._uploader
         return locals()
 
-    def __init__(self) :
-        pass
     
-    def download(self,localpath,remotepath):
+    def transforExtUri(self,externalURI):
+        output = externalURI
+        if self.externalPrefix == None:
+            self.log.warning("No external prefix found, this is likely causing configuration issues.")
+            self.log.info("externalURI=%s" % (externalURI))
+            self.log.info("externalPattern=%s" % (self.externalPrefix))
+            self.log.info("externalReplace=%s" % (self.remotePrefix))
+            return output
+        self.log.info("externalPrefix=%s" % (self.externalPrefix))
+        self.log.info("externalURI=%s" % (externalURI))
+        
+        match = re.match(self.externalPrefix,externalURI)
+        if match == None:
+            self.log.warning("External URI does not match external prefix.")
+            return output
+        print match
+        print dir(match)
+        return re.sub(self.externalPrefix, self.remotePrefix, externalURI)
+        
+        
+    def download(self,localpath,externalURI):
         if hasattr(self, '_uploaderImp'):
+            remotepath = self.transforExtUri(externalURI)
             return self._uploaderImp.download(localpath,remotepath)
-    def upload(self,localpath,remotepath):
+    def upload(self,localpath,externalURI):
         if hasattr(self, '_uploaderImp'):
+            remotepath = self.transforExtUri(externalURI)
             return self._uploaderImp.upload(localpath,remotepath)
-    def replace(self,localpath,remotepath):
+    def replace(self,localpath,externalURI):
         if hasattr(self, '_uploaderImp'):
+            remotepath = self.transforExtUri(externalURI)
             return self._uploaderImp.replace(localpath,remotepath)
-
-    def delete(self,remotepath):
+    def delete(self,externalURI):
         if hasattr(self, '_uploaderImp'):
+            remotepath = self.transforExtUri(externalURI)
             return self._uploaderImp.delete(remotepath)
     
     
