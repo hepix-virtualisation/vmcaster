@@ -606,7 +606,7 @@ class imagelistpub:
                 if len(missingImageMetaData) > 0:
                     self.log.error("Image metadata is missing for '%s'." % (imageIdentifier))
                     for item in missingImageMetaData:
-                        self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,imageIdentifier))
+                        self.log.error("Please add '%s' to the metadata for image '%s'." % (item,imageIdentifier))
                     return False
         if not "hv:endorser" in imagelistKeys:
             self.log.error("No endorsers found in '%s'." % (imagelistUUID))
@@ -630,7 +630,7 @@ class imagelistpub:
                 if len(reqMetaData) > 0:
                     self.log.error("Image metadata is missing for '%s'." % (endorserDetails))
                     for item in reqMetaData:
-                        self.log.error("Please add '%s' to the image metadata for image '%s'." % (item,endorserDetails))
+                        self.log.error("Please add '%s' to the metadata for endorser '%s'." % (item,endorserDetails))
                     return False
                 if endorserDetails["hv:dn"] == subject and endorserDetails["hv:ca"] == issuerSub:
                     foundEndorser = True
