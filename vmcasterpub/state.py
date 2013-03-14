@@ -462,7 +462,7 @@ class imagelistpub:
                 filter(model.ImageMetadata.key == image_key)
 
         if query_imagelists.count() == 0:
-            self.log.warning('No image meta data found found')
+            self.log.warning("No image meta data found for image '%s' with key '%s'" % (imageUuid,image_key))
             return None
         if query_imagelists.count() > 1:
             self.log.warning('To  much image metadata found')
