@@ -567,6 +567,8 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
                 tmpfilePath = os.path.join(mytempdir,"compressed")
                 #shutil.copyfile(imageFileLocal,tmpfilePath )
                 cmd = 'cat %s | gzip -c > %s.gz' % (imageFileLocal,tmpfilePath)
+                if rFeildList[-1] == "bz2":
+                    cmd = 'cat %s | bzip2 -c > %s.bz2' % (imageFileLocal,tmpfilePath)
                 log.info("Compresing source image '%s'." % (cmd))
                 rc,output = commands.getstatusoutput(cmd)
                 if rc != 0 :
