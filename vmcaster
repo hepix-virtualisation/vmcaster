@@ -5,7 +5,7 @@ import vmcasterpub.dishpubdb as model
 import vmcasterpub.state as dishpubstate
 import vmcasterpub.uploader as uploader
 from vmcasterpub.versioning import bumpVersion
-from vmcasterpub.process import hostUploader 
+from vmcasterpub.process import hostUploader, InputError
 
 import os.path
 import logging
@@ -33,7 +33,7 @@ import M2Crypto.SMIME
 import M2Crypto.X509
 import tempfile
 import urlparse
-
+import magic
 
 import optparse
 
@@ -198,7 +198,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     
     
     
-    p.add_option('-d', '--database', action ='store', help='Database conection string, Defaults to "sqlite:///dish.db"')
+    p.add_option('-d', '--database', action ='store', help='Database conection string, Defaults to "sqlite:///vmcaster.db"')
     p.add_option('-L', '--logfile', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
     
@@ -414,7 +414,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     # Now default unset values
     
     if databaseConnectionString == None:
-        databaseConnectionString = 'sqlite:///dish.db'
+        databaseConnectionString = 'sqlite:///vmcaster.db'
         log.info("Defaulting DB connection to '%s'" % (databaseConnectionString))
     
     # Now check for required fields
@@ -434,8 +434,10 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     if dishCfg == None:
         dishCfg = os.path.join(signingPathHome,".vmcaster.cfg")
         if not os.path.isfile(dishCfg):
-            dishCfg = "/etc/vmcaster/vmcaster.cfg"
-            
+            log.info("Config file '%s' not found, using system defaults" % (dishCfg))
+            dishCfgNew = "/etc/vmcaster/vmcaster.cfg"
+            log.info("Config file '%s' not found, using system defaults" % (dishCfg,dishCfgNew))
+            dishCfg = dishCfgNew
         
 
     if not os.path.isfile(dishCfg):
@@ -540,44 +542,79 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
             log.error("No matching image list found")
             sys.exit(45)
         ThisImageListUuid = str(listOfImagelists[0])
+        reuiredImageType = imagepub.image_key_get(imageUuid,"hv:format")
+        if reuiredImageType == None:
+            log.debug("Using raw image in provided format")
+        else:
+            ms = magic.open(magic.MAGIC_NONE)
+            ms.load()
+            sourceImageType =  ms.file(imageFileLocal)
+            sFieldList =  sourceImageType.split(',')
+            rFeildList = reuiredImageType.split(".")
+            mappings = { 'bz2' : "bzip2 compressed data",
+                'gz' : "gzip compressed data" }
+            
+            shouldCompress = False
+            if rFeildList[-1] in mappings.keys():
+                if sFieldList[0] != mappings[rFeildList[-1]]:
+                    log.info("The image you are uploading should be compresed.")
+                    shouldCompress = True
+                else:
+                    log.debug("File type is as expected")
+            localPath = imageFileLocal
+            if shouldCompress:
+                mytempdir = tempfile.mkdtemp()
+                tmpfilePath = os.path.join(mytempdir,"compressed")
+                #shutil.copyfile(imageFileLocal,tmpfilePath )
+                cmd = 'cat %s | gzip -c > %s.gz' % (imageFileLocal,tmpfilePath)
+                log.info("Compresing source image '%s'." % (cmd))
+                rc,output = commands.getstatusoutput(cmd)
+                if rc != 0 :
+                    log.error(output)
+                    sys.exit(1)
+                combinedNamesList = []
+                for filename in os.listdir(mytempdir):
+                    combainedName = os.path.join(mytempdir,filename)
+                    if os.path.isfile(combainedName):
+                        combinedNamesList.append(filename)
+                uploadablefileName = ""
+                if len(combinedNamesList) > 1:
+                    print "unknown file found"
+                    sys.exit(1)
+                if len(combinedNamesList) == 0:
+                    print "compresed file not found"
+                    sys.exit(1)
+                imageName = combinedNamesList[0]
+                localPath = os.path.join(mytempdir,imageName)
+        m = hashlib.sha512()
+        filelength = 0
+        for line in open(localPath,'r'):
+            filelength += len(line)
+            m.update(line)
+
+        sha512 = imagepub.image_key_get(imageUuid,"sl:checksum:sha512")
+        
+        if sha512 == m.hexdigest():
+            log.info("Image unchanged, aborting uppdate.")
+            sys.exit(0)
+        
+        
         uri = imagepub.imagelist_key_get(ThisImageListUuid,"hv:uri")
         parsedUri = uglyUriParser(uri)
         
-        mytempdir = tempfile.mkdtemp()
-        tmpfilePath = os.path.join(mytempdir,"uncompressed")
-        #shutil.copyfile(imageFileLocal,tmpfilePath )
-        cmd = ('cat imageFileLocal | gzip -c > %s.gz' % tmpfilePath)
-        rc,output = commands.getstatusoutput('cat %s | gzip -c > %s.gz' % (imageFileLocal,tmpfilePath))
-        if rc != 0 :
-            log.error(output)
-            sys.exit(1)
-        combinedNamesList = []
-        for filename in os.listdir(mytempdir):
-            combainedName = os.path.join(mytempdir,filename)
-            if os.path.isfile(combainedName):
-                combinedNamesList.append(filename)
-        uploadablefileName = ""
-        if len(combinedNamesList) > 1:
-            print "unknown file found"
-            sys.exit(1)
-        if len(combinedNamesList) == 0:
-            print "compresed file not found"
-            sys.exit(1)
-        imageName = combinedNamesList[0]
-        localPath = os.path.join(mytempdir,imageName)
         curtime = datetime.datetime.utcnow()
         imageName = "%s_%s.img.gz" % (imageUuid,curtime.strftime("%Y-%M-%d_%H-%m-%S"))
         uploadpath = os.path.join("images" , imageName)
         parsedUri['path'] = uploadpath
         timeout = 10000
         uploader = hostUploader(dishCfg)
-        uploader.replaceFile(localPath,parsedUri['hostname'],uploadpath)
+        try:
+            uploader.replaceFile(localPath,parsedUri['hostname'],uploadpath)
+        except InputError, e:
+            log.error(e.msg)
+            sys.exit(99)
         
-        m = hashlib.sha512()
-        filelength = 0
-        for line in open(localPath,'r'):
-            filelength += len(line)
-            m.update(line)
+        
         imagepub.image_key_update(imageUuid,u'hv:size',filelength)
         imagepub.image_key_update(imageUuid,u'sl:checksum:sha512',m.hexdigest())
         
