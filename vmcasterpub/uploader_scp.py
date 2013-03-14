@@ -58,10 +58,20 @@ class uploaderScp:
         return runpreloadcommand(cmd,timeout)
         
     def upload(self,localpath,remotePath):
-        
+        self.log = logging.getLogger("uploaderScp.upload")
+        self.log.debug("localpath=%s" % (localpath))
+        self.log.debug("remotePath=%s" % (remotePath))
+        cmd = "scp %s %s" % (localpath,remotePath)
+        rc,stdout,stderr = runpreloadcommand(cmd,10)
+        if rc != 0:
+            self.log.debug(cmd)
+            self.log.error( stderr)
+            return (rc,stdout,stderr)
+        return (rc,stdout,stderr)
         return self.replace(localpath,remotePath)
 
     def replace(self,localpath,remotePath):
+        self.log = logging.getLogger("uploaderScp.replace")
         self.log.debug("localpath=%s" % (localpath))
         self.log.debug("remotePath=%s" % (remotePath))
         cmd = "scp %s %s" % (localpath,remotePath)
