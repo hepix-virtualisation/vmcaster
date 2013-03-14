@@ -154,7 +154,7 @@ class imagelistpub:
             filter(model.Endorser.id == model.EndorserMetadata.fkEndorser).\
             filter(model.EndorserMetadata.key == key)
         if query_endorsermetadata.count() == 0:
-            self.log.warning("making new.")
+            self.log.warning("making new key '%s' with value '%s'" % (key,value))
             newpetadata = model.EndorserMetadata(EndorserId, key,value)
             Session.add(newpetadata)
         else:
