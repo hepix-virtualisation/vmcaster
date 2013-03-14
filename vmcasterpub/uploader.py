@@ -83,8 +83,6 @@ class uploaderFacade(object):
         if match == None:
             self.log.warning("External URI does not match external prefix.")
             return output
-        print match
-        print dir(match)
         return re.sub(self.externalPrefix, self.remotePrefix, externalURI)
         
         
