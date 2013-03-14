@@ -432,7 +432,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
             log.error('Endorser subject is needed')
             sys.exit(1)
     if dishCfg == None:
-        dishCfg = os.path.join(signingPathHome,".vmcaster.cfg")
+        dishCfg = os.path.join(applicationHome,".vmcaster.cfg")
         if not os.path.isfile(dishCfg):
             log.info("Config file '%s' not found, using system defaults" % (dishCfg))
             dishCfgNew = "/etc/vmcaster/vmcaster.cfg"
