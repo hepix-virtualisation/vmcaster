@@ -28,8 +28,9 @@ def runpreloadcommand(cmd,timeout):
             os.kill(process.pid, signal.SIGKILL)
             processRc = -9
             break
-    
     return (processRc,stdout,stderr)
+
+
 
 class uploaderScp:
     def __init__(self):
@@ -51,25 +52,33 @@ class uploaderScp:
     def delete(self,remotePath):
         prefix = self.remotePrefix.split(":")
         fuill = "%s/%s" % (prefix[1],remotePath)
+        
         cmd = "ssh %s rm %s" % (prefix[0],fuill)
         timeout = 10
         return runpreloadcommand(cmd,timeout)
         
     def upload(self,localpath,remotePath):
-        path = self._getfilepath(remotePath)
-        return gsiDcapCopy(localpath,path)
+        
+        return self.replace(localpath,remotePath)
 
     def replace(self,localpath,remotePath):
-        path = self._getfilepath(remotePath)
-        cmd = "scp %s %s" % (localpath,path)
+        self.log.debug("localpath=%s" % (localpath))
+        self.log.debug("remotePath=%s" % (remotePath))
+        cmd = "scp %s %s" % (localpath,remotePath)
         rc,stdout,stderr = runpreloadcommand(cmd,10)
         if rc != 0:
-            print stderr
+            self.log.debug(cmd)
+            self.log.error( stderr)
             return (rc,stdout,stderr)
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
-        rc,stdout,stderr = gsiDcapCopy(self._getfilepath(remotePath),localpath)
+        self.log = logging.getLogger("uploaderScp.download")
+        self.log.debug("localpath=%s" % (localpath))
+        self.log.debug("remotePath=%s" % (remotePath))
+        cmd = "scp %s %s" % (remotePath,localpath)
+        rc,stdout,stderr = runpreloadcommand(cmd,10)
         if rc != 0:
-            for errorLine in stderr.split('\n'):
-                self.log.error("stderr:'%s'" % (errorLine))
-        return rc,stdout,stderr
+            self.log.debug(cmd)
+            self.log.error( stderr)
+            return (rc,stdout,stderr)
+        return (rc,stdout,stderr)
