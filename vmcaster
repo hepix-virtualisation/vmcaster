@@ -650,11 +650,15 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         timeout = 10000
         uploader = hostUploader(dishCfg)
         try:
-            uploader.replaceFile(localPath,parsedUri['hostname'],uri)
+            rc,stdout,stderr = uploader.replaceFile(localPath,parsedUri['hostname'],uri)
         except InputError, e:
             log.error(e.msg)
             sys.exit(99)
-        
+        if rc != 0:
+            log.error("failed to upload file")
+            log.error("Upload produced the following output:\n%s" % (stdout))
+            log.error("Upload produced the following srderr:\n%s" % (stderr))
+            sys.exit(77)
         imagepub.image_key_update(imageUuid,u'hv:size',filelength)
         imagepub.image_key_update(imageUuid,u'sl:checksum:sha512',m.hexdigest())
         versionOld = imagepub.image_key_get(imageUuid, "hv:version")
@@ -801,7 +805,12 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         except InputError, E:
             log.error(E.msg)
             sys.exit(21)
-        uploader.replaceFile(tmpfilePath,parsedUri['hostname'],uri)
+        rc,stdout,stderr = uploader.replaceFile(tmpfilePath,parsedUri['hostname'],uri)
+        if rc != 0:
+            log.error("failed to upload file")
+            log.error("Upload produced the following output:\n%s" % (stdout))
+            log.error("Upload produced the following srderr:\n%s" % (stderr))
+            sys.exit(77)
         
 if __name__ == "__main__":
     main()
