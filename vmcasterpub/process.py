@@ -47,16 +47,17 @@ class hostUploader:
             else:
                 self.log.error("Section '%s' is missing a 'writeprefix' config setting." % (section))
                 continue
-            readPrefix = None
-            if self.config.has_option(section, 'readprefix'):
-                readPrefix = self.config.getJson(section,'readprefix')
+            
+            uriPrefix = None
+            if self.config.has_option(section, 'uriMatch'):
+                uriMatch = self.config.getJson(section,'uriMatch')
             else:
-                self.log.error("Section '%s' is missing a 'readprefix' config setting." % (section))
+                self.log.error("Section '%s' is missing a 'uriMatch' config setting." % (section))
                 continue
             self.allHosts[serverName] = {'serverName' : serverName,
                 'writeProto' : writeProto,
                 'writePrefix' : writePrefix,
-                'readPrefix' : readPrefix}
+                'uriMatch' : uriMatch}
             
     def replaceFile(self,localPath,remoteHost,externalPath):
         if not remoteHost in self.allHosts:
@@ -68,7 +69,7 @@ class hostUploader:
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
         u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
-        u1.externalPrefix = self.allHosts[remoteHost]["readPrefix"]
+        u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
         return u1.replace(localPath,externalPath)   
     def uploadFile(self,localPath,remoteHost,remotePath):
         if not remoteHost in self.allHosts:
@@ -79,7 +80,7 @@ class hostUploader:
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
         u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
-        u1.externalPrefix = self.allHosts[remoteHost]["readPrefix"]
+        u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
         return u1.upload(localPath,remotePath)
     def deleteFile(self,remoteHost,remotePath):
         if not remoteHost in self.allHosts:
@@ -88,7 +89,7 @@ class hostUploader:
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
         u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
-        u1.externalPrefix = self.allHosts[remoteHost]["readPrefix"]
+        u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
         return u1.delete(remotePath)
         
 if __name__ == "__main__":
