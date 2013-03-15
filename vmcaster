@@ -423,6 +423,10 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     if options.upload_image:
         actions.add('image_upload')
         imageFileLocal = options.upload_image
+    if options.key_del_image:
+        actions.add('image_key_del')
+        image_req = True
+        image_key_del = options.key_del_image
     if options.database:
         databaseConnectionString = options.database
     if options.config_file:
@@ -560,9 +564,13 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     
     if 'image_key_update' in actions:
         imagepub.image_key_update(imageUuid ,image_key, image_key_value)
-
+    if 'image_key_del' in actions:
+        imagepub.image_key_delete(imageUuid, image_key_del)
     if 'image_keys' in actions:
         imagepub.image_keys(imagelistUUID, imageUuid)
+        
+        
+    
     if 'image_upload' in actions:
         listOfImagelists = imagepub.image_get_imagelist(imageUuid)
         if len(listOfImagelists) == 0:

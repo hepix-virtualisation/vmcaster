@@ -499,6 +499,23 @@ class imagelistpub:
             Session.commit()
             return True
         return True
+    def image_key_delete(self, imageUuid ,image_key):
+        print imageUuid
+        print image_key
+        Session = self.SessionFactory()
+        query_image_metadata = Session.query(model.ImageMetadata).\
+                filter(model.Image.identifier == imageUuid).\
+                filter(model.Imagelist.id == model.Image.fkImageList).\
+                filter(model.Image.id == model.ImageMetadata.fkImage).\
+                filter(model.ImageMetadata.key == image_key)
+        if query_image_metadata.count() == 0:
+            self.log.warning('image key not found')
+            self.log.debug('' % (imageUuid))
+            return True
+        for item in query_image_metadata:
+            Session.delete(item)
+        Session.commit()
+        return True
 
     def image_keys(self,imageListUuid, imageUuid):
         Session = self.SessionFactory()
