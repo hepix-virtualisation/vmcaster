@@ -1,8 +1,19 @@
 [x61]
 server = "localhost"
 writeprotocol = "local"
-readprefix = "https://x61.yokel.org:2880/"
+readprefix = "https://x61.example.org:2880/"
 writeprefix = "/tmp/tonggoo"
+
+
+
+[example.org]
+server = "http.example.org"
+writeprotocol = "scp"
+readprefix = "http://http.example.org/repos/prod/vmcaster"
+writeprefix = "jenkins@http.example.org:/export/example.org/prod/vmcaster"
+
+
+
 
 
 [dish.desy.de]
