@@ -570,7 +570,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
             sys.exit(45)
         ThisImageListUuid = str(listOfImagelists[0])
         reuiredImageType = imagepub.image_key_get(imageUuid,"hv:format")
-	localPath = imageFileLocal
+        localPath = imageFileLocal
         if reuiredImageType == None:
             log.debug("Using raw image in provided format")
         else:
@@ -637,7 +637,10 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         log.debug("old base directory=%s" % (directory))
         
         curtime = datetime.datetime.utcnow()
-        imageName = "%s_%s.img.gz" % (imageUuid,curtime.strftime("%Y-%m-%d_%H-%M-%S"))
+        extension = "img"
+        if reuiredImageType == None:
+            extension = reuiredImageType
+        imageName = "%s_%s.%s" % (imageUuid,curtime.strftime("%Y-%m-%d_%H-%M-%S"),extension)
         newPath = os.path.join(directory, imageName)
         
         parsedUri['path'] = newPath
