@@ -41,11 +41,11 @@ class hostUploader:
             else:
                 self.log.error("Section '%s' is missing a 'server' config setting." % (section))
                 continue
-            writePrefix = None
-            if self.config.has_option(section, 'writeprefix'):
-                writePrefix = self.config.getJson(section,'writeprefix')
+            uriReplace = None
+            if self.config.has_option(section, 'uriReplace'):
+                uriReplace = self.config.getJson(section,'uriReplace')
             else:
-                self.log.error("Section '%s' is missing a 'writeprefix' config setting." % (section))
+                self.log.error("Section '%s' is missing a 'uriReplace' config setting." % (section))
                 continue
             
             uriPrefix = None
@@ -56,7 +56,7 @@ class hostUploader:
                 continue
             self.allHosts[serverName] = {'serverName' : serverName,
                 'writeProto' : writeProto,
-                'writePrefix' : writePrefix,
+                'uriReplace' : uriReplace,
                 'uriMatch' : uriMatch}
             
     def replaceFile(self,localPath,remoteHost,externalPath):
@@ -68,7 +68,7 @@ class hostUploader:
             raise InputError("File not found at path '%s'" % localPath)
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
-        u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
+        u1.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
         u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
         return u1.replace(localPath,externalPath)   
     def uploadFile(self,localPath,remoteHost,remotePath):
@@ -79,7 +79,7 @@ class hostUploader:
             raise InputError("file not found at localpath '%s'" % localPath)
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
-        u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
+        u1.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
         u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
         return u1.upload(localPath,remotePath)
     def deleteFile(self,remoteHost,remotePath):
@@ -88,7 +88,7 @@ class hostUploader:
             raise InputError("Host '%s' is not known" % remoteHost)
         u1 = uploader.uploaderFacade()
         u1.uploader = self.allHosts[remoteHost]["writeProto"]
-        u1.remotePrefix = self.allHosts[remoteHost]["writePrefix"]
+        u1.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
         u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
         return u1.delete(remotePath)
         
