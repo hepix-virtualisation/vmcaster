@@ -60,7 +60,12 @@ class hostUploader:
                 'uriMatch' : uriMatch}
             
     def replaceFile(self,localPath,remoteHost,externalPath):
+        numberHosts = len(self.allHosts)
+        if numberHosts == 0:
+            self.log.warning("No hosts configred, please check the configuration file.")
+            raise InputError("No hosts configured")
         if not remoteHost in self.allHosts:
+            self.log.warning("Hosts '%s' is not configured." % (remoteHost))
             self.log.info("Available hosts:" % (self.allHosts.keys()))
             raise InputError("Host '%s' is not registered" % remoteHost)
         
