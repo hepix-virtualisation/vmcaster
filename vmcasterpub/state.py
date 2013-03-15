@@ -500,8 +500,6 @@ class imagelistpub:
             return True
         return True
     def image_key_delete(self, imageUuid ,image_key):
-        print imageUuid
-        print image_key
         Session = self.SessionFactory()
         query_image_metadata = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
@@ -510,7 +508,8 @@ class imagelistpub:
                 filter(model.ImageMetadata.key == image_key)
         if query_image_metadata.count() == 0:
             self.log.warning('image key not found')
-            self.log.debug('' % (imageUuid))
+            self.log.debug('imageUuid=%s' % (imageUuid))
+            self.log.debug('image_key=%s' % (image_key))
             return True
         for item in query_image_metadata:
             Session.delete(item)
