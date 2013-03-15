@@ -638,7 +638,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         
         curtime = datetime.datetime.utcnow()
         extension = "img"
-        if reuiredImageType == None:
+        if reuiredImageType != None:
             extension = reuiredImageType
         imageName = "%s_%s.%s" % (imageUuid,curtime.strftime("%Y-%m-%d_%H-%M-%S"),extension)
         newPath = os.path.join(directory, imageName)
