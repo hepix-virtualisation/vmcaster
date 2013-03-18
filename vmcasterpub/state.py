@@ -495,7 +495,6 @@ class imagelistpub:
         query_image = Session.query(model.Image).\
                 filter(model.Image.identifier == imageUuid)
         if query_image.count() == 0:
-            print imageListUuid, imageUuid ,image_key, image_value
             self.log.warning('Image does not exist.')
             return None
         query_image_metadata = Session.query(model.ImageMetadata).\
