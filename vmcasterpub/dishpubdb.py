@@ -86,9 +86,7 @@ class Image(Base):
     __tablename__ = 'Image'
     id = Column(Integer, primary_key=True)
     identifier = Column(String(50),nullable = False,unique=True)
-    fkImageList = Column(Integer, ForeignKey(Imagelist.id, onupdate="CASCADE", ondelete="CASCADE"))
-    def __init__(self,imagelist,identifier):
-        self.fkImageList = imagelist
+    def __init__(self,identifier):
         self.identifier = identifier
     def __repr__(self):
         return "<Image('%s','%s', '%s')>" % (self.fkImageList, self.key, self.value)
@@ -116,6 +114,15 @@ class Endorsement(Base):
     def __init__(self,imagelist,endorser):
         self.fkImageList = imagelist
         self.fkEndorser = endorser
+
+class ImageListImage(Base):
+    __tablename__ = 'ImageListImage'
+    id = Column(Integer, primary_key=True)
+    fkImageList = Column(Integer, ForeignKey(Imagelist.id, onupdate="CASCADE", ondelete="CASCADE"))
+    fkImage = Column(Integer, ForeignKey(Image.id, onupdate="CASCADE", ondelete="CASCADE"))
+    def __init__(self,imagelist,image):
+        self.fkImageList = imagelist
+        self.fkImage = image
 
 
 def init(engine):
