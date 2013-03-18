@@ -106,6 +106,22 @@ To delete an Image:
    $ vmcaster  --del-imagelist --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
 
 
+Upload images:
+
+$ vmcaster \
+ --upload-image sl6.cpio.bz2 \
+ --select-image aa42ca85-179b-4873-b12e-32d549bf02b6 \
+ --verbose --verbose --verbose 
+
+Upload image lists:
+
+$ vmcaster \
+ --select-imagelist ab1754cd-7d59-4851-c333-c96cb6545aaa \
+ --upload-imagelist \
+ --verbose --verbose --verbose 
+
+
+
 Configuration file.
 ~~~~~~~~~~~~~~~~~~
 
@@ -122,8 +138,8 @@ The following section is taken from my image list management configuration.
    [dish.desy.de]
    server = "dish.desy.de"
    writeprotocol = "gsidcap"
-   readprefix = "https://dish.desy.de:2880/"
-   writeprefix = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
+   uriMatch = "https://dish.desy.de:2880/"
+   uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
 
 This states that all image lists to be published on the server "dish.desy.de",
 should be updated using the "gsidcap" protocol, and that all writes corresponding 
@@ -135,12 +151,11 @@ file transfer tool from the openssh project. "gsidcap" for a long time this was 
 standard posix like write protocol for a file storage server called dCache which 
 specializes in storing very large quantities of data at the lowest price possible.
 
-
    [foo]
    server = "gridvirt.desy.de"
    writeprotocol = "scp"
-   readprefix = "https://gridvirt.desy.de/"
-   writeprefix = "root@vmic-virt-grid:/tmp/"
+   uriMatch = "https://gridvirt.desy.de/"
+   uriReplace = "root@vmic-virt-grid:/tmp/"
 
 This is another example of a configuration section that is updated using the scp protocol,
 rather than the "gsidcap" protocol previously described.
