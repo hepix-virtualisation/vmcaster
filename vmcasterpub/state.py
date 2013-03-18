@@ -231,6 +231,53 @@ class imagelistpub:
             
         Session.commit()
         return True
+    
+    
+    def imageListImageConnect(self, imagelistUUID,imageUUID):
+        Session = self.SessionFactory()
+        queryimageBindings = Session.query(model.ImageListImage).\
+            filter(model.Image.identifier == imageUUID).\
+            filter(model.Imagelist.identifier == imagelistUUID ).\
+            filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
+            filter(model.Image.id == model.ImageListImage.fkImage)
+        if queryimageBindings.count() > 0:
+            self.log.warning("'%s' already linked to '%s'" % (imageUUID,imagelistUUID))
+            return False
+
+        query_imagelists = Session.query(model.Imagelist).\
+            filter(model.Imagelist.identifier == imagelistUUID )
+        if query_imagelists.count() == 0:
+            self.log.warning('No matching imagelist found')
+            return False
+        query_image = Session.query(model.Image).\
+            filter(model.Image.identifier == imageUUID)
+        if query_image.count() == 0:
+            self.log.warning("Image does not exist.")
+            return False
+        imagelist = query_imagelists.one()
+        image = query_image.one()
+        imageBinding = model.ImageListImage(imagelist.id,image.id)
+        Session.add(imageBinding)
+        Session.commit()
+        return True
+    
+    
+    def imageListImageDisconnect(self, imagelistUUID,imageUUID):
+        Session = self.SessionFactory()
+        queryImageListImage = Session.query(model.ImageListImage).\
+            filter(model.Image.identifier == imageUUID).\
+            filter(model.Imagelist.identifier == imagelistUUID ).\
+            filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
+            filter(model.Image.id == model.ImageListImage.fkImage)
+        if queryImageListImage.count() == 0:
+            self.log.warning("'%s' is not linked to '%s'" % (endorserSubject,imagelistUUID))
+            return False
+        for item in queryImageListImage:
+            Session.delete(item)
+            
+        Session.commit()
+        return True
+    
 
     def imageListList(self):
         Session = self.SessionFactory()
@@ -281,7 +328,7 @@ class imagelistpub:
                         imagemetadata[imageItem.key] = imageItem.value
                 return imagemetadata
         return None
-        
+ 
         
     def imageListShow(self,UUID):
         Session = self.SessionFactory()
@@ -299,7 +346,9 @@ class imagelistpub:
             outModel[item.key] = item.value
         query_imagelist_images = Session.query(model.Image).\
                 filter(model.Imagelist.identifier == UUID ).\
-                filter(model.Imagelist.id == model.Image.fkImageList)
+                filter(model.ImageListImage.fkImageList == model.Imagelist.id).\
+                filter(model.ImageListImage.fkImage == model.Image.id)
+                
         if query_imagelist_images.count() > 0:
             imagesarray = []
             for image in query_imagelist_images:
@@ -404,39 +453,7 @@ class imagelistpub:
         Session.commit()
         return True
 
-    def imagelist_image_add(self,imageListUuid,ImageUUID):
-        Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Imagelist).\
-                filter(model.Imagelist.identifier == imageListUuid)
-        if query_imagelists.count() == 0:
-            self.log.warning('No imagelists found')
-            return None
-        query_image = Session.query(model.Image).\
-                filter(model.Image.identifier == ImageUUID)
-        if query_image.count() != 0:
-            self.log.warning('Image alreaady exists')
-            return None
-        
-        imagelist = query_imagelists.one()
-        newimage = model.Image(imagelist.id,ImageUUID)
-        Session.add(newimage)
-        Session.commit()        
-        return True
 
-    def imagelist_image_delete(self,ImageUUID):
-        Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Image).\
-               filter(model.Image.identifier == ImageUUID)
-        NoItems = True
-        for item in query_imagelists:
-            NoItems = False
-            Session.delete(item)
-        if not NoItems:
-            Session.commit()
-            return True
-        else:
-            self.log.info("No items deleted")
-        return False
                 
     def imageList(self):
         output = []
@@ -483,7 +500,8 @@ class imagelistpub:
             return None
         query_image_metadata = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
-                filter(model.Imagelist.id == model.Image.fkImageList).\
+                filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
+                filter(model.Image.id == model.ImageListImage.fkImage).\
                 filter(model.Image.id == model.ImageMetadata.fkImage).\
                 filter(model.ImageMetadata.key == image_key)
         if query_image_metadata.count() == 0:
@@ -503,7 +521,8 @@ class imagelistpub:
         Session = self.SessionFactory()
         query_image_metadata = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
-                filter(model.Imagelist.id == model.Image.fkImageList).\
+                filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
+                filter(model.Image.id == model.ImageListImage.fkImage).\
                 filter(model.Image.id == model.ImageMetadata.fkImage).\
                 filter(model.ImageMetadata.key == image_key)
         if query_image_metadata.count() == 0:
@@ -529,6 +548,33 @@ class imagelistpub:
             print "'%s' : '%s'" % (item.key,item.value)
         return True
 
+    def imageAdd(self,UUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Image).\
+                filter(model.Image.identifier == UUID )
+        if query_imagelists.count() > 0:
+            self.log.warning('Image already exists')
+            return False
+        newImage = model.Image(UUID)
+        Session.add(newImage)
+        Session.commit()
+        return True   
+
+    def imageDelete(self,ImageUUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Image).\
+               filter(model.Image.identifier == ImageUUID)
+        NoItems = True
+        for item in query_imagelists:
+            NoItems = False
+            Session.delete(item)
+        if not NoItems:
+            Session.commit()
+            return True
+        else:
+            self.log.info("No items deleted")
+        return False
+
     def importer(self,dictInput):
         if not 'hv:imagelist' in dictInput.keys():
             self.log.error("JSON is not a 'hv:imagelist'")
@@ -553,8 +599,9 @@ class imagelistpub:
                 if not 'dc:identifier' in imagecontent.keys():
                     self.log.warning("image has no ID '%s'" % (image))
                     continue
-                imageIdentifier = imagecontent['dc:identifier']               
-                self.imagelist_image_add(identifier, imageIdentifier)
+                imageIdentifier = imagecontent['dc:identifier']
+                self.imageAdd(imageIdentifier)
+                self.imageListImageConnect(identifier, imageIdentifier)
                 for key in imagecontent.keys():
                     if key in ['dc:identifier']:
                         continue
