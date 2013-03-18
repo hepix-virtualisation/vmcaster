@@ -177,9 +177,12 @@ and replace the master copy.""")
     p.add_option('--del-image', action ='store_true',help='Image delete. This option requires an "image" selection.')
     p.add_option('--del-endorser', action ='store',help='Endorser delete.')
     
-    p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind Endorser to imagelist. This option requires an "imagelist" and an "endorser" selection.')
-    p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind Endorser to imagelist. This option requires an "imagelist" and an "endorser" selection.')
+    p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind Endorser to Imagelist. This option requires an "imagelist" and an "endorser" selection.')
+    p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind Endorser to Imagelist. This option requires an "imagelist" and an "endorser" selection.')
+    p.add_option('--imagelist-add-image', action ='store_true',help='Bind Image to Imagelist. This option requires an "imagelist" and an "image" selection.')
+    p.add_option('--imagelist-del-image', action ='store_true',help='Unbind Image to Imagelist. This option requires an "imagelist" and an "image" selection.')
     
+
     p.add_option('--keys-imagelist', action ='store_true',help='List imagelist metadata keys. . This option requires an "image" selection.')
     p.add_option('--keys-image', action ='store_true',help='List image metadata keys. This option requires an "image" selection.')
     p.add_option('--keys-endorser', action ='store',help='List endorser metadata keys. This option requires an "endorser" selection.')
@@ -338,6 +341,15 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         endorser_req = True
         imagelist_req = True
         actions.add('disconnect')
+        
+    if options.imagelist_add_image:
+        image_req = True
+        imagelist_req = True
+        actions.add('imagelist_image_bind')
+    if options.imagelist_del_image:
+        image_req = True
+        imagelist_req = True
+        actions.add('imagelist_image_unbind')
     
     if options.select_imagelist:
         imagelistUUID = options.select_imagelist
@@ -501,6 +513,15 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     if 'disconnect' in actions:
         imagepub.imageListEndorserDisconnect(imagelistUUID,endorserSub)
     
+    if 'imagelist_image_bind' in actions:
+        imagepub.imageListImageConnect(imagelistUUID,imageUuid)
+
+    if 'imagelist_image_unbind' in actions:
+        imagepub.imageListImageDisconnect(imagelistUUID,imageUuid)
+    
+    
+    
+    
     if 'imagelist_list' in actions:
         imagepub.imageListList()
     if 'imagelist_show' in actions:
@@ -549,7 +570,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         for item in images:
             print item
     if 'image_add' in actions:
-        imagepub.imagelist_image_add(imagelistUUID,imageUuid)
+        imagepub.imageAdd(imageUuid)
         return
     if 'image_show' in actions:
         output = json.dumps(imagepub.imageShow(imageUuid),sort_keys=True, indent=4)
@@ -557,7 +578,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
             print output
         
     if 'image_del' in actions:
-        imagepub.imagelist_image_delete(imageUuid)
+        imagepub.imageDelete(imageUuid)
         return
     
     
