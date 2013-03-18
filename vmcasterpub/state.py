@@ -466,7 +466,8 @@ class imagelistpub:
     def image_get_imagelist(self,imageUuid):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist.identifier).\
-            filter(model.Imagelist.id == model.Image.fkImageList).\
+            filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
+            filter(model.Image.id == model.ImageListImage.fkImage).\
             filter(model.Image.identifier == imageUuid)
         output = []
         for item in query_imagelists:
