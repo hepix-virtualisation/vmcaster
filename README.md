@@ -33,7 +33,7 @@ Quick Start
 
 Please note this application has online help.
 
-   $ vmcaster --help
+     $ vmcaster --help
 
 This will always have an up to date list of command line options and state if they take parameters.
 
@@ -46,31 +46,31 @@ Imagelists must have an endorser, but no images is allowed.
 
 The easiest way to start playing with image list publishing is to copy some one else's hard work.
 
-   $ wget https://cernvm.cern.ch/releases/image.list \
+    $ wget https://cernvm.cern.ch/releases/image.list \
         --no-check-certificate -o CernVM.list.smime
 
 This is a large image list from the CernVm project. I provides a lot of images in a lot of formats 
 so as many customers as possible benefit from the CernVM project. We should now import the 
 image list.
 
-   $ ./vmcaster  \
+    $ ./vmcaster  \
          --import-imagelist-smime CernVM.list.smime
 
 To check the image has been imported correctly we can use the command:
 
-   $ ./vmcaster  --list-imagelist
+    $ ./vmcaster  --list-imagelist
    
 To list the endorsers,
 
-   $ ./vmcaster  --list-endorser
+    $ ./vmcaster  --list-endorser
 
 to list images:
 
-   $ ./vmcaster  --list-image
+    $ ./vmcaster  --list-image
 
 To display the imagelist:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --show-imagelist 
 
@@ -85,18 +85,18 @@ images "dc:identifier". These UUID's should be globally unique and consequently
 the UUID should be generated using a UUID generator using suitable seeds. With 
 Debian I use the following UUID generator.
 
-   $ uuidgen 
+    $ uuidgen 
 70d9816a-2f6b-4aea-9412-16716b7539b7
 
 To show image meta data:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
        --show-image
 
 To show endorser meta data:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-endorser "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=buncic/CN=379010/CN=Predrag Buncic" \
        --show-endorser
 
@@ -108,13 +108,13 @@ To create an Endorser:
 
 To create an image:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --add-imagelist
 
 To create an image:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --add-image
 
@@ -126,61 +126,61 @@ To delete and Endorser:
 
 To delete an image:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --del-image
 
 To delete an image:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --del-image
 
 
 To add an image to a image list:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
        --imagelist-add-image \
        --select-image 3a1df02c-121a-461d-b720-521903ef99f0
 
 To remove an image from the image list:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
        --imagelist-del-image \
        --select-image 3a1df02c-121a-461d-b720-521903ef99f0
 
 To add an endorser to a image list:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
        --imagelist-add-endorser \
        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
 To remove an image from the image list:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
        --imagelist-del-endorser \
        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
 To change or add meta data to an :endorser
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
        --key-set-imagelist "hv:ca"    \
        --key-value-imagelist "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
 
 To change or add meta data to an imagelist:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
        --key-set-imagelist "dc:description"        --key-value-imagelist "DESY Image List SHaring service" 
 
 To change or add meta data to an image:
 
-   $ vmcaster   \
+    $ vmcaster   \
        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
        --key-set-image "hv:uri" \
        --key-value-image "https://cernvm.cern.ch/releases/17/cernvm-desktop-2.6.0-4-1-x86.vpc.gz" 
@@ -188,19 +188,19 @@ To change or add meta data to an image:
 
 To delete meta date from :endorser
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
        --key-del-imagelist "hv:ca"    
 
 To delete meta date from imagelist:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
        --key-del-imagelist "dc:description" 
 
 To delete meta date from image:
 
-   $ vmcaster   \
+    $ vmcaster   \
        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
        --key-del-image "hv:uri" 
 
@@ -216,13 +216,13 @@ To change "dc:identifier" this we need to dump the imagelist to file, change
 the imagelist UUID, all images we wish to keep 
 
     
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --show-imagelist > output.json
-   $ OLD_LIST_UUID=e55c1afe-0a62-4d31-a8d7-fb8c825f92a2
-   $ NEW_LIST_UUID=`uuidgen`
-   $ sed -e "s/${OLD_LIST_UUID}/${NEW_LIST_UUID}/"  output.json  > input.json
-   $ vmcaster --import-imagelist-json input.json
+    $ OLD_LIST_UUID=e55c1afe-0a62-4d31-a8d7-fb8c825f92a2
+    $ NEW_LIST_UUID=`uuidgen`
+    $ sed -e "s/${OLD_LIST_UUID}/${NEW_LIST_UUID}/"  output.json  > input.json
+    $ vmcaster --import-imagelist-json input.json
 
 It might be easiest to edit the JSON with a conventional text editor. As you 
 also want to change many other variables. Note that the new UUID is generated 
@@ -236,11 +236,11 @@ identifiers ("dc:identifier" for each image.).
 All changes to the original imagelist can be reverted by re - importing an 
 imagelist previously stored as a JSON file.
 
-   $ vmcaster --import-imagelist-json input.json
+    $ vmcaster --import-imagelist-json input.json
 
 To Add an image to a image list:
 
-   $ vmcaster  \
+    $ vmcaster  \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
        --imagelist-add-image \
        --select-image 3a1df02c-121a-461d-b720-521903ef99f0
@@ -294,13 +294,13 @@ To update an Image:
 
 Now we can select an image to and update it.
 
-   $ vmcaster \
+    $ vmcaster \
       --upload-image /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
       --select-image 7b1aea46-8776-4447-9450-00e720fc042c
    
 Shows the image list as it would be made.
 
-   $ vmcaster \
+    $ vmcaster \
       --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
       --imagelist-show
       
@@ -315,20 +315,20 @@ To update an ImageList:
 
 # First check the image list is as you expect:
 
-   $ vmcaster \
+    $ vmcaster \
       --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
       --imagelist-show
 
 
 # To update and sign image list.
 
-   $ vmcaster \
+    $ vmcaster \
       --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
       --upload-imagelist
 
 # to list stored imagelists.
 
-   $ vmcaster  --imagelist-list    
+    $ vmcaster  --imagelist-list    
 
 Environment Variables.
 ~~~~~~~~~~~~~~~~~~~~~
@@ -369,6 +369,6 @@ If this application is not suitable for your use case it should not be forgotten
 SMIME and json are common standards and can be created in many ways. Below is an 
 example of how to sign a message using SMIME.
 
-   $ openssl smime her-cert.pem -encrypt -in my-message.txt
+    $ openssl smime her-cert.pem -encrypt -in my-message.txt
    
 This may prove useful in the long term.
