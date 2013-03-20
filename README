@@ -295,8 +295,20 @@ Shows the image list as it would be made.
       --imagelist-show
       
 whis shodul now have the "hv:uri" set to the correct path to download the image
-that was just updated, including the "sl:sha512" firled and incremented the 
-version number. Once you are happy with the new image list, it is time to publish this.
+that was just updated, including the "sl:sha512" is now set and the value of 
+"hv:version" has incremented the version number. 
+Once you are happy with the new image list, it is time to publish this.
+
+
+To update an ImageList:
+~~~~~~~~~~~~~~~~~~~~~~
+
+# First check the image list is as you expect:
+
+   $ vmcaster \
+      --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
+      --imagelist-show
+
 
 # To update and sign image list.
 
@@ -307,116 +319,6 @@ version number. Once you are happy with the new image list, it is time to publis
 # to list stored imagelists.
 
    $ vmcaster  --imagelist-list    
-
-Basic image list management
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-List endorsers,
-
-   $ vmcaster --list-endorser 
-
-Show JSON for endorsers.
-
-   $ vmcaster --select-endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge' --endorser-show
-
-Create an endorser 
-
-   $ vmcaster --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" --add-endorser 
-
-Show JSON for endorsers.
-
-   $ vmcaster --select-endorser '/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge' --endorser-show
-
-Add Key pair for endorser.
-
-   $ vmcaster --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"  \
-      --key-set-endorser  'hv:email' \
-      --key-value-endorser 'owen.synge@desy.de' 
-
-Create an image list.
-
-   $ vmcaster --select-imagelist  e38a3fd2-0ed8-11e2-873a-001cc0beb420 --add-imagelist
-
-To display your image list.
-
-   $ ./vmcaster --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 --show-imagelist
-
-Binding endorser to an imagelist
-
-   $ ./vmcaster --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420   \
-        --imagelist-add-endorser  \
-        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
-
-Unbinding endorser to an imagelist
-
-   $ ./vmcaster    --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420    \
-        --imagelist-del-endorser \
-        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
-
-Add attributes to an image list
-
-   $ ./vmcaster    --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
-        --key-set-imagelist "dc:description"   \
-        --key-value-imagelist "DESY Image List SHaring service"
-
-To delete an Image:
-
-   $ vmcaster  --del-imagelist --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36
-
-
-Upload images:
-
-   $ vmcaster \
-      --upload-image sl6.cpio.bz2 \
-      --select-image aa42ca85-179b-4873-b12e-32d549bf02b6 \
-      --verbose --verbose --verbose 
-
-Upload image lists:
-
-   $ vmcaster \
-      --select-imagelist ab1754cd-7d59-4851-c333-c96cb6545aaa \
-      --upload-imagelist \
-      --verbose --verbose --verbose 
-
-
-
-Configuration file.
-~~~~~~~~~~~~~~~~~~
-
-The configuration file for vmcaster is used to define the hosts and parameters 
-needed to update images and imagelists on the servers publishing the image list.
-
-The configuration file is expected system wide at "/etc/vmcaster/vmcaster.cfg" or per 
-user at "~/.vmcaster.cfg". The image list is in ini/cfg format with all values being 
-stored as json. Each section will map to one or more image lists and provides the 
-necessary information to "vmcaster" to update and upload image lists.
-
-The following section is taken from my image list management configuration.
-
-   [dish.desy.de]
-   server = "dish.desy.de"
-   writeprotocol = "gsidcap"
-   uriMatch = "https://dish.desy.de:2880/"
-   uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
-
-This states that all image lists to be published on the server "dish.desy.de",
-should be updated using the "gsidcap" protocol, and that all writes corresponding 
-with a prefix of "https://dish.desy.de:2880/" should be updated using a prefix of
-"gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/".
-
-The following write protocols are currently supported: "scp" this is the standard 
-file transfer tool from the openssh project. "gsidcap" for a long time this was the 
-standard posix like write protocol for a file storage server called dCache which 
-specializes in storing very large quantities of data at the lowest price possible.
-
-   [foo]
-   server = "gridvirt.desy.de"
-   writeprotocol = "scp"
-   uriMatch = "https://gridvirt.desy.de/"
-   uriReplace = "root@vmic-virt-grid:/tmp/"
-
-This is another example of a configuration section that is updated using the scp protocol,
-rather than the "gsidcap" protocol previously described.
 
 Environment Variables.
 ~~~~~~~~~~~~~~~~~~~~~
