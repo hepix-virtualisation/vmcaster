@@ -336,27 +336,49 @@ To list stored imagelists.
 Environment Variables.
 ----------------------
 
-* HOME *
+* HOME
 
 Used as a prefix for configuration files and certificates.
 
-* DISH_KEY *
+* DISH_KEY
 
 Path to the private key for the signing of image lists.
 
-* DISH_CERT *
+* DISH_CERT
 
 Path to the certificate for the signing of image lists.
 
-* DISH_CFG *
+* DISH_CFG
 
 Path to the configuration file for vmcaster.
 
-* DISH_RDBMS *
+* DISH_RDBMS
 
 Sqllight based connection string, Typically defaulting to 'sqlite:///dish.db'.
 This URL refers to the current working directory, to use an absolute path with 
 Sqlight, add an extra slash to the URL like syntax.
+
+* DISH_LOG_CONF
+
+vmcaster uses pythosn standard logging module, this sets the configuration file 
+to be used for logging. For specifications on how to set this up see the python
+logging documentation.
+
+* DISH_X509_DIR
+
+Sets the default directory for the users x.509 certificates. If not set this 
+value is defaulted to "$HOME/.globus".
+
+* DISH_X509_KEY
+
+Sets the default path for the users x.509 user key. If not set this 
+value is defaulted to "$HOME/.globus/userkey.pem".
+
+* DISH_X509_CERT
+
+Sets the default path for the users x.509 user key. If not set this 
+value is defaulted to "$HOME/.globus/usercert.pem".
+
 
 Road map
 --------
