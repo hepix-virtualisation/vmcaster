@@ -108,7 +108,7 @@ To create an Endorser:
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --add-endorser
 
-To create an image:
+To create an Imagelist:
 
     $ vmcaster  \
         --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
@@ -117,25 +117,25 @@ To create an image:
 To create an image:
 
     $ vmcaster  \
-        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
         --add-image
 
-To delete and Endorser:
+To delete an Endorser:
 
     $ vmcaster  \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --del-endorser
 
-To delete an image:
+To delete an Imagelist:
 
     $ vmcaster  \
-        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
-        --del-image
+        --select-imagelist  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --del-imagelist
 
-To delete an image:
+To delete an Image:
 
     $ vmcaster  \
-        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
         --del-image
 
 
@@ -171,8 +171,8 @@ To change or add meta data to an :endorser
 
     $ vmcaster  \
         --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
-        --key-set-imagelist "hv:ca"    \
-        --key-value-imagelist "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
+        --key-set-endorser "hv:ca"    \
+        --key-value-endorser "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
 
 To change or add meta data to an imagelist:
 
@@ -186,7 +186,6 @@ To change or add meta data to an image:
         --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
         --key-set-image "hv:uri" \
         --key-value-image "https://cernvm.cern.ch/releases/17/cernvm-desktop-2.6.0-4-1-x86.vpc.gz" 
-
 
 To delete meta date from :endorser
 
