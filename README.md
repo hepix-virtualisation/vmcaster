@@ -85,7 +85,7 @@ an that of Imagelist "dc:identifier".
 UUID's are used for the imagelist "dc:identifier" and also
 images "dc:identifier". These UUID's should be globally unique and consequently 
 the UUID should be generated using a UUID generator using suitable seeds. With 
-Debian I use the following UUID generator.
+Debian, Redhat and Scientific Linux I use the following UUID generator.
 
     $ uuidgen 
     70d9816a-2f6b-4aea-9412-16716b7539b7
