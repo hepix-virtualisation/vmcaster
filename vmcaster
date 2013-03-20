@@ -246,9 +246,9 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     dishCfg = None
     # Read enviroment variables
     if 'DISH_LOG_CONF' in os.environ:
-        logFile = os.environ['VMILS_LOG_CONF']
+        logFile = os.environ['DISH_LOG_CONF']
     if 'DISH_RDBMS' in os.environ:
-        databaseConnectionString = os.environ['VMILS_RDBMS']
+        databaseConnectionString = os.environ['DISH_RDBMS']
     if 'DISH_CFG' in os.environ:
         dishCfg = os.environ['DISH_CFG']
     if 'HOME' in os.environ:
