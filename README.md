@@ -265,7 +265,7 @@ The following section is taken from my image list management configuration.
 
     [example.org]
     server = "www.example.org"
-    writeprotocol = "scp"
+    protocol = "scp"
     uriMatch = "https://www.example.org/repos/prod/vmcaster"
     uriReplace = "user_name@www.example.org:/export/example.org/prod/vmcaster"
 
@@ -292,7 +292,7 @@ For a long time this was the standard POSIX like write protocol for a file
 storage server called dCache which specialises in storing very large quantities of 
 data at the lowest price possible. 
 
-A second examplek using the local file system:
+A second example using the local file system:
 
     [foo]
     server = "gridvirt.desy.de"
@@ -371,7 +371,7 @@ Sqlight, add an extra slash to the URL like syntax.
 
 * VMCASTER_LOG_CONF
 
-vmcaster uses pythosn standard logging module, this sets the configuration file 
+vmcaster uses pythons standard logging module, this sets the configuration file 
 to be used for logging. For specifications on how to set this up see the python
 logging documentation.
 
