@@ -1,5 +1,12 @@
 Changelog
 
+vmcaster-0.0.15
+
+ * Lots of small documentation fixes.
+ * Improved error handling for incvalid upload protocols.
+ * Improved logging for invalid upload prottocols.
+ * Support for 'local' upload protocol.
+
 vmcaster-0.0.14
 
  * Upgraded the documentation.
