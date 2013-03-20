@@ -55,7 +55,7 @@ This is a large image list from the CernVm project. I provides a lot of images i
 so as many customers as possible benefit from the CernVM project. We should now import the 
 image list.
 
-    $ vmcaster  \
+    $ vmcaster \
          --import-imagelist-smime CernVM.list.smime
 
 To check the image has been imported correctly we can use the command:
@@ -72,7 +72,7 @@ to list images:
 
 To display the imagelist:
 
-    $ vmcaster  \
+    $ vmcaster \
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --show-imagelist 
 
@@ -92,118 +92,118 @@ Debian, Redhat and Scientific Linux I use the following UUID generator.
 
 To show image meta data:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
         --show-image
 
 To show endorser meta data:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-endorser "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=buncic/CN=379010/CN=Predrag Buncic" \
         --show-endorser
 
 To create an Endorser:
 
-    $vmcaster  \
+    $vmcaster \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --add-endorser
 
 To create an Imagelist:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-imagelist  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --add-imagelist
 
 To create an image:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
         --add-image
 
 To delete an Endorser:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --del-endorser
 
 To delete an Imagelist:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-imagelist  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --del-imagelist
 
 To delete an Image:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
         --del-image
 
 
 To add an image to a image list:
 
-    $ vmcaster  \
-        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+    $ vmcaster \
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --imagelist-add-image \
         --select-image 3a1df02c-121a-461d-b720-521903ef99f0
 
 To remove an image from the image list:
 
-    $ vmcaster  \
-        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+    $ vmcaster \
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --imagelist-del-image \
         --select-image 3a1df02c-121a-461d-b720-521903ef99f0
 
 To add an endorser to a image list:
 
-    $ vmcaster  \
-        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+    $ vmcaster \
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --imagelist-add-endorser \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
 To remove an image from the image list:
 
-    $ vmcaster  \
-        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+    $ vmcaster \
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --imagelist-del-endorser \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
 To change or add meta data to an endorser:
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
-        --key-set-endorser "hv:ca"    \
+        --key-set-endorser "hv:ca" \
         --key-value-endorser "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
 
 To change or add meta data to an imagelist:
 
-    $ vmcaster  \
-        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
+    $ vmcaster \
+        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
         --key-set-imagelist "dc:description" \
         --key-value-imagelist "DESY Image List SHaring service" 
 
 To change or add meta data to an image:
 
-    $ vmcaster   \
-        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
+    $ vmcaster \
+        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0" \
         --key-set-image "hv:uri" \
         --key-value-image "https://cernvm.cern.ch/releases/17/cernvm-desktop-2.6.0-4-1-x86.vpc.gz" 
 
 To delete meta date from :endorser
 
-    $ vmcaster  \
+    $ vmcaster \
         --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --key-del-endorser "hv:ca"    
 
 To delete meta date from imagelist:
 
-    $ vmcaster  \
-        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
+    $ vmcaster \
+        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
         --key-del-imagelist "dc:description" 
 
 To delete meta date from image:
 
-    $ vmcaster   \
-        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
+    $ vmcaster \
+        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0" \
         --key-del-image "hv:uri" 
 
 
@@ -218,7 +218,7 @@ To change "dc:identifier" this we need to dump the imagelist to file, change
 the imagelist UUID, all images we wish to keep 
 
     
-    $ vmcaster  \
+    $ vmcaster \
         --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --show-imagelist > output.json
     $ OLD_LIST_UUID=e55c1afe-0a62-4d31-a8d7-fb8c825f92a2
@@ -243,8 +243,8 @@ imagelist previously stored as a JSON file.
 
 To Add an image to a image list:
 
-    $ vmcaster  \
-        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+    $ vmcaster \
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --imagelist-add-image \
         --select-image 3a1df02c-121a-461d-b720-521903ef99f0
        
@@ -304,7 +304,7 @@ Now we can select an image to and update it.
 Shows the image list as it would be made.
 
     $ vmcaster \
-        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
+        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
         --imagelist-show
       
 which should now have the "hv:uri" set to the correct path to download the image
@@ -319,7 +319,7 @@ To update an ImageList:
 First check the image list is as you expect:
 
     $ vmcaster \
-        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
+        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
         --imagelist-show
 
 
