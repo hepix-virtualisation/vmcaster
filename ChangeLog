@@ -2,10 +2,60 @@ Changelog
 
 vmcaster-0.0.14
 
-* Upgraded the documentation.
-* Changed the enviroment variable prefix from "DISH" to "VMCASTER"
-* changed the configuration section vairbale "writeprotocol" to "protocol"
-* Fixed logging errors.
+ * Upgraded the documentation.
+ * Changed the enviroment variable prefix from "DISH" to "VMCASTER"
+ * changed the configuration section vairbale "writeprotocol" to "protocol"
+ * Fixed logging errors.
+
+vmcaster-0.0.13
+
+ * Bug fix due to data base schema change.
+
+vmcaster-0.0.12
+
+ * Changed the the database Schema.
+ * Made consistent addition and removal of endorsers and images 
+
+vmcaster-0.0.11
+
+ * Changed the configuration file field, readprefix -> uriMatch
+ * Changed the configuration file field, writeprefix  -> uriReplace
+ * Improved logging for scp operations as info level messages.
+
+vmcaster-0.0.10
+
+ * Supports Deletion of Images form the database.
+ 
+vmcaster-0.0.9
+
+ * Fixed default image upload name, as Minutes and months where inverted.
+
+vmcaster-0.0.8
+
+ * added flexible logging.
+ * Fixed bug with non standard port handling.
+ * Improved upload logging.
+ * Reordered uploading and downloading into more rational order.
+ * changed semantics of using up loader facade.
+
+vmcaster-0.0.7
+
+ * introduced bug in image upload name, Minutes and months are now inverted.
+
+vmcaster-0.0.6
+
+ * fixed logging bugs.
+
+vmcaster-0.0.5
+
+ * small bug fix.
+
+vmcaster-0.0.4
+
+ * Better error handling.
+ * Cusotomisable certificate location.
+ * Improvements to uploading logic.
+
 
 vmcaster-0.0.3
 
