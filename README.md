@@ -122,7 +122,7 @@ To create an image:
 
 To delete and Endorser:
 
-   ./vmcaster  \
+    $ vmcaster  \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --del-endorser
 
