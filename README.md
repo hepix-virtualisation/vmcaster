@@ -354,7 +354,7 @@ Path to the configuration file for vmcaster.
 
 * VMCASTER_RDBMS
 
-Sqllight based connection string, Typically defaulting to 'sqlite:///dish.db'.
+Sqllight based connection string, Typically defaulting to 'sqlite:///vmcaster.db'.
 This URL refers to the current working directory, to use an absolute path with 
 Sqlight, add an extra slash to the URL like syntax.
 
