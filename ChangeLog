@@ -6,6 +6,7 @@ vmcaster-0.0.14
  * Changed the enviroment variable prefix from "DISH" to "VMCASTER"
  * changed the configuration section vairbale "writeprotocol" to "protocol"
  * Fixed logging errors.
+ * Changed README to README.md and reformated documentation from text to markdown format.
 
 vmcaster-0.0.13
 
