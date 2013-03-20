@@ -111,7 +111,7 @@ To create an Endorser:
 To create an Imagelist:
 
     $ vmcaster  \
-        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --select-imagelist  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --add-imagelist
 
 To create an image:
