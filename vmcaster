@@ -682,10 +682,14 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         timeout = 10000
         uploader = hostUploader(dishCfg)
         try:
-            rc,stdout,stderr = uploader.replaceFile(localPath,parsedUri['hostname'],uri)
+            uploaderRc = uploader.replaceFile(localPath,parsedUri['hostname'],uri)
         except InputError, e:
             log.error(e.msg)
             sys.exit(99)
+        if uploaderRc == None:
+            log.error("Error precessing result of upload.")
+            sys.exit(99)
+        rc,stdout,stderr = uploaderRc
         if rc != 0:
             log.error("failed to upload file")
             log.error("Upload produced the following output:\n%s" % (stdout))
