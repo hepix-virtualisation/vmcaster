@@ -104,7 +104,7 @@ To show endorser meta data:
 
 To create an Endorser:
 
-   ./vmcaster  \
+    $vmcaster  \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --add-endorser
 
