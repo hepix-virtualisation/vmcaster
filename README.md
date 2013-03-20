@@ -88,123 +88,123 @@ the UUID should be generated using a UUID generator using suitable seeds. With
 Debian I use the following UUID generator.
 
     $ uuidgen 
-70d9816a-2f6b-4aea-9412-16716b7539b7
+    70d9816a-2f6b-4aea-9412-16716b7539b7
 
 To show image meta data:
 
     $ vmcaster  \
-       --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
-       --show-image
+        --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
+        --show-image
 
 To show endorser meta data:
 
     $ vmcaster  \
-       --select-endorser "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=buncic/CN=379010/CN=Predrag Buncic" \
-       --show-endorser
+        --select-endorser "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=buncic/CN=379010/CN=Predrag Buncic" \
+        --show-endorser
 
 To create an Endorser:
 
    ./vmcaster  \
-       --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
-       --add-endorser
+        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
+        --add-endorser
 
 To create an image:
 
     $ vmcaster  \
-       --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
-       --add-imagelist
+        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --add-imagelist
 
 To create an image:
 
     $ vmcaster  \
-       --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
-       --add-image
+        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --add-image
 
 To delete and Endorser:
 
    ./vmcaster  \
-       --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
-       --del-endorser
+        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
+        --del-endorser
 
 To delete an image:
 
     $ vmcaster  \
-       --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
-       --del-image
+        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --del-image
 
 To delete an image:
 
     $ vmcaster  \
-       --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
-       --del-image
+        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --del-image
 
 
 To add an image to a image list:
 
     $ vmcaster  \
-       --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
-       --imagelist-add-image \
-       --select-image 3a1df02c-121a-461d-b720-521903ef99f0
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+        --imagelist-add-image \
+        --select-image 3a1df02c-121a-461d-b720-521903ef99f0
 
 To remove an image from the image list:
 
     $ vmcaster  \
-       --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
-       --imagelist-del-image \
-       --select-image 3a1df02c-121a-461d-b720-521903ef99f0
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+        --imagelist-del-image \
+        --select-image 3a1df02c-121a-461d-b720-521903ef99f0
 
 To add an endorser to a image list:
 
     $ vmcaster  \
-       --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
-       --imagelist-add-endorser \
-       --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+        --imagelist-add-endorser \
+        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
 To remove an image from the image list:
 
     $ vmcaster  \
-       --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
-       --imagelist-del-endorser \
-       --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+        --imagelist-del-endorser \
+        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
 To change or add meta data to an :endorser
 
     $ vmcaster  \
-       --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
-       --key-set-imagelist "hv:ca"    \
-       --key-value-imagelist "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
+        --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
+        --key-set-imagelist "hv:ca"    \
+        --key-value-imagelist "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
 
 To change or add meta data to an imagelist:
 
     $ vmcaster  \
-       --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
-       --key-set-imagelist "dc:description"        --key-value-imagelist "DESY Image List SHaring service" 
+        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
+        --key-set-imagelist "dc:description"        --key-value-imagelist "DESY Image List SHaring service" 
 
 To change or add meta data to an image:
 
     $ vmcaster   \
-       --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
-       --key-set-image "hv:uri" \
-       --key-value-image "https://cernvm.cern.ch/releases/17/cernvm-desktop-2.6.0-4-1-x86.vpc.gz" 
+        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
+        --key-set-image "hv:uri" \
+        --key-value-image "https://cernvm.cern.ch/releases/17/cernvm-desktop-2.6.0-4-1-x86.vpc.gz" 
 
 
 To delete meta date from :endorser
 
     $ vmcaster  \
-       --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
-       --key-del-imagelist "hv:ca"    
+        --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
+        --key-del-imagelist "hv:ca"    
 
 To delete meta date from imagelist:
 
     $ vmcaster  \
-       --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
-       --key-del-imagelist "dc:description" 
+        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
+        --key-del-imagelist "dc:description" 
 
 To delete meta date from image:
 
     $ vmcaster   \
-       --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
-       --key-del-image "hv:uri" 
+        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
+        --key-del-image "hv:uri" 
 
 
 Object identifiers cannot be modified with vmcaster, they can only be created 
@@ -219,11 +219,12 @@ the imagelist UUID, all images we wish to keep
 
     
     $ vmcaster  \
-       --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
-       --show-imagelist > output.json
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
+        --show-imagelist > output.json
     $ OLD_LIST_UUID=e55c1afe-0a62-4d31-a8d7-fb8c825f92a2
     $ NEW_LIST_UUID=`uuidgen`
-    $ sed -e "s/${OLD_LIST_UUID}/${NEW_LIST_UUID}/"  output.json  > input.json
+    $ sed -e "s/${OLD_LIST_UUID}/${NEW_LIST_UUID}/" \
+        output.json  > input.json
     $ vmcaster --import-imagelist-json input.json
 
 It might be easiest to edit the JSON with a conventional text editor. As you 
@@ -243,9 +244,9 @@ imagelist previously stored as a JSON file.
 To Add an image to a image list:
 
     $ vmcaster  \
-       --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
-       --imagelist-add-image \
-       --select-image 3a1df02c-121a-461d-b720-521903ef99f0
+        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2  \
+        --imagelist-add-image \
+        --select-image 3a1df02c-121a-461d-b720-521903ef99f0
        
 The final setting up task is now to set up the configuration file.
 
@@ -262,11 +263,11 @@ necessary information to "vmcaster" to update and upload image lists.
 
 The following section is taken from my image list management configuration.
 
-   [dish.desy.de]
-   server = "dish.desy.de"
-   writeprotocol = "gsidcap"
-   uriMatch = "https://dish.desy.de:2880/"
-   uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
+    [dish.desy.de]
+    server = "dish.desy.de"
+    writeprotocol = "gsidcap"
+    uriMatch = "https://dish.desy.de:2880/"
+    uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
 
 This states that all image lists to be published on the server "dish.desy.de",
 should be updated using the "gsidcap" protocol, and that all writes corresponding 
@@ -282,11 +283,11 @@ storage server called dCache which specialises in storing very large quantities 
 data at the lowest price possible. The following example is working but publishes 
 files locally.
 
-   [foo]
-   server = "gridvirt.desy.de"
-   writeprotocol = "local"
-   uriMatch = "https://gridvirt.desy.de/"
-   uriReplace = "/tmp/"
+    [foo]
+    server = "gridvirt.desy.de"
+    writeprotocol = "local"
+    uriMatch = "https://gridvirt.desy.de/"
+    uriReplace = "/tmp/"
 
 Note: Publishing an Imagelist without any images is the best way to decommission an
 imagelist when no images are expected to be requested ever again.
@@ -297,14 +298,14 @@ To update an Image:
 Now we can select an image to and update it.
 
     $ vmcaster \
-      --upload-image /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
-      --select-image 7b1aea46-8776-4447-9450-00e720fc042c
+        --upload-image /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
+        --select-image 7b1aea46-8776-4447-9450-00e720fc042c
    
 Shows the image list as it would be made.
 
     $ vmcaster \
-      --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
-      --imagelist-show
+        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
+        --imagelist-show
       
 which should now have the "hv:uri" set to the correct path to download the image
 that was just updated, including the "sl:sha512" is now set and the value of 
@@ -318,15 +319,15 @@ To update an ImageList:
 # First check the image list is as you expect:
 
     $ vmcaster \
-      --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
-      --imagelist-show
+        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
+        --imagelist-show
 
 
 # To update and sign image list.
 
     $ vmcaster \
-      --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
-      --upload-imagelist
+        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
+        --upload-imagelist
 
 # to list stored imagelists.
 
