@@ -263,25 +263,36 @@ necessary information to "vmcaster" to update and upload image lists.
 
 The following section is taken from my image list management configuration.
 
-    [dish.desy.de]
-    server = "dish.desy.de"
-    protocol = "gsidcap"
-    uriMatch = "https://dish.desy.de:2880/"
-    uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
+    [example.org]
+    server = "www.example.org"
+    writeprotocol = "scp"
+    uriMatch = "https://www.example.org/repos/prod/vmcaster"
+    uriReplace = "user_name@www.example.org:/export/example.org/prod/vmcaster"
 
-This states that all image lists to be published on the server "dish.desy.de",
-should be updated using the "gsidcap" protocol, and that all writes corresponding 
-with a prefix of "https://dish.desy.de:2880/" should be updated using a prefix of
-"gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/". The 
-section name is not significant and is just to group the attributes.
 
-The following write protocols are currently supported: "scp" this is the standard 
-file transfer tool from the openssh project. 
+This states that all image lists to be published on the server "www.example.org",
+should be updated using the "scp" protocol, and that all writes corresponding 
+with a prefix of "https://www.example.org/repos/prod/vmcaster" should be updated 
+using a prefix of "user_name@www.example.org:/export/example.org/prod/vmcaster". 
+The section name is not significant and is just to group the attributes.
 
-"gsidcap" for a long time this was the standard POSIX like write protocol for a file 
+The following write protocols are currently supported: 
+
+ * scp
+ 
+This is the standard file transfer tool from the openssh project. 
+
+ * local
+
+This is when you share a file system with the publilc server.
+
+ * gsidcap
+
+For a long time this was the standard POSIX like write protocol for a file 
 storage server called dCache which specialises in storing very large quantities of 
-data at the lowest price possible. The following example is working but publishes 
-files locally.
+data at the lowest price possible. 
+
+A second examplek using the local file system:
 
     [foo]
     server = "gridvirt.desy.de"
