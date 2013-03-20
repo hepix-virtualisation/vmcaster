@@ -316,20 +316,20 @@ Once you are happy with the new image list, it is time to publish this.
 To update an ImageList:
 -----------------------
 
-# First check the image list is as you expect:
+First check the image list is as you expect:
 
     $ vmcaster \
         --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
         --imagelist-show
 
 
-# To update and sign image list.
+To update and sign image list.
 
     $ vmcaster \
         --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
         --upload-imagelist
 
-# to list stored imagelists.
+To list stored imagelists.
 
     $ vmcaster  --imagelist-list    
 
