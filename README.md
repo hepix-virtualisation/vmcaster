@@ -36,24 +36,27 @@ Please note this application has online help.
 
      $ vmcaster --help
 
-This will always have an up to date list of command line options and state if they take parameters.
+This will always have an up to date list of command line options and state if 
+they take parameters.
 
 Background
 ----------
 
 An image list contains an array of images and an array of endorsers. Imagelists 
-Images and Endorsers can all have key value pair attributes. Some of these attributes are 
-required in every imagelist. Similarly Endorsers and Images have a set of required meta data. Every 
-Imagelists must have an endorser, but no images is allowed.
+Images and Endorsers can all have key value pair attributes. Some of these 
+attributes are required in every imagelist. Similarly Endorsers and Images have 
+a set of required meta data. Every Imagelists must have an endorser, but no 
+images is allowed.
 
-The easiest way to start playing with image list publishing is to copy some one else's hard work.
+The easiest way to start playing with image list publishing is to copy some one 
+else's hard work.
 
     $ wget https://cernvm.cern.ch/releases/image.list \
         --no-check-certificate -o CernVM.list.smime
 
-This is a large image list from the CernVm project. I provides a lot of images in a lot of formats 
-so as many customers as possible benefit from the CernVM project. We should now import the 
-image list.
+This is a large image list from the CernVm project. I provides a lot of images 
+in a lot of formats so as many customers as possible benefit from the CernVM 
+project. We should now import the image list.
 
     $ vmcaster \
          --import-imagelist-smime CernVM.list.smime
@@ -233,8 +236,8 @@ using a UUID generator.
 
 It is recommended that only experienced users with good reason share images 
 between  imagelists (primarily disk space and as part of automation). For this 
-reason while editing the  JSON. So it is probably wise to change all Image object 
-identifiers ("dc:identifier" for each image.).
+reason while editing the  JSON. So it is probably wise to change all Image 
+object identifiers ("dc:identifier" for each image.).
 
 All changes to the original imagelist can be reverted by re - importing an 
 imagelist previously stored as a JSON file.
@@ -256,10 +259,11 @@ Configuration file.
 The configuration file for vmcaster is used to define the hosts and parameters 
 needed to update images and imagelists on the servers publishing the image list.
 
-The configuration file is expected system wide at "/etc/vmcaster/vmcaster.cfg" or per 
-user at "~/.vmcaster.cfg". The image list is in ini/cfg format with all values being 
-stored as json. Each section will map to one or more image lists and provides the 
-necessary information to "vmcaster" to update and upload image lists.
+The configuration file is expected system wide at "/etc/vmcaster/vmcaster.cfg" 
+or per user at "~/.vmcaster.cfg". The image list is in ini/cfg format with all 
+values being stored as json. Each section will map to one or more image lists 
+and provides the necessary information to "vmcaster" to update and upload image 
+lists.
 
 The following section is taken from my image list management configuration.
 
@@ -289,8 +293,8 @@ This is when you share a file system with the publilc server.
  * gsidcap
 
 For a long time this was the standard POSIX like write protocol for a file 
-storage server called dCache which specialises in storing very large quantities of 
-data at the lowest price possible. 
+storage server called dCache which specialises in storing very large quantities 
+of data at the lowest price possible. 
 
 A second example using the local file system:
 
@@ -300,8 +304,8 @@ A second example using the local file system:
     uriMatch = "https://gridvirt.desy.de/"
     uriReplace = "/tmp/"
 
-Note: Publishing an Imagelist without any images is the best way to decommission an
-imagelist when no images are expected to be requested ever again.
+Note: Publishing an Imagelist without any images is the best way to decommission
+an imagelist when no images are expected to be requested ever again.
 
 To update an Image:
 -------------------
@@ -365,7 +369,7 @@ Path to the configuration file for vmcaster.
 
 * VMCASTER_RDBMS
 
-Sqllight based connection string, Typically defaulting to 'sqlite:///vmcaster.db'.
+Sqllight based connection string, This defaults to 'sqlite:///vmcaster.db'.
 This URL refers to the current working directory, to use an absolute path with 
 Sqlight, add an extra slash to the URL like syntax.
 
@@ -401,9 +405,9 @@ started.
 Appendix
 --------
 
-If this application is not suitable for your use case it should not be forgotten that 
-SMIME and json are common standards and can be created in many ways. Below is an 
-example of how to sign a message using SMIME.
+If this application is not suitable for your use case it should not be forgotten
+that SMIME and json are common standards and can be created in many ways. Below 
+is an example of how to sign a message using SMIME.
 
     $ openssl smime her-cert.pem -encrypt -in my-message.txt
    
