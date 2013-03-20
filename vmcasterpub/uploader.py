@@ -3,6 +3,8 @@ import types
 import uploader_dcap as uploaderDcap
 
 from uploader_scp import uploaderScp
+from uploader_local import uploaderLocal
+
 import re
 import sys
 
@@ -57,7 +59,12 @@ class uploaderFacade(object):
                 self._uploaderImp = uploaderDcap.uploaderDcap()
             elif name == "scp":
                 self._uploaderImp = uploaderScp()
+            elif name == "local":
+                self._uploaderImp = uploaderLocal()
             else:
+                self.log.error("Invalid upload protocol sellected '%s'" % (name))
+                self.log.info('Valid upload protocols are ["local","scp","gsidcap"]')
+                
                 del(self._uploaderImp)
             if hasattr(self, '_uploaderImp'):
                 self._uploaderImp.remotePrefix = self.remotePrefix
@@ -71,7 +78,7 @@ class uploaderFacade(object):
     def transforExtUri(self,externalURI):
         output = externalURI
         if self.externalPrefix == None:
-            self.log.warning("External match pattern not set. This may cause configuration issues.")
+            self.log.error("External match pattern not set. This may cause configuration issues.")
             self.log.info("uri=%s" % (externalURI))
             self.log.info("match=%s" % (self.externalPrefix))
             self.log.info("replace=%s" % (self.remotePrefix))
