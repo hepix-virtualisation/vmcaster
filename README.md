@@ -167,7 +167,7 @@ To remove an image from the image list:
         --imagelist-del-endorser \
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
-To change or add meta data to an :endorser
+To change or add meta data to an endorser:
 
     $ vmcaster  \
         --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
@@ -178,7 +178,8 @@ To change or add meta data to an imagelist:
 
     $ vmcaster  \
         --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
-        --key-set-imagelist "dc:description"        --key-value-imagelist "DESY Image List SHaring service" 
+        --key-set-imagelist "dc:description" \
+        --key-value-imagelist "DESY Image List SHaring service" 
 
 To change or add meta data to an image:
 
