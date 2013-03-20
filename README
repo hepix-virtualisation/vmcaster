@@ -11,9 +11,9 @@ This tool is designed to aid "endorsers" as defined in the security policy,
 and anyone who wants to publish virtual machine images in a way where 
 tampering will be detected.
 
-vmcaster was designed with the realization that users typically create new 
+vmcaster was designed with the realisation that users typically create new 
 virtual machines images rarely but update them frequently. Vmcaster attempts 
-to be the first of a new generation of image list publishers the mimise the 
+to be the first of a new generation of image list publishers the minimise the 
 data entry for updating images, with imagelists.
 
 The tasks of updating an image and uploading a fresh signed image is now just 
@@ -35,13 +35,13 @@ Please note this application has online help.
 
    $ vmcaster --help
 
-This will always have an upto date list of command line options and state if they take parameters.
+This will always have an up to date list of command line options and state if they take parameters.
 
 - Background
 
 An image list contains an array of images and an array of endorsers. Imagelists 
 Images and Endorsers can all have key value pair attributes. Some of these attributes are 
-required in every imagelist. Similarly Endorsers and Images have a set of required metadata. Every 
+required in every imagelist. Similarly Endorsers and Images have a set of required meta data. Every 
 Imagelists must have an endorser, but no images is allowed.
 
 The easiest way to start playing with image list publishing is to copy some one else's hard work.
@@ -50,7 +50,7 @@ The easiest way to start playing with image list publishing is to copy some one 
         --no-check-certificate -o CernVM.list.smime
 
 This is a large image list from the CernVm project. I provides a lot of images in a lot of formats 
-so as many customers as possible benifit from the CernVM project. We should now import the 
+so as many customers as possible benefit from the CernVM project. We should now import the 
 image list.
 
    $ ./vmcaster  \
@@ -77,24 +77,24 @@ To display the imagelist:
 Imagelist Object's "dc:identifier" is a special property of an imagelist, this 
 is the object identifier and can be used to select items for creation, deletion 
 or modification. Each Object has an Identifier, the Endorser object identifier 
-is the value cossiponding with "hv:dn". Image Objects identifier is the same as 
+is the value corresponding with "hv:dn". Image Objects identifier is the same as 
 an that of Imagelist "dc:identifier". 
 
 UUID's are used for the imagelist "dc:identifier" and also
-images "dc:identifier". These UUID's should be globally unique and conisquently 
-the UUID should be generated using a UUID gnerator using suitable seeds. With 
-Debian I usae the following UUID generator.
+images "dc:identifier". These UUID's should be globally unique and consequently 
+the UUID should be generated using a UUID generator using suitable seeds. With 
+Debian I use the following UUID generator.
 
    $ uuidgen 
 70d9816a-2f6b-4aea-9412-16716b7539b7
 
-To show image metadata:
+To show image meta data:
 
    $ vmcaster  \
        --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
        --show-image
 
-To show endorser metadata:
+To show endorser meta data:
 
    $ vmcaster  \
        --select-endorser "/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=buncic/CN=379010/CN=Predrag Buncic" \
@@ -106,13 +106,13 @@ To create an Endorser:
        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
        --add-endorser
 
-To create an immage:
+To create an image:
 
    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --add-imagelist
 
-To create an immage:
+To create an image:
 
    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
@@ -124,13 +124,13 @@ To delete and Endorser:
        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
        --del-endorser
 
-To delete an immage:
+To delete an image:
 
    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --del-image
 
-To delete an immage:
+To delete an image:
 
    $ vmcaster  \
        --select-image  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
@@ -165,20 +165,20 @@ To remove an image from the image list:
        --imagelist-del-endorser \
        --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge"
 
-To change or add metadata to an :endorser
+To change or add meta data to an :endorser
 
    $ vmcaster  \
        --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
        --key-set-imagelist "hv:ca"    \
        --key-value-imagelist "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
 
-To change or add metadata to an imagelist:
+To change or add meta data to an imagelist:
 
    $ vmcaster  \
        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
        --key-set-imagelist "dc:description"        --key-value-imagelist "DESY Image List SHaring service" 
 
-To change or add metadata to an image:
+To change or add meta data to an image:
 
    $ vmcaster   \
        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
@@ -186,33 +186,33 @@ To change or add metadata to an image:
        --key-value-image "https://cernvm.cern.ch/releases/17/cernvm-desktop-2.6.0-4-1-x86.vpc.gz" 
 
 
-To delete metadate from :endorser
+To delete meta date from :endorser
 
    $ vmcaster  \
        --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
        --key-del-imagelist "hv:ca"    
 
-To delete metadate from imagelist:
+To delete meta date from imagelist:
 
    $ vmcaster  \
        --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420  \
        --key-del-imagelist "dc:description" 
 
-To delete metadate from image:
+To delete meta date from image:
 
    $ vmcaster   \
        --select-image "2934ec2b-7a67-4b96-ba16-6775d66898d0"    \
        --key-del-image "hv:uri" 
 
 
-Obnect itentifiers cannot be modified with vmcaster, they can only be created 
-and destroyed,. This is intentioanl to prevent accidental errors.
+Object identifiers cannot be modified with vmcaster, they can only be created 
+and destroyed,. This is intentional to prevent accidental errors.
 
-Imagelists with clashing  "dc:identifier" value is conisdered disruptive at 
-best and hostile at worst, and it will be noticed by imagelist subscibers. 
+Imagelists with clashing  "dc:identifier" value is considered disruptive at 
+best and hostile at worst, and it will be noticed by imagelist subscribers. 
 Similarly not having your endorser details correctly is stated in the endorser.
 
-To chnage "dc:identifier" this we need to dump the imagelist to file, change 
+To change "dc:identifier" this we need to dump the imagelist to file, change 
 the imagelist UUID, all images we wish to keep 
 
     
@@ -224,17 +224,17 @@ the imagelist UUID, all images we wish to keep
    $ sed -e "s/${OLD_LIST_UUID}/${NEW_LIST_UUID}/"  output.json  > input.json
    $ vmcaster --import-imagelist-json input.json
 
-It might be easiest to edit the json with a conventional text editor. As you 
+It might be easiest to edit the JSON with a conventional text editor. As you 
 also want to change many other variables. Note that the new UUID is generated 
 using a UUID generator.
 
-It is recomended that only experienced users with good reason share images 
-between  imagelists (primarily diskspace and as part of automation). For this 
-reason while editing the  json. So it is probably wise to change all Image object 
+It is recommended that only experienced users with good reason share images 
+between  imagelists (primarily disk space and as part of automation). For this 
+reason while editing the  JSON. So it is probably wise to change all Image object 
 identifiers ("dc:identifier" for each image.).
 
 All changes to the original imagelist can be reverted by re - importing an 
-imagelist prviously stored as a JSON file.
+imagelist previously stored as a JSON file.
 
    $ vmcaster --import-imagelist-json input.json
 
@@ -270,13 +270,13 @@ This states that all image lists to be published on the server "dish.desy.de",
 should be updated using the "gsidcap" protocol, and that all writes corresponding 
 with a prefix of "https://dish.desy.de:2880/" should be updated using a prefix of
 "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/". The 
-secion name is not significant and is just to group the attributes.
+section name is not significant and is just to group the attributes.
 
 The following write protocols are currently supported: "scp" this is the standard 
 file transfer tool from the openssh project. 
 
-"gsidcap" for a long time this was the standard posix like write protocol for a file 
-storage server called dCache which specializes in storing very large quantities of 
+"gsidcap" for a long time this was the standard POSIX like write protocol for a file 
+storage server called dCache which specialises in storing very large quantities of 
 data at the lowest price possible. The following example is working but publishes 
 files locally.
 
@@ -286,7 +286,7 @@ files locally.
    uriMatch = "https://gridvirt.desy.de/"
    uriReplace = "/tmp/"
 
-Note: Publishing an Imagelist without any images is the best way to decomison an
+Note: Publishing an Imagelist without any images is the best way to decommission an
 imagelist when no images are expected to be requested ever again.
 
 To update an Image:
@@ -304,7 +304,7 @@ Shows the image list as it would be made.
       --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36  \
       --imagelist-show
       
-whis shodul now have the "hv:uri" set to the correct path to download the image
+which should now have the "hv:uri" set to the correct path to download the image
 that was just updated, including the "sl:sha512" is now set and the value of 
 "hv:version" has incremented the version number. 
 Once you are happy with the new image list, it is time to publish this.
