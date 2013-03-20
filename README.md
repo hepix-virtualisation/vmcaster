@@ -192,7 +192,7 @@ To delete meta date from :endorser
 
     $ vmcaster  \
         --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
-        --key-del-imagelist "hv:ca"    
+        --key-del-endorser "hv:ca"    
 
 To delete meta date from imagelist:
 
