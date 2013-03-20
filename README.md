@@ -188,7 +188,7 @@ To change or add meta data to an image:
         --key-set-image "hv:uri" \
         --key-value-image "https://cernvm.cern.ch/releases/17/cernvm-desktop-2.6.0-4-1-x86.vpc.gz" 
 
-To delete meta date from :endorser
+To delete meta date from endorser:
 
     $ vmcaster \
         --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
