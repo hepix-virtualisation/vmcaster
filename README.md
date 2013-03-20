@@ -264,7 +264,7 @@ The following section is taken from my image list management configuration.
 
     [dish.desy.de]
     server = "dish.desy.de"
-    writeprotocol = "gsidcap"
+    protocol = "gsidcap"
     uriMatch = "https://dish.desy.de:2880/"
     uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
 
@@ -284,7 +284,7 @@ files locally.
 
     [foo]
     server = "gridvirt.desy.de"
-    writeprotocol = "local"
+    protocol = "local"
     uriMatch = "https://gridvirt.desy.de/"
     uriReplace = "/tmp/"
 
