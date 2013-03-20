@@ -30,10 +30,10 @@ class hostUploader:
         self.allHosts = {}
         for section in self.config.sections():
             writeProto = None
-            if self.config.has_option(section, 'writeprotocol'):
-                writeProto = self.config.getJson(section,'writeprotocol')
+            if self.config.has_option(section, 'protocol'):
+                writeProto = self.config.getJson(section,'protocol')
             else:
-                self.log.error("Section '%s' is missing a 'writeprotocol' config setting." % (section))
+                self.log.error("Section '%s' is missing a 'protocol' config setting." % (section))
                 continue
             serverName = None
             if self.config.has_option(section, 'server'):

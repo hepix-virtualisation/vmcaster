@@ -1,6 +1,6 @@
 [x61]
 server = "localhost"
-writeprotocol = "local"
+protocol = "local"
 uriMatch = "https://x61.example.org:2880/"
 uriReplace = "/tmp/tonggoo"
 
@@ -8,7 +8,7 @@ uriReplace = "/tmp/tonggoo"
 
 [example.org]
 server = "http.example.org"
-writeprotocol = "scp"
+protocol = "scp"
 uriMatch = "http://http.example.org/repos/prod/vmcaster"
 uriReplace = "jenkins@http.example.org:/export/example.org/prod/vmcaster"
 
@@ -18,7 +18,7 @@ uriReplace = "jenkins@http.example.org:/export/example.org/prod/vmcaster"
 
 [dish.desy.de]
 server = "dish.desy.de"
-writeprotocol = "gsidcap"
+protocol = "gsidcap"
 uriMatch = "https://dish.desy.de:2880/"
 uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
 
@@ -26,7 +26,7 @@ uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmim
 
 [foo]
 server = "gridvirt.desy.de"
-writeprotocol = "scp"
+protocol = "scp"
 uriMatch = "https://gridvirt.desy.de/"
 uriReplace = "root@vmic-virt-grid:/tmp/"
 
