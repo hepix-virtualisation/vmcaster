@@ -46,13 +46,15 @@ Imagelists must have an endorser, but no images is allowed.
 
 The easiest way to start playing with image list publishing is to copy some one else's hard work.
 
-   $ wget https://cernvm.cern.ch/releases/image.list --no-check-certificate -o CernVM.list.smime
+   $ wget https://cernvm.cern.ch/releases/image.list \
+        --no-check-certificate -o CernVM.list.smime
 
 This is a large image list from the CernVm project. I provides a lot of images in a lot of formats 
 so as many customers as possible benifit from the CernVM project. We should now import the 
 image list.
 
-   $ ./vmcaster  --import-imagelist-smime CernVM.list.smime
+   $ ./vmcaster  \
+         --import-imagelist-smime CernVM.list.smime
 
 To check the image has been imported correctly we can use the command:
 
@@ -78,8 +80,13 @@ or modification. Each Object has an Identifier, the Endorser object identifier
 is the value cossiponding with "hv:dn". Image Objects identifier is the same as 
 an that of Imagelist "dc:identifier". 
 
-It is recomended that UUID's are used for any imagelist "dc:identifier" and also
-images "dc:identifier". Endorsers "hv:dn" shoud be the ceriticates subject.
+UUID's are used for the imagelist "dc:identifier" and also
+images "dc:identifier". These UUID's should be globally unique and conisquently 
+the UUID should be generated using a UUID gnerator using suitable seeds. With 
+Debian I usae the following UUID generator.
+
+   $ uuidgen 
+70d9816a-2f6b-4aea-9412-16716b7539b7
 
 To show image metadata:
 
@@ -213,20 +220,23 @@ the imagelist UUID, all images we wish to keep
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --show-imagelist > output.json
    $ OLD_LIST_UUID=e55c1afe-0a62-4d31-a8d7-fb8c825f92a2
-   $ NEW_LIST_UUID=aaac1afe-0a62-4d31-a8d7-fb8c825f92a2
+   $ NEW_LIST_UUID=`uuidgen`
    $ sed -e "s/${OLD_LIST_UUID}/${NEW_LIST_UUID}/"  output.json  > input.json
    $ vmcaster --import-imagelist-json input.json
 
 It might be easiest to edit the json with a conventional text editor. As you 
-also want to change many other variables.
+also want to change many other variables. Note that the new UUID is generated 
+using a UUID generator.
 
-It is recomended that only experienced used with good reason share images 
-between  imagelists (primarily diskspace and automation), for this reason while 
-editing the  json. So it is probably wise to change all Image object 
-identifiers.
+It is recomended that only experienced users with good reason share images 
+between  imagelists (primarily diskspace and as part of automation). For this 
+reason while editing the  json. So it is probably wise to change all Image object 
+identifiers ("dc:identifier" for each image.).
 
-      
-All changes to the original imagelist can be reverted by re - importing the imagelist.
+All changes to the original imagelist can be reverted by re - importing an 
+imagelist prviously stored as a JSON file.
+
+   $ vmcaster --import-imagelist-json input.json
 
 To Add an image to a image list:
 
