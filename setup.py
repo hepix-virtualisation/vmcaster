@@ -34,6 +34,6 @@ setup(name='vmcaster',
         ],
     packages=['vmcasterpub'],
     scripts=['vmcaster'],
-    data_files=[('/usr/share/doc/vmcaster',['README']),
+    data_files=[('/usr/share/doc/vmcaster',['README.md']),
         ('/etc/vmcaster',['vmcaster.cfg.template'])],
     )
