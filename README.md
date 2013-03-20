@@ -29,7 +29,8 @@ effort.
 
 
 Quick Start
-~~~~~~~~~~~
+===========
+
 
 Please note this application has online help.
 
@@ -37,7 +38,8 @@ Please note this application has online help.
 
 This will always have an up to date list of command line options and state if they take parameters.
 
-- Background
+Background
+----------
 
 An image list contains an array of images and an array of endorsers. Imagelists 
 Images and Endorsers can all have key value pair attributes. Some of these attributes are 
@@ -248,7 +250,7 @@ To Add an image to a image list:
 The final setting up task is now to set up the configuration file.
 
 Configuration file.
-~~~~~~~~~~~~~~~~~~
+-------------------
 
 The configuration file for vmcaster is used to define the hosts and parameters 
 needed to update images and imagelists on the servers publishing the image list.
@@ -290,7 +292,7 @@ Note: Publishing an Imagelist without any images is the best way to decommission
 imagelist when no images are expected to be requested ever again.
 
 To update an Image:
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Now we can select an image to and update it.
 
@@ -311,7 +313,7 @@ Once you are happy with the new image list, it is time to publish this.
 
 
 To update an ImageList:
-~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 # First check the image list is as you expect:
 
@@ -331,7 +333,7 @@ To update an ImageList:
     $ vmcaster  --imagelist-list    
 
 Environment Variables.
-~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 * HOME *
 
@@ -356,14 +358,14 @@ This URL refers to the current working directory, to use an absolute path with
 Sqlight, add an extra slash to the URL like syntax.
 
 Road map
-~~~~~~~
+--------
 
 The code should also be publishable into a message Queue service provided by a 
 cloud provider allowing unpublished images to be shared. This work has not been 
 started.
 
 Appendix
-~~~~~~~
+--------
 
 If this application is not suitable for your use case it should not be forgotten that 
 SMIME and json are common standards and can be created in many ways. Below is an 
