@@ -66,7 +66,7 @@ To list the endorsers,
 
     $ vmcaster  --list-endorser
 
-to list images:
+To list images:
 
     $ vmcaster  --list-image
 
