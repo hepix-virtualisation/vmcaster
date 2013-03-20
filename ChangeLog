@@ -1,5 +1,11 @@
 Changelog
 
+vmcaster-0.0.14
+
+* Upgraded the documentation.
+* Changed the enviroment variable prefix from "DISH" to "VMCASTER"
+* changed the configuration section vairbale "writeprotocol" to "protocol"
+* Fixed logging errors.
 
 vmcaster-0.0.3
 
