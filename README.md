@@ -55,20 +55,20 @@ This is a large image list from the CernVm project. I provides a lot of images i
 so as many customers as possible benefit from the CernVM project. We should now import the 
 image list.
 
-    $ ./vmcaster  \
+    $ vmcaster  \
          --import-imagelist-smime CernVM.list.smime
 
 To check the image has been imported correctly we can use the command:
 
-    $ ./vmcaster  --list-imagelist
+    $ vmcaster  --list-imagelist
    
 To list the endorsers,
 
-    $ ./vmcaster  --list-endorser
+    $ vmcaster  --list-endorser
 
 to list images:
 
-    $ ./vmcaster  --list-image
+    $ vmcaster  --list-image
 
 To display the imagelist:
 
