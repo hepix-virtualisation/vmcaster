@@ -270,11 +270,10 @@ class imagelistpub:
             filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
             filter(model.Image.id == model.ImageListImage.fkImage)
         if queryImageListImage.count() == 0:
-            self.log.warning("'%s' is not linked to '%s'" % (endorserSubject,imagelistUUID))
+            self.log.warning("'%s' is not linked to '%s'" % (imagelistUUID,imagelistUUID))
             return False
         for item in queryImageListImage:
             Session.delete(item)
-            
         Session.commit()
         return True
     
