@@ -146,9 +146,9 @@ def main():
     p.add_option('--verbose', action ='count',help='Change global log level, increasing log output.', metavar='LOGFILE')
     p.add_option('--quiet', action ='count',help='Change global log level, decreasing log output.', metavar='LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
-    p.add_option('--x509-dir', action ='store',help='Directory for x.509 certificates and keys.', metavar='DISH_X509_DIR')
-    p.add_option('--x509-cert', action ='store',help='Path of x.509 Certificate.', metavar='DISH_X509_CERT')
-    p.add_option('--x509-key', action ='store',help='Path of x.509 Key.', metavar='DISH_X509_KEY')
+    p.add_option('--x509-dir', action ='store',help='Directory for x.509 certificates and keys.', metavar='VMCASTER_X509_DIR')
+    p.add_option('--x509-cert', action ='store',help='Path of x.509 Certificate.', metavar='VMCASTER_X509_CERT')
+    p.add_option('--x509-key', action ='store',help='Path of x.509 Key.', metavar='VMCASTER_X509_KEY')
     p.add_option('--list-imagelist', action ='store_true',help='list imageslists by "dc:identifier".')
     p.add_option('--list-image', action ='store_true',help='list Images by "dc:identifier".')    
     p.add_option('--list-endorser', action ='store_true',help='list Endorsers by "hv:dn".')
@@ -245,21 +245,21 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
     
     dishCfg = None
     # Read enviroment variables
-    if 'DISH_LOG_CONF' in os.environ:
-        logFile = os.environ['DISH_LOG_CONF']
-    if 'DISH_RDBMS' in os.environ:
-        databaseConnectionString = os.environ['DISH_RDBMS']
-    if 'DISH_CFG' in os.environ:
-        dishCfg = os.environ['DISH_CFG']
+    if 'VMCASTER_LOG_CONF' in os.environ:
+        logFile = os.environ['VMCASTER_LOG_CONF']
+    if 'VMCASTER_RDBMS' in os.environ:
+        databaseConnectionString = os.environ['VMCASTER_RDBMS']
+    if 'VMCASTER_CFG' in os.environ:
+        dishCfg = os.environ['VMCASTER_CFG']
     if 'HOME' in os.environ:
         applicationHome = os.environ['HOME']
     
-    if 'DISH_X509_DIR' in os.environ:
-        pathX509Dir = os.environ['DISH_X509_DIR']
-    if 'DISH_X509_KEY' in os.environ:
-        pathX509Key = os.environ['DISH_X509_KEY']
-    if 'DISH_X509_CERT' in os.environ:
-        pathX509Cert = os.environ['DISH_X509_CERT']
+    if 'VMCASTER_X509_DIR' in os.environ:
+        pathX509Dir = os.environ['VMCASTER_X509_DIR']
+    if 'VMCASTER_X509_KEY' in os.environ:
+        pathX509Key = os.environ['VMCASTER_X509_KEY']
+    if 'VMCASTER_X509_CERT' in os.environ:
+        pathX509Cert = os.environ['VMCASTER_X509_CERT']
 
     
     # Set up log file
