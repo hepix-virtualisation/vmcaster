@@ -52,7 +52,7 @@ The easiest way to start playing with image list publishing is to copy some one
 else's hard work.
 
     $ wget https://cernvm.cern.ch/releases/image.list \
-        --no-check-certificate -o CernVM.list.smime
+        --no-check-certificate --output-document CernVM.list.smime
 
 This is a large image list from the CernVm project. I provides a lot of images 
 in a lot of formats so as many customers as possible benefit from the CernVM 
