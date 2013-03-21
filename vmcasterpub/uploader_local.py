@@ -49,10 +49,7 @@ class uploaderLocal:
         return runpreloadcommand(cmd,timeout)
         
     def delete(self,remotePath):
-        prefix = self.remotePrefix.split(":")
-        fuill = "%s/%s" % (prefix[1],remotePath)
-        
-        cmd = "rm %s" % (fuill)
+        cmd = "rm %s" % (remotePath)
         timeout = 10
         return runpreloadcommand(cmd,timeout)
         
