@@ -58,8 +58,8 @@ Secuity note:
 
 It is more secure to use "https" than "http" for serving the imagelist, as it 
 will prevent "man in the middle" presenting old image lists. For serving images 
-http is fine is as secure as https, as the authentisity of the image is secured 
-by the imagelist.
+http is fine and is as secure as https, as the authentisity of the image is 
+secured by the imagelist.
 
 Background
 ----------
