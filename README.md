@@ -357,7 +357,7 @@ Shows the image list as it would be made.
 
     $ vmcaster \
         --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
-        --imagelist-show
+        --show-imagelist
       
 which should now have the "hv:uri" set to the correct path to download the image
 that was just updated, including the "sl:sha512" is now set and the value of 
@@ -372,7 +372,7 @@ First check the image list is as you expect:
 
     $ vmcaster \
         --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
-        --imagelist-show
+        --show-imagelist
 
 
 To update and sign image list.
