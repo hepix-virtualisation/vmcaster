@@ -54,12 +54,19 @@ default installed as "/etc/vmcaster/vmcaster.cfg.template". To get started:
 When it comes to uploading images and imagelists you will need to add to this
 file for your own site specific settings.
 
-Secuity note:
+### Secuity note ###
 
-It is more secure to use "https" than "http" for serving the imagelist, as it 
-will prevent "man in the middle" presenting old image lists. For serving images 
-http is fine and is as secure as https, as the authentisity of the image is 
-secured by the imagelist.
+It is more secure to use "https" than "http" for serving the imagelist. While 
+the authentisity of the imagelist is secured by the imagelist signature, the 
+signature cannot prevent "man in the middle" presenting an old signed imagelist.
+
+For serving images http is as secure as https, as the authentisity of the image 
+is secured by the imagelist's signature, thus the worst a man in the middle 
+attack can do with images is provide a denial of service when the image does not 
+match the sha512 hash it will be detected and rejected.
+
+It is expected future versions of vmcatcher will issue a warning when retriving
+imagelists from unauthenticated hosts.
 
 Background
 ----------
