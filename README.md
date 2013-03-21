@@ -65,8 +65,10 @@ is secured by the imagelist's signature, thus the worst a man in the middle
 attack can do with images is provide a denial of service when the image does not 
 match the sha512 hash it will be detected and rejected.
 
-It is expected future versions of vmcatcher will issue a warning when retriving
-imagelists from unauthenticated hosts.
+It is expected future versions of vmcatcher will issue a warning when 
+subscribing to and retriving imagelists from unauthenticated hosts. Imagelist 
+subscribers will prefure not to see these warnings, and may decide to only trust
+imagelist hosted on authenticated servers.
 
 Background
 ----------
