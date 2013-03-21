@@ -31,13 +31,27 @@ effort.
 Quick Start
 ===========
 
-
 Please note this application has online help.
 
      $ vmcaster --help
 
 This will always have an up to date list of command line options and state if 
 they take parameters.
+
+vmcaster uses the standard python logging library for detailed documentation on 
+configuring the python logging library it is better to use other online 
+resources. The python logging library is highly configurable. To make things 
+simpler the vmcaster command line has "--verbose" and "--quiet" command line 
+options which respectively makes the logging more or less detailed.
+
+vmcaster requires a configuration file, this file should exist in either 
+"/etc/vmcaster/vmcaster.cfg" or "~/.vmcaster.cfg". An example template is by 
+default installed as "/etc/vmcaster/vmcaster.cfg.template". To get started:
+
+    $ cp /etc/vmcaster/vmcaster.cfg.template ~/.vmcaster.cfg
+
+When it comes to uploading images and imagelists you will need to add to this
+file for your own site specific settings.
 
 Background
 ----------
@@ -318,7 +332,8 @@ Now we can select an image to and update it.
 
 TIP: If you are setting up vmcaster for the first time, you may be presented 
 with errors but need more information to debug. You may find adding one or more 
-"--verbose" parameters to the call will give useful extra debugging information.
+"--verbose" parameters to the command will give useful extra debugging 
+information.
 
    
 Shows the image list as it would be made.
