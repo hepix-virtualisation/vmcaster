@@ -381,10 +381,6 @@ To update and sign image list.
         --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
         --upload-imagelist
 
-To list stored imagelists.
-
-    $ vmcaster  --imagelist-list    
-
 Environment Variables.
 ----------------------
 
