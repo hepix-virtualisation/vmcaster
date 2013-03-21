@@ -315,6 +315,11 @@ Now we can select an image to and update it.
     $ vmcaster \
         --upload-image /var/lib/libvirt/images/hudson-slave-vm06.desy.de.img \
         --select-image 7b1aea46-8776-4447-9450-00e720fc042c
+
+TIP: If you are setting up vmcaster for the first time, you may be presented 
+with errors but need more information to debug. You may find adding one or more 
+"--verbose" parameters to the call will give useful extra debugging information.
+
    
 Shows the image list as it would be made.
 
@@ -324,7 +329,7 @@ Shows the image list as it would be made.
       
 which should now have the "hv:uri" set to the correct path to download the image
 that was just updated, including the "sl:sha512" is now set and the value of 
-"hv:version" has incremented the version number. 
+"hv:version" has incremented the version number.
 Once you are happy with the new image list, it is time to publish this.
 
 
