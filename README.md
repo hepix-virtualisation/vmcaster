@@ -38,11 +38,12 @@ Please note this application has online help.
 This will always have an up to date list of command line options and state if 
 they take parameters.
 
-vmcaster uses the standard python logging library for detailed documentation on 
-configuring the python logging library it is better to use other online 
-resources. The python logging library is highly configurable. To make things 
-simpler the vmcaster command line has "--verbose" and "--quiet" command line 
-options which respectively makes the logging more or less detailed.
+vmcaster uses the standard python logging library. To make things simpler the 
+vmcaster command line has "--verbose" and "--quiet" command line options which 
+respectively makes the logging more or less detailed. You can also specify a 
+logging configuration file using "--logcfg". Details of setting up pythons 
+logging library and its associated configuration file are out of scope for this 
+document.
 
 vmcaster requires a configuration file, this file should exist in either 
 "/etc/vmcaster/vmcaster.cfg" or "~/.vmcaster.cfg". An example template is by 
@@ -302,7 +303,7 @@ This is the standard file transfer tool from the openssh project.
 
  * local
 
-This is when you share a file system with the publilc server.
+This is when you share a file system with the public server.
 
  * gsidcap
 
