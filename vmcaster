@@ -196,7 +196,7 @@ This option requires an "imagelist" selection and a "--key-value-imagelist" para
 As Guidence Keys should follow a pattern of "namespace:type".
 This option requires an "image" selection and a "--key-value-image" paramer.""")
     
-    p.add_option('--key-del-imagelist', action ='store',help='Imagelist metadata key to delete. This option requires an "image" selection.')
+    p.add_option('--key-del-imagelist', action ='store',help='Imagelist metadata key to delete. This option requires an "image" selection.')
     p.add_option('--key-del-image', action ='store',help='Image metadata key to delete. This option requires an "image" selection.')
     p.add_option('--key-del-endorser', action ='store_true',help='Endorser metadata key to delete. This option requires an "endorser" selection.')
     

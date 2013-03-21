@@ -232,7 +232,7 @@ To delete meta data from imagelist:
 
     $ vmcaster \
         --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
-        --key-del-imagelist "dc:description" 
+        --key-del-imagelist "dc:description"
 
 To delete meta data from image:
 
