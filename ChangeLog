@@ -1,5 +1,11 @@
 Changelog
 
+vmcaster-0.0.16
+
+ * Lots of documentation updates.
+ * Bug fix in uploading imagelists using the "local" protocol.
+ * Thanks to Sandor for testing the documentation and reporting bugs.
+
 vmcaster-0.0.15
 
  * Lots of small documentation fixes.
