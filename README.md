@@ -1,6 +1,10 @@
 Vmcaster is a simple tool for managing and updating your published 
 virtual machines image lists. Following the Hepix image list format.
 
+vmcaster software is available here:
+
+    https://github.com/hepix-virtualisation/vmcaster
+
 Users of this application should read "security-related policy requirements for 
 the generation and endorsement of trusted virtual machine (VM) images for use on 
 the Grid". The URL is shown below.
@@ -53,22 +57,6 @@ default installed as "/etc/vmcaster/vmcaster.cfg.template". To get started:
 
 When it comes to uploading images and imagelists you will need to add to this
 file for your own site specific settings.
-
-### Secuity note ###
-
-It is more secure to use "https" than "http" for serving the imagelist. While 
-the authenticity of the imagelist is secured by the imagelist signature, the 
-signature cannot prevent "man in the middle" presenting an old signed imagelist.
-
-For serving images http is as secure as https, as the authenticity of the image 
-is secured by the imagelist's signature, thus the worst a man in the middle 
-attack can do with images is provide a denial of service when the image does not 
-match the sha512 hash it will be detected and rejected.
-
-It is expected future versions of vmcatcher will issue a warning when 
-subscribing to and retrieving imagelists from unauthenticated hosts. Imagelist 
-subscribers will prefer not to see these warnings, and may decide to only trust
-imagelists hosted on authenticated servers.
 
 Background
 ----------
@@ -381,6 +369,14 @@ To update and sign image list.
         --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
         --upload-imagelist
 
+Clients
+-------
+
+Currently only one image list subscriber exists called vmcatcher.
+
+    https://github.com/hepix-virtualisation/vmcatcher
+
+
 Environment Variables.
 ----------------------
 
@@ -434,6 +430,27 @@ Road map
 The code should also be publishable into a message Queue service provided by a 
 cloud provider allowing unpublished images to be shared. This work has not been 
 started.
+
+
+Deployment
+----------
+
+### Secuity note ###
+
+It is more secure to use "https" than "http" for serving the imagelist. While 
+the authenticity of the imagelist is secured by the imagelist signature, the 
+signature cannot prevent "man in the middle" presenting an old signed imagelist.
+
+For serving images http is as secure as https, as the authenticity of the image 
+is secured by the imagelist's signature, thus the worst a man in the middle 
+attack can do with images is provide a denial of service when the image does not 
+match the sha512 hash it will be detected and rejected.
+
+It is expected future versions of vmcatcher will issue a warning when 
+subscribing to and retrieving imagelists from unauthenticated hosts. Imagelist 
+subscribers will prefer not to see these warnings, and may decide to only trust
+imagelists hosted on authenticated servers.
+
 
 Appendix
 --------
