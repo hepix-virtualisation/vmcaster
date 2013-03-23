@@ -435,6 +435,14 @@ started.
 Deployment
 ----------
 
+It is wise to deploy an "imagelist subsciber" so you can check for errors with 
+vmcaster as your "imagelist" publisher. 
+
+    http://github.com/hepix-virtualisation/vmcatcher
+
+Is an "imagelist subsciber" that has almost the same dependacies as vmcatcher.
+
+
 ### Secuity note ###
 
 It is more secure to use "https" than "http" for serving the imagelist. While 
