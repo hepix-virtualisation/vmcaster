@@ -794,7 +794,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         subject = str(x509.get_subject())
         
         if not imagepub.checkMissingFields(imagelistUUID,subject,issuerSubject):
-            log.error("Image list has required attribute missing.")
+            log.error("Image list has 1 or more required attributes missing.")
             sys.exit(20)
         
         if pathX509Key == None or pathX509Cert == None:
