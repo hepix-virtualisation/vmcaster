@@ -663,7 +663,7 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         # Generate a new URI based on the old one.
         uri = imagepub.image_key_get(imageUuid,"hv:uri")
         if uri == None:
-            log.error("Image us no external URI to upload images to.")
+            log.error("Image has no external URI so cant generate a new URI.")
             sys.exit(13)
         parsedUri = uglyUriParser(uri)
         oldpath = parsedUri['path']
