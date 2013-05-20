@@ -1,5 +1,11 @@
 Changelog
 
+vmcaster-0.0.17
+
+ * Added licence to packaging.
+ * Catch images without external URI.
+ * Update documentation.
+
 vmcaster-0.0.16
 
  * Lots of documentation updates.
