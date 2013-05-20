@@ -3,7 +3,9 @@ Changelog
 vmcaster-0.0.17
 
  * Added licence to packaging.
- * Catch images without external URI.
+ * Catch images without external URI on upload and make clear error message stating URI is required.
+ * Catch images without version number and default version number to 0.0.1.
+ * Improve error message when attributes are missing.
  * Update documentation.
 
 vmcaster-0.0.16
