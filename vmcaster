@@ -704,6 +704,9 @@ This option requires an "image" selection and a "--key-value-image" paramer.""")
         imagepub.image_key_update(imageUuid,u'hv:size',filelength)
         imagepub.image_key_update(imageUuid,u'sl:checksum:sha512',m.hexdigest())
         versionOld = imagepub.image_key_get(imageUuid, "hv:version")
+        if versionOld == None:
+            versionOld = "0.0.0"
+            log.warning("Adding a default version.")
         versionNew = bumpVersion(versionOld)
         imagepub.image_key_update(imageUuid, "hv:version",versionNew)
         uri = uglyUriBuilder(parsedUri)
