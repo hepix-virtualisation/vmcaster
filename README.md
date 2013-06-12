@@ -465,6 +465,7 @@ If this application is not suitable for your use case it should not be forgotten
 that SMIME and json are common standards and can be created in many ways. Below 
 is an example of how to sign a message using SMIME.
 
-    $ openssl smime her-cert.pem -encrypt -in my-message.txt
+    $ openssl smime -sign -signer .globus/usercred.pem -inkey .globus/userkey.pem \
+        -in imagelist.json -out imagelist.json.signed
    
 This may prove useful in the long term.
