@@ -18,14 +18,14 @@ tampering will be detected.
 vmcaster was designed with the realisation that users typically create new 
 virtual machines images rarely but update them frequently. Vmcaster attempts 
 to be the first of a new generation of image list publishers the minimise the 
-data entry for updating images, with imagelists.
+data entry for updating images, with image lists.
 
 The tasks of updating an image and uploading a fresh signed image is now just 
 two quiet short command line operations away. The aim is to make image and 
-imagelist updates as painless as possible as these are the most common 
+image list updates as painless as possible as these are the most common 
 tasks.
 
-Internally the application uses a simple sql database, sqlight for storing 
+Internally the application uses a simple SQL database, SQLite for storing 
 image lists and multiple back ends managing uploading of images / images lists 
 using a facade pattern. This allows transfer protocol to be derived from the 
 meta data of the image list and a configuration file, updates need much less 
@@ -55,17 +55,17 @@ default installed as "/etc/vmcaster/vmcaster.cfg.template". To get started:
 
     $ cp /etc/vmcaster/vmcaster.cfg.template ~/.vmcaster.cfg
 
-When it comes to uploading images and imagelists you will need to add to this
+When it comes to uploading images and image lists you will need to add to this
 file for your own site specific settings.
 
 Background
 ----------
 
-An image list contains an array of images and an array of endorsers. Imagelists 
-Images and Endorsers can all have key value pair attributes. Some of these 
-attributes are required in every imagelist. Similarly Endorsers and Images have 
-a set of required meta data. Every Imagelists must have an endorser, but no 
-images is allowed.
+An image list contains an array of images and an array of endorsers. Image lists 
+images and endorsers can all have key value pair attributes. Some of these 
+attributes are required in every image list. Similarly, endorsers and images have 
+a set of required meta data. Every image list must have an endorser, but no 
+images are allowed.
 
 The easiest way to start playing with image list publishing is to copy some one 
 else's hard work.
@@ -98,14 +98,14 @@ To display the imagelist:
        --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
        --show-imagelist 
 
-Imagelist Object's "dc:identifier" is a special property of an imagelist, this 
+Image list Object's "dc:identifier" is a special property of an image list, this 
 is the object identifier and can be used to select items for creation, deletion 
 or modification. Each Object has an Identifier, the Endorser object identifier 
-is the value corresponding with "hv:dn". Image Objects identifier is the same as 
-an that of Imagelist "dc:identifier". 
+is the value corresponding with "hv:dn". Image objects identifier is the same as 
+an that of image list "dc:identifier". 
 
-UUID's are used for the imagelist "dc:identifier" and also
-images "dc:identifier". These UUID's should be globally unique and consequently 
+UUIDs are used for the image list "dc:identifier" and also
+images "dc:identifier". These UUIDs should be globally unique and consequently 
 the UUID should be generated using a UUID generator using suitable seeds. With 
 Debian, Redhat and Scientific Linux I use the following UUID generator.
 
@@ -130,7 +130,7 @@ To create an Endorser:
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --add-endorser
 
-To create an Imagelist:
+To create an image list:
 
     $ vmcaster \
         --select-imagelist  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
@@ -148,20 +148,20 @@ To delete an Endorser:
         --select-endorser "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --del-endorser
 
-To delete an Imagelist:
+To delete an image list:
 
     $ vmcaster \
         --select-imagelist  e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
         --del-imagelist
 
-To delete an Image:
+To delete an image:
 
     $ vmcaster \
         --select-image b36d8b24-c63c-4fd1-ba13-bda6877207e8 \
         --del-image
 
 
-To add an image to a image list:
+To add an image to an image list:
 
     $ vmcaster \
         --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
@@ -175,7 +175,7 @@ To remove an image from the image list:
         --imagelist-del-image \
         --select-image 3a1df02c-121a-461d-b720-521903ef99f0
 
-To add an endorser to a image list:
+To add an endorser to an image list:
 
     $ vmcaster \
         --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
@@ -196,7 +196,7 @@ To change or add meta data to an endorser:
         --key-set-endorser "hv:ca" \
         --key-value-endorser "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority" 
 
-To change or add meta data to an imagelist:
+To change or add meta data to an image list:
 
     $ vmcaster \
         --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
@@ -216,7 +216,7 @@ To delete meta data from endorser:
         --select-endorser  "/C=DE/O=GermanGrid/OU=DESY/CN=Owen Synge" \
         --key-del-endorser "hv:ca"    
 
-To delete meta data from imagelist:
+To delete meta data from image list:
 
     $ vmcaster \
         --select-imagelist e38a3fd2-0ed8-11e2-873a-001cc0beb420 \
@@ -232,12 +232,12 @@ To delete meta data from image:
 Object identifiers cannot be modified with vmcaster, they can only be created 
 and destroyed,. This is intentional to prevent accidental errors.
 
-Imagelists with clashing  "dc:identifier" value is considered disruptive at 
-best and hostile at worst, and it will be noticed by imagelist subscribers. 
+Image lists with clashing  "dc:identifier" value is considered disruptive at 
+best and hostile at worst, and it will be noticed by image list subscribers. 
 Similarly not having your endorser details correctly is stated in the endorser.
 
-To change "dc:identifier" this we need to dump the imagelist to file, change 
-the imagelist UUID, all images we wish to keep 
+To change "dc:identifier" this we need to dump the image list to file, change 
+the image list UUID, all images we wish to keep 
 
     
     $ vmcaster \
@@ -254,16 +254,16 @@ also want to change many other variables. Note that the new UUID is generated
 using a UUID generator.
 
 It is recommended that only experienced users with good reason share images 
-between  imagelists (primarily disk space and as part of automation). For this 
-reason while editing the  JSON. So it is probably wise to change all Image 
+between  image lists (primarily disk space and as part of automation). For this 
+reason while editing the  JSON. So it is probably wise to change all image 
 object identifiers ("dc:identifier" for each image.).
 
-All changes to the original imagelist can be reverted by re - importing an 
-imagelist previously stored as a JSON file.
+All changes to the original image list can be reverted by re - importing an 
+image list previously stored as a JSON file.
 
     $ vmcaster --import-imagelist-json input.json
 
-To Add an image to a image list:
+To Add an image to an image list:
 
     $ vmcaster \
         --select-imagelist e55c1afe-0a62-4d31-a8d7-fb8c825f92a2 \
@@ -276,7 +276,7 @@ Configuration file.
 -------------------
 
 The configuration file for vmcaster is used to define the hosts and parameters 
-needed to update images and imagelists on the servers publishing the image list.
+needed to update images and image lists on the servers publishing the image list.
 
 The configuration file is expected system wide at "/etc/vmcaster/vmcaster.cfg" 
 or per user at "~/.vmcaster.cfg". The image list is in ini/cfg format with all 
@@ -312,7 +312,7 @@ This is when you share a file system with the public server.
  * gsidcap
 
 For a long time this was the standard POSIX like write protocol for a file 
-storage server called dCache which specialises in storing very large quantities 
+storage server called dCache which specializes in storing very large quantities 
 of data at the lowest price possible. 
 
 A second example using the local file system:
@@ -323,10 +323,10 @@ A second example using the local file system:
     uriMatch = "https://gridvirt.desy.de/"
     uriReplace = "/tmp/"
 
-Note: Publishing an Imagelist without any images is the best way to decommission
-an imagelist when no images are expected to be requested ever again.
+Note: Publishing an image list without any images is the best way to decommission
+an image list when no images are expected to be requested ever again.
 
-To update an Image:
+To update an image:
 -------------------
 
 Now we can select an image to and update it.
@@ -353,8 +353,8 @@ that was just updated, including the "sl:sha512" is now set and the value of
 Once you are happy with the new image list, it is time to publish this.
 
 
-To update an ImageList:
------------------------
+To update an image list:
+------------------------
 
 First check the image list is as you expect:
 
@@ -398,9 +398,9 @@ Path to the configuration file for vmcaster.
 
 * VMCASTER_RDBMS
 
-Sqllight based connection string, This defaults to 'sqlite:///vmcaster.db'.
+SQLite based connection string, This defaults to 'sqlite:///vmcaster.db'.
 This URL refers to the current working directory, to use an absolute path with 
-Sqlight, add an extra slash to the URL like syntax.
+SQLite, add an extra slash to the URL like syntax.
 
 * VMCASTER_LOG_CONF
 
@@ -435,27 +435,27 @@ started.
 Deployment
 ----------
 
-It is wise to deploy an "imagelist subsciber" so you can check for errors with 
-vmcaster as your "imagelist" publisher. vmcatcher 
-(http://github.com/hepix-virtualisation/vmcatcher) is an "imagelist subsciber" 
-that has almost the same dependacies as vmcatcher.
+It is wise to deploy an "image list subscriber" so you can check for errors with 
+vmcaster as your "image list" publisher. vmcatcher 
+(http://github.com/hepix-virtualisation/vmcatcher) is an "image list subscriber" 
+that has almost the same dependencies as vmcatcher.
 
 
-### Secuity note ###
+### Security note ###
 
-It is more secure to use "https" than "http" for serving the imagelist. While 
-the authenticity of the imagelist is secured by the imagelist signature, the 
-signature cannot prevent "man in the middle" presenting an old signed imagelist.
+It is more secure to use "https" than "http" for serving the image list. While 
+the authenticity of the image list is secured by the image list signature, the 
+signature cannot prevent "man in the middle" presenting an old signed image list.
 
 For serving images http is as secure as https, as the authenticity of the image 
-is secured by the imagelist's signature, thus the worst a man in the middle 
+is secured by the image list's signature, thus the worst a man in the middle 
 attack can do with images is provide a denial of service when the image does not 
 match the sha512 hash it will be detected and rejected.
 
 It is expected future versions of vmcatcher will issue a warning when 
-subscribing to and retrieving imagelists from unauthenticated hosts. Imagelist 
+subscribing to and retrieving image lists from unauthenticated hosts. Image list 
 subscribers will prefer not to see these warnings, and may decide to only trust
-imagelists hosted on authenticated servers.
+image lists hosted on authenticated servers.
 
 
 Appendix
