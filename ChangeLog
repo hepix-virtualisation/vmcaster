@@ -1,5 +1,11 @@
 Changelog
 
+
+vmcaster-0.0.18
+
+ * README Documentation spelling fixes
+ * Command line --help spelling fixes
+
 vmcaster-0.0.17
 
  * Added licence to packaging.
