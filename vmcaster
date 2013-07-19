@@ -162,7 +162,7 @@ def main():
     p.add_option('--upload-image', action ='store',help='Path for image to be uploaded. The image format should be detected automatically and compressed if needed.')
     p.add_option('--upload-imagelist', action ='store_true',help="""Update the image list with a newly signed image list. 
 Expect to type in your grid certificate password to sign a new image list, and then transfer the new image list and replace the master copy.""")
-    
+    p.add_option('--lifetime-imagelist', action ='store',help="""Set the length of the imagelist lifetime in days. To be used in conjuction with '--upload-imagelist'. Defaults to 28 days.""", metavar='VMCASTER_IMAGELIST_LIFETIME')
     p.add_option('--select-imagelist', action ='store',help='Select "imagelist" by "dc:identifier".', metavar='IMAGELIST_UUID')
     p.add_option('--select-image', action ='store',help='Select "image" by "dc:identifier"', metavar='IMAGELIST_UUID')
     p.add_option('--select-endorser', action ='store',help='Select "endorser" by "hv:dn".', metavar='ENDORSER_UUID')
@@ -242,7 +242,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     signingPathDefaultKey = None
     signingPathDefaultCert = None
     signingPathHome = None
-    
+    imagelistLifeTimeStr = "28"
     
     
     dishCfg = None
@@ -262,6 +262,9 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         pathX509Key = os.environ['VMCASTER_X509_KEY']
     if 'VMCASTER_X509_CERT' in os.environ:
         pathX509Cert = os.environ['VMCASTER_X509_CERT']
+
+    if 'VMCASTER_IMAGELIST_LIFETIME' in os.environ:
+        imagelistLifeTimeStr = os.environ['VMCASTER_IMAGELIST_LIFETIME']
 
     
     # Set up log file
@@ -360,6 +363,9 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if options.upload_imagelist:
         actions.add('imagelist_upload')
         imagelist_req = True
+    if options.lifetime_imagelist:
+        imagelistLifeTimeStr = options.lifetime_imagelist
+    
     if options.add_imagelist:
         actions.add('imagelist_add')
         imagelist_req = True
@@ -484,10 +490,19 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             log.info("Config file '%s' not found, using system defaults '%s'" % (dishCfg,dishCfgNew))
             dishCfg = dishCfgNew
         
-
-    if not os.path.isfile(dishCfg):
-        log.error("Configuration file '%s' was not found." % dishCfg)
+    try:
+        imagelistLifeTime = int(imagelistLifeTimeStr)
+    except ValueError,E:
+        log.error('Imagelist Lifetime is invalid : %s' % (E))
         sys.exit(1)
+    if imagelistLifeTime < 1:
+        log.error("Imagelist Lifetime is too short at '%s'" % (imagelistLifeTime))
+        sys.exit(1)
+    if not os.path.isfile(dishCfg):
+        log.error("Configuration file '%s' was not found." % (dishCfg))
+        sys.exit(1)
+    
+    
     
     # now do the work.
 
@@ -767,7 +782,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
         
         now = datetime.datetime.utcnow()
-        servicelength = datetime.timedelta(weeks=4)
+        servicelength = datetime.timedelta(days=imagelistLifeTime)
         expiry = now + servicelength
         time_format_definition = "%Y-%m-%dT%H:%M:%SZ"
         dateNow = now.strftime(time_format_definition)
