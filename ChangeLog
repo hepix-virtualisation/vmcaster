@@ -1,5 +1,9 @@
 Changelog
 
+vmcaster-0.0.19
+
+ * New Command line option --lifetime-imagelist days,  and enviroment variable 
+   VMCASTER_IMAGELIST_LIFETIME which specifies the length of an imagelist.
 
 vmcaster-0.0.18
 
