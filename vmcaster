@@ -203,8 +203,11 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     p.add_option('--key-del-endorser', action ='store_true',help='Endorser metadata key to delete. This option requires an "endorser" selection.')
     
     p.add_option('--key-value-imagelist', action ='store',help='Image list metadata value to set. This option requires an "imagelist" selection and a "--key-set-imagelist" parameter.')
+    p.add_option('--key-value-imagelist-file', action ='store',help='Image list metadata value to set from a file. This option requires an "imagelist" selection and a "--key-set-imagelist" parameter.')
     p.add_option('--key-value-image', action ='store',help='Image metadata value to set. This option requires an "image" selection and a "--key-set-image" parameter.')
-    p.add_option('--key-value-endorser', action ='store',help='Endorser metadata value to set.This option requires an "endorser" selection and a "--key-set-endorser" parameter.')
+    p.add_option('--key-value-image-file', action ='store',help='Image metadata value to set from a file. This option requires an "image" selection and a "--key-set-image" parameter.')
+    p.add_option('--key-value-endorser', action ='store',help='Endorser metadata value to set. This option requires an "endorser" selection and a "--key-set-endorser" parameter.')
+    p.add_option('--key-value-endorser-file', action ='store',help='Endorser metadata value to set from a file. This option requires an "endorser" selection and a "--key-set-endorser" parameter.')
         
     options, arguments = p.parse_args()
     
@@ -217,6 +220,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     imagelist_key_set_req = False
     imagelist_key_value = None
     imagelist_key_value_add_req = False
+    imagelist_key_value_file = None
     imagelist_import_json = None
     imageUuid = None
     image_key = None
@@ -224,6 +228,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     image_req = None
     image_key_value = None
     image_key_value_add_req = False
+    image_key_value_file = None
     endorserSub = None
     endorser_req  = False
     endorserKey = None
@@ -231,7 +236,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     
     endorserValue = None
     endorserValueReq = False
-    
+    endorserValue_file = None
     imageFileLocal = None
     dishCfg = 'publisher.cfg'
     applicationHome = None
@@ -338,6 +343,12 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if options.key_value_endorser:
         endorserValue = options.key_value_endorser
         endorser_req = True
+    
+    if options.key_value_endorser_file:
+        endorserValue_file = options.key_value_endorser_file
+        endorser_req = True
+    
+    
     if options.imagelist_add_endorser:
         endorser_req = True
         imagelist_req = True
@@ -398,6 +409,13 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagelist_key_set_req = True
         imagelist_key_value = options.key_value_imagelist
 
+    if options.key_value_imagelist_file:
+        actions.add('imagelist_key_update')
+        imagelist_req = True
+        imagelist_key_set_req = True
+        imagelist_key_value_file = options.key_value_imagelist_file
+
+
     if options.import_imagelist_smime:
         actions.add('imagelist_import_smime')
         
@@ -440,6 +458,13 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         image_req = True
         image_key_req = True
         image_key_value = options.key_value_image
+    
+    if options.key_value_image_file:
+        actions.add('image_key_update')
+        image_req = True
+        image_key_req = True
+        image_key_value_file = options.key_value_image_file
+    
     if options.upload_image:
         actions.add('image_upload')
         imageFileLocal = options.upload_image
@@ -469,6 +494,40 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         databaseConnectionString = 'sqlite:///vmcaster.db'
         log.info("Defaulting DB connection to '%s'" % (databaseConnectionString))
     
+    # Now over ride the values when setting a file
+    
+    if endorserValue_file != None:
+        if not os.path.isfile(endorserValue_file):
+            log.error("Invalid --key-value-endorser-file is not a file :'%s'" % (endorserValue_file))
+            sys.exit(1)
+        if endorserValue != None:
+            log.warning("Parameter --key-value-endorser will be over writern with the content of file :'%s'" % (endorserValue_file))
+        endorserValue = ''
+        fp = open(endorserValue_file)
+        with fp:
+            endorserValue += fp.read()
+    if imagelist_key_value_file != None:
+        if not os.path.isfile(imagelist_key_value_file):
+            log.error("Invalid --key-value-imagelist-file is not a file :'%s'" % (imagelist_key_value_file))
+            sys.exit(1)
+        if imagelist_key_value != None:
+            log.warning("Parameter --key-value-imagelist will be over writern with the content of file :'%s'" % (imagelist_key_value_file))
+        imagelist_key_value = ''
+        fp = open(imagelist_key_value_file)
+        with fp:
+            imagelist_key_value += fp.read()
+    if image_key_value_file != None:
+        if not os.path.isfile(image_key_value_file):
+            log.error("Invalid --key-value-image-file is not a file :'%s'" % (image_key_value_file))
+            sys.exit(1)
+        if image_key_value != None:
+            log.warning("Parameter --key-value-image will be over writern with the content of file :'%s'" % (image_key_value_file))
+        image_key_value = ''
+        fp = open(image_key_value_file)
+        with fp:
+            image_key_value += fp.read()
+
+
     # Now check for required fields
     
     if imagelist_req:
