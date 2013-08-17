@@ -1,5 +1,14 @@
 Changelog
 
+vmcaster-0.0.20
+
+ * Added new command line options to support adding metadata from a file.
+    so allowing much easier including of image lists as metadata for 
+    image lists The following new commands provide this:
+        --key-value-imagelist-file
+        --key-value-image-file
+        --key-value-endorser-file
+
 vmcaster-0.0.19
 
  * New Command line option --lifetime-imagelist days,  and enviroment variable 
