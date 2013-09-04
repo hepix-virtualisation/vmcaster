@@ -532,15 +532,15 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     
     if imagelist_req:
         if imagelistUUID == None:
-            log.error('Image list UUID is needed')
+            log.error('Image list UUID is needed ("dc:identifier")')
             sys.exit(1)
     if image_req:
         if imageUuid == None:
-            log.error('Image UUID is needed')
+            log.error('Image UUID is needed ("dc:identifier")')
             sys.exit(1)
     if endorser_req:
         if endorserSub == None:
-            log.error('Endorser subject is needed')
+            log.error('Endorser subject is needed ("hv:dn")')
             sys.exit(1)
     if dishCfg == None:
         dishCfg = os.path.join(applicationHome,".vmcaster.cfg")
