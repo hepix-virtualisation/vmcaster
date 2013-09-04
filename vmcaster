@@ -833,8 +833,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
         if versionOld == None:
-            log.error("Image list '%s' has not attribute 'hv:version', image upload aborted." % (imagelistUUID))
-            sys.exit(26)
+            versionOld = "0.0.0"
         versionNew = bumpVersion(versionOld)
         if versionNew == None:
             versionNew = '0.0.1'
