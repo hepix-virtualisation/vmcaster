@@ -1,0 +1,4 @@
+
+This error shoudl be replaced with autoguessing the 'hv:version' as 0.0.0
+
+ERROR:main:Image list '0871ae0f-d472-4b36-bc93-ea34da3e69e7' has not attribute 'hv:version', image upload aborted.
