@@ -12,6 +12,20 @@ import logging
 def Property(func):
     return property(**func())
 
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+class InputError(Error):
+    """Exception raised for errors in the input.
+
+    Attributes:
+        msg  -- explanation of the error
+    """
+
+    def __init__(self, msg):
+        self.msg = msg
+        
 # Facade class
 
 class uploaderFacade(object):
@@ -22,7 +36,11 @@ class uploaderFacade(object):
         self.log = logging.getLogger("uploaderFacade")
         self._uploaderImp = None
         self.externalPrefix = None
-    
+    def HasImplementation(self):
+        if hasattr(self, '_uploaderImp'):
+            return True
+        else:
+            return False
     
     @Property
     def remotePrefix():
@@ -68,6 +86,10 @@ class uploaderFacade(object):
                 del(self._uploaderImp)
             if hasattr(self, '_uploaderImp'):
                 self._uploaderImp.remotePrefix = self.remotePrefix
+            else:
+                errorMsg = str("Invalid upload protocol sellected:'%s'" % (name))
+                error = InputError("Invalid Value")
+                raise error
             
             
         def fdel(self):
