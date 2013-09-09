@@ -20,14 +20,15 @@ uriMatch = "https://dish.desy.de:2880/"
 uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
 
 
+
 [appdb]
 server = "vmcaster.appdb.egi.eu"
 protocol = "egiappdb"
 uriMatch = ".*"
-uriReplace = "username@egiappdb://vmcaster.appdb.egi.eu/vmlist/submit/sso/"
+uriReplace = "egiappdb://username@vmcaster.appdb.egi.eu/vmlist/submit/sso/"
 
 [appdb-dev]
 server = "vmcaster.appdb-dev.marie.hellasgrid.gr"
 protocol = "egiappdb"
 uriMatch = ".*"
-uriReplace = "username@egiappdb://vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/" 
+uriReplace = "egiappdb://username@vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/" 
