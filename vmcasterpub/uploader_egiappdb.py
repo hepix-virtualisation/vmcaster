@@ -1,6 +1,10 @@
 import urllib2, urllib, base64
 import sys, string, os, getopt
 import getpass
+import logging
+import getpass
+
+
 
 vmcappdburl = 'https://vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/'
 
@@ -33,12 +37,12 @@ def postdata(username, password, imagelist, action, entity, response):
    req=urllib2.Request(vmcappdburl, postdata)
    req.add_header("Content-type", "application/x-www-form-urlencoded")
    page=urllib2.urlopen(req).read()
-   print page
+   return 0,page,""
 
  
 #postdata(username, password, imagelist)
 
-class uploaderScp:
+class uploaderEgiAppDb:
     def __init__(self):
         self.remotePrefix = None
         self.log = logging.getLogger("uploaderEgiAppDb")
@@ -48,41 +52,37 @@ class uploaderScp:
         else:
             return remotePath
     def exists(self,remotePath):
-        prefix = self.remotePrefix.split(":")
-        fuill = "%s/%s" % (prefix[1],remotePath)
-        cmd = "ssh %s stat %s" % (prefix[0],fuill)
-        timeout = 10
-        return runpreloadcommand(cmd,timeout)
+        return 1,"",""
         
     def delete(self,remotePath):
-        prefix = self.remotePrefix.split(":")
-        fuill = "%s/%s" % (prefix[1],remotePath)
-        
-        cmd = "ssh %s rm %s" % (prefix[0],fuill)
-        timeout = 10
-        return runpreloadcommand(cmd,timeout)
+        return 0,"",""
         
     def upload(self,localpath,remotePath):
-        self.log = logging.getLogger("uploaderScp.upload")
-        cmd = "scp %s %s" % (localpath,remotePath)
-        self.log.info("Attempting:%s" % (cmd))
-        rc,stdout,stderr = runpreloadcommand(cmd,10)
-        if rc != 0:
-            self.log.debug(cmd)
-            self.log.error( stderr)
-            return (rc,stdout,stderr)
-        return (rc,stdout,stderr)
+        for line in open(localpath):
+            print line
         return self.replace(localpath,remotePath)
 
     def replace(self,localpath,remotePath):
         self.log = logging.getLogger("uploaderScp.replace")
-        cmd = "scp %s %s" % (localpath,remotePath)
-        self.log.info("Attempting:%s" % (cmd))
-        rc,stdout,stderr = runpreloadcommand(cmd,10)
-        if rc != 0:
-            self.log.debug(cmd)
-            self.log.error( stderr)
-            return (rc,stdout,stderr)
+        signedFile = ""
+        for line in open(localpath):
+            signedFile += line
+        self.log.info("localpath:%s" % (localpath))
+        self.log.info("remotePath:%s" % (remotePath))
+        splitRemotePath = remotePath.split("@")
+        if len(splitRemotePath) < 1:
+            return 1,"","No user name found in protocol" 
+        if len(splitRemotePath) < 2:
+            return 1,"","failed to parse user@uri" 
+        
+        username = splitRemotePath[0]
+        password = getpass.getpass("Appdb password for '%s':" % (username))
+        action = 'insert'
+        entity = 'imagelist'
+        response = 'json'
+        output = postdata(username, password, localpath, action, entity, response)
+        print output
+        rc,stdout,stderr = output
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
         self.log = logging.getLogger("uploaderScp.download")
