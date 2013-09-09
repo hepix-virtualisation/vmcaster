@@ -4,7 +4,18 @@ import getpass
 
 vmcappdburl = 'https://vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/'
 
-def postdata(username, password, imagelist):
+def createXMLwrapper(action, entity, username, response, imagelist_data):
+   xml = '<?xml version="1.0" encoding="utf-8"?>'+\
+         '<appdbvmc>'+\
+	 '<action><![CDATA['+action+']]></action>'+\
+	 '<entity><![CDATA['+entity+']]></entity>'+\
+         '<response><![CDATA['+response+']]></response>'+\
+	 '<user><![CDATA['+username+']]></user>'+\
+	 '<imagelist><![CDATA['+imagelist_data+']]></imagelist>'+\
+	 '</appdbvmc>'
+   return xml
+
+def postdata(username, password, imagelist, action, entity, response):
    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
    passman.add_password(None, vmcappdburl, username, password)
    authhandler = urllib2.HTTPBasicAuthHandler(passman)
@@ -14,7 +25,9 @@ def postdata(username, password, imagelist):
    f = open(imagelist, 'r')
    file_data = base64.b64encode(f.read())
 
-   postdata=[('published','false'),('file',file_data)]
+
+   data=createXMLwrapper(action, entity, username, response, file_data)
+   postdata=[('data',data)]
 
    postdata=urllib.urlencode(postdata)
    req=urllib2.Request(vmcappdburl, postdata)
@@ -22,7 +35,7 @@ def postdata(username, password, imagelist):
    page=urllib2.urlopen(req).read()
    print page
 
-
+ 
 #postdata(username, password, imagelist)
 
 class uploaderScp:
