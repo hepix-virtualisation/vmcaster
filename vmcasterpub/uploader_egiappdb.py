@@ -60,30 +60,29 @@ class uploaderEgiAppDb:
         return self.replace(localpath,remotePath)
 
     def replace(self,localpath,remotePath):
-        self.log = logging.getLogger("uploaderScp.replace")
+        self.log = logging.getLogger("uploaderEgiAppDb.replace")
         signedFile = ""
         for line in open(localpath):
             signedFile += line
-        self.log.info("localpath:%s" % (localpath))
-        self.log.info("remotePath:%s" % (remotePath))
-        splitRemotePath = remotePath.split("@")
-        if len(splitRemotePath) < 1:
-            return 1,"","No user name found in protocol" 
-        if len(splitRemotePath) < 2:
-            return 1,"","failed to parse user@uri" 
+        self.log.debug("localpath:%s" % (localpath))
+        self.log.debug("remotePath:%s" % (remotePath))
         
-        username = splitRemotePath[0]
-        uriParsed = uglyuri.uglyUriParser(splitRemotePath[1])
-        
+        uriParsed = uglyuri.uglyUriParser(remotePath)
+        if uriParsed["user"] == None:
+            return 1,"","Remote uri does not assign an upload user" 
         if uriParsed["scheme"] != "egiappdb":
+            print uriParsed["scheme"],remotePath
             return 1,"","Remote uri protocol is not 'egiappdb'" 
+        #self.log.debug("hostname:%s" % (uriParsed["hostname"]))
         newUriComponents = {
             "scheme" : "https",
             "path" : uriParsed["path"],
             "hostname" : uriParsed["hostname"],
             "port" : uriParsed["port"],
         }
+        username = uriParsed["user"]
         newUri = uglyuri.uglyUriBuilder(newUriComponents)
+        self.log.debug("Uploading uri:%s" % (newUri))
         password = getpass.getpass("Appdb password for '%s':" % (username))
         action = 'insert'
         entity = 'imagelist'
@@ -93,7 +92,7 @@ class uploaderEgiAppDb:
         rc,stdout,stderr = output
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
-        self.log = logging.getLogger("uploaderScp.download")
+        self.log = logging.getLogger("uploaderEgiAppDb.download")
         cmd = "scp %s %s" % (remotePath,localpath)
         self.log.info("Attempting:%s" % (cmd))
         rc,stdout,stderr = runpreloadcommand(cmd,10)
