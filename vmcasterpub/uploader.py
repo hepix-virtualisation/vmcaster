@@ -1,9 +1,12 @@
     
 import types
 import uploader_dcap as uploaderDcap
+import uploader_egiappdb as uploaderEgiAppDb
+
 
 from uploader_scp import uploaderScp
 from uploader_local import uploaderLocal
+
 
 import re
 import sys
@@ -77,11 +80,13 @@ class uploaderFacade(object):
                 self._uploaderImp = uploaderDcap.uploaderDcap()
             elif name == "scp":
                 self._uploaderImp = uploaderScp()
+            elif name == "egiappdb":
+                self._uploaderImp = uploaderEgiAppDb.uploaderEgiAppDb()
             elif name == "local":
                 self._uploaderImp = uploaderLocal()
             else:
                 self.log.error("Invalid upload protocol sellected '%s'" % (name))
-                self.log.info('Valid upload protocols are ["local","scp","gsidcap"]')
+                self.log.info('Valid upload protocols are ["local","scp","gsidcap","egiappdb"]')
                 
                 del(self._uploaderImp)
             if hasattr(self, '_uploaderImp'):
