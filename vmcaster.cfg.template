@@ -2,7 +2,7 @@
 server = "localhost"
 protocol = "local"
 uriMatch = "https://x61.example.org:2880/"
-uriReplace = "/tmp/tonggoo"
+uriReplace = "/tmp/example_publishing"
 
 
 
@@ -13,9 +13,6 @@ uriMatch = "http://http.example.org/repos/prod/vmcaster"
 uriReplace = "jenkins@http.example.org:/export/example.org/prod/vmcaster"
 
 
-
-
-
 [dish.desy.de]
 server = "dish.desy.de"
 protocol = "gsidcap"
@@ -23,10 +20,14 @@ uriMatch = "https://dish.desy.de:2880/"
 uriReplace = "gsidcap://dcache-desy-gsidcap.desy.de:22128/pnfs/desy.de/desy/vmimages/"
 
 
+[appdb]
+server = "vmcaster.appdb.egi.eu"
+protocol = "egiappdb"
+uriMatch = ".*"
+uriReplace = "username@egiappdb://vmcaster.appdb.egi.eu/vmlist/submit/sso/"
 
-[foo]
-server = "gridvirt.desy.de"
-protocol = "scp"
-uriMatch = "https://gridvirt.desy.de/"
-uriReplace = "root@vmic-virt-grid:/tmp/"
-
+[appdb-dev]
+server = "vmcaster.appdb-dev.marie.hellasgrid.gr"
+protocol = "egiappdb"
+uriMatch = ".*"
+uriReplace = "username@egiappdb://vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/" 
