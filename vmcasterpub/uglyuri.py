@@ -5,14 +5,16 @@ def uglyUriParser(uri):
     if isinstance(parsedUri, tuple):
         # We are probably python 2.4
         networklocation = parsedUri[1].split(':')
-        hostname = networklocation[0]
+        hostname = parsedUri.hostname
+        user = parsedUri.username
         port = ""
-        if len (networklocation) > 1:
-            port = networklocation[1]
+        if parsedUri.port != None:
+            port = parsedUri.port
         return { "scheme" : parsedUri[0],
             "path" : parsedUri[2],
             "hostname" : hostname,
             "port" : port,
+            "user" : user
         }
     if isinstance(parsedUri,urlparse.SplitResult):
         # We are probably python 2.6
