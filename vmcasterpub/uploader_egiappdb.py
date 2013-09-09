@@ -3,10 +3,7 @@ import sys, string, os, getopt
 import getpass
 import logging
 import getpass
-
-
-
-vmcappdburl = 'https://vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/'
+import uglyuri
 
 def createXMLwrapper(action, entity, username, response, imagelist_data):
    xml = '<?xml version="1.0" encoding="utf-8"?>'+\
@@ -19,9 +16,9 @@ def createXMLwrapper(action, entity, username, response, imagelist_data):
 	 '</appdbvmc>'
    return xml
 
-def postdata(username, password, imagelist, action, entity, response):
+def postdata(uri,username, password, imagelist, action, entity, response):
    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-   passman.add_password(None, vmcappdburl, username, password)
+   passman.add_password(None, uri, username, password)
    authhandler = urllib2.HTTPBasicAuthHandler(passman)
    opener = urllib2.build_opener(authhandler)
    urllib2.install_opener(opener)
@@ -34,7 +31,7 @@ def postdata(username, password, imagelist, action, entity, response):
    postdata=[('data',data)]
 
    postdata=urllib.urlencode(postdata)
-   req=urllib2.Request(vmcappdburl, postdata)
+   req=urllib2.Request(uri, postdata)
    req.add_header("Content-type", "application/x-www-form-urlencoded")
    page=urllib2.urlopen(req).read()
    return 0,page,""
@@ -76,12 +73,23 @@ class uploaderEgiAppDb:
             return 1,"","failed to parse user@uri" 
         
         username = splitRemotePath[0]
+        uriParsed = uglyuri.uglyUriParser(splitRemotePath[1])
+        
+        if uriParsed["scheme"] != "egiappdb":
+            return 1,"","Remote uri protocol is not 'egiappdb'" 
+        newUriComponents = {
+            "scheme" : "https",
+            "path" : uriParsed["path"],
+            "hostname" : uriParsed["hostname"],
+            "port" : uriParsed["port"],
+        }
+        newUri = uglyuri.uglyUriBuilder(newUriComponents)
         password = getpass.getpass("Appdb password for '%s':" % (username))
         action = 'insert'
         entity = 'imagelist'
         response = 'json'
-        output = postdata(username, password, localpath, action, entity, response)
-        print output
+        output = postdata(newUri,username, password, localpath, action, entity, response)
+        self.log.info("Output:%s" % (str(output)))
         rc,stdout,stderr = output
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
