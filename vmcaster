@@ -146,8 +146,8 @@ def main():
     p = optparse.OptionParser(version = "%prog " + version)
     p.add_option('-d', '--database', action ='store', help='Database conection string')
     p.add_option('-L', '--logcfg', action ='store',help='Logfile configuration file.', metavar='CFG_LOGFILE')
-    p.add_option('--verbose', action ='count',help='Change global log level, increasing log output.', metavar='LOGFILE')
-    p.add_option('--quiet', action ='count',help='Change global log level, decreasing log output.', metavar='LOGFILE')
+    p.add_option('-v', '--verbose', action ='count',help='Change global log level, increasing log output.', metavar='LOGFILE')
+    p.add_option('-q', '--quiet', action ='count',help='Change global log level, decreasing log output.', metavar='LOGFILE')
     p.add_option('-C', '--config-file', action ='store',help='Configuration file.', metavar='CFG_FILE')
     p.add_option('--x509-dir', action ='store',help='Directory for x.509 certificates and keys.', metavar='VMCASTER_X509_DIR')
     p.add_option('--x509-cert', action ='store',help='Path of x.509 Certificate.', metavar='VMCASTER_X509_CERT')
@@ -231,12 +231,14 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     image_key_value_file = None
     endorserSub = None
     endorser_req  = False
+    
     endorserKey = None
     endorserKeyReq = False
     
     endorserValue = None
     endorserValueReq = False
     endorserValue_file = None
+    endorser_key_value_add_req = False
     imageFileLocal = None
     dishCfg = 'publisher.cfg'
     applicationHome = None
@@ -334,6 +336,8 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
 
     if options.key_set_endorser:
         actions.add('endorser_key_set')
+        endorser_req = True
+        endorser_key_value_add_req = True
         endorserKey = options.key_set_endorser
         
     if options.key_del_endorser:
@@ -561,6 +565,19 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         log.error("Configuration file '%s' was not found." % (dishCfg))
         sys.exit(1)
     
+    # Now check for required fields
+    
+    if endorserValue == None and endorser_key_value_add_req == True:
+        log.error("Missing '--key-value-endorser'" % (dishCfg))
+        sys.exit(1)
+    
+    if image_key_value == None and image_key_value_add_req == True:
+        log.error("Missing '--key-value-image'" % (dishCfg))
+        sys.exit(1)
+    
+    if imagelist_key_value == None and imagelist_key_value_add_req == True:
+        log.error("Missing '--key-value-image'" % (dishCfg))
+        sys.exit(1)
     
     
     # now do the work.
