@@ -240,7 +240,6 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     endorserValue_file = None
     endorser_key_value_add_req = False
     imageFileLocal = None
-    dishCfg = 'publisher.cfg'
     applicationHome = None
     pathX509Key = None
     pathX509Cert = None
@@ -552,6 +551,8 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             dishCfgNew = "/etc/vmcaster/vmcaster.cfg"
             log.info("Config file '%s' not found, using system defaults '%s'" % (dishCfg,dishCfgNew))
             dishCfg = dishCfgNew
+        else:
+            log.info("Found config at '%s'" % (dishCfg))
         
     try:
         imagelistLifeTime = int(imagelistLifeTimeStr)
@@ -939,7 +940,11 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         except InputError, E:
             log.error(E.msg)
             sys.exit(21)
-        rc,stdout,stderr = uploader.replaceFile(tmpfilePath,parsedUri['hostname'],uri)
+        output = uploader.replaceFile(tmpfilePath,parsedUri['hostname'],uri)
+        if output == None:
+            log.error("Could not replaceFile")
+            sys.exit(21)
+        rc,stdout,stderr = output
         if rc != 0:
             log.error("failed to upload file")
             log.error("Upload produced the following output:\n%s" % (stdout))
