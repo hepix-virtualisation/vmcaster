@@ -57,9 +57,10 @@ class hostUploader:
             self.allHosts[serverName] = {'serverName' : serverName,
                 'writeProto' : writeProto,
                 'uriReplace' : uriReplace,
-                'uriMatch' : uriMatch}
-            
-    def replaceFile(self,localPath,remoteHost,externalPath):
+                'uriMatch' : uriMatch,
+                'section' : section}
+
+    def _validateCfg(self,remoteHost):
         numberHosts = len(self.allHosts)
         if numberHosts == 0:
             self.log.warning("No hosts configred, please check the configuration file.")
@@ -68,34 +69,31 @@ class hostUploader:
             self.log.warning("Hosts '%s' is not configured." % (remoteHost))
             self.log.info("Available hosts:" % (self.allHosts.keys()))
             raise InputError("Host '%s' is not registered" % remoteHost)
+        self.facard = uploader.uploaderFacade()
+        try:
+            self.facard.uploader = self.allHosts[remoteHost]["writeProto"]
+        except uploader.InputError, E:
+            self.log.error("Section '%s' has invalid protocol:%s" % (self.allHosts[remoteHost]["section"],
+                self.allHosts[remoteHost]["writeProto"]))
+            raise InputError(E.msg)
+        self.facard.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
+        self.facard.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
+        
+    def replaceFile(self,localPath,remoteHost,externalPath):
+        
         if not os.path.isfile(localPath):
             raise InputError("File not found at path '%s'" % localPath)
-        u1 = uploader.uploaderFacade()
-        u1.uploader = self.allHosts[remoteHost]["writeProto"]
-        u1.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
-        u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
-        output = u1.replace(localPath,externalPath)
+        self._validateCfg(remoteHost)
+        output = self.facard.replace(localPath,externalPath)
         return output
     def uploadFile(self,localPath,remoteHost,remotePath):
-        if not remoteHost in self.allHosts:
-            self.log.info("Available hosts:" % (self.allHosts.keys()))
-            raise InputError("Host '%s' is not known" % remoteHost)
         if not os.path.isfile(localPath):
             raise InputError("file not found at localpath '%s'" % localPath)
-        u1 = uploader.uploaderFacade()
-        u1.uploader = self.allHosts[remoteHost]["writeProto"]
-        u1.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
-        u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
-        return u1.upload(localPath,remotePath)
+        self._validateCfg(remoteHost)
+        return self.facard.upload(localPath,remotePath)
     def deleteFile(self,remoteHost,remotePath):
-        if not remoteHost in self.allHosts:
-            self.log.info("Available hosts:" % (self.allHosts.keys()))
-            raise InputError("Host '%s' is not known" % remoteHost)
-        u1 = uploader.uploaderFacade()
-        u1.uploader = self.allHosts[remoteHost]["writeProto"]
-        u1.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
-        u1.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
-        return u1.delete(remotePath)
+        self._validateCfg(remoteHost)
+        return self.facard.delete(remotePath)
         
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
