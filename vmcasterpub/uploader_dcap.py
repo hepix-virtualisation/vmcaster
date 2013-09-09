@@ -7,7 +7,7 @@ import os
 
 
 
-def runpreloadcommand(cmd,timeout,preload = 60):
+def runpreloadcommand(cmd,timeout,preload):
     newenv = dict(os.environ)
     newenv["LD_PRELOAD"] = preload
     process = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,env=newenv)
