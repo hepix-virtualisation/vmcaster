@@ -4,6 +4,7 @@ import getpass
 import logging
 import getpass
 import uglyuri
+import json
 
 def createXMLwrapper(action, entity, username, response, imagelist_data):
    xml = '<?xml version="1.0" encoding="utf-8"?>'+\
@@ -39,6 +40,43 @@ def postdata(uri,username, password, imagelist, action, entity, response):
  
 #postdata(username, password, imagelist)
 
+
+def parseResultSuccess(inputStr):
+    log = logging.getLogger("parseResultSuccess")
+    parsedJson = json.loads(inputStr)
+    if parsedJson == None:
+        log.error("Invalid Json")
+        return None
+        
+    if not isinstance( parsedJson, dict ):
+        log.error("Json does not encode a dictionary")
+        return None
+    if not "egiappdb" in parsedJson.keys():
+        log.error("Json does not encode egiappdb protocol")
+        return None
+    if not isinstance( parsedJson["egiappdb"], dict ):
+        log.error("Json does not encode egiappdb as dict")
+        return None
+    reqfieldsStr = set(['status','details'])
+    reqfieldsInt = set(['submission_id'])
+    
+    for reqKey in reqfieldsStr.union(reqfieldsInt):
+        if not reqKey in parsedJson["egiappdb"].keys():
+            log.error("Json does not encode egiappdb:%s" % (reqKey))
+            return None
+    for reqKey in reqfieldsStr:
+        if not isinstance( parsedJson["egiappdb"][reqKey], unicode ):
+            log.error("Json does not encode as a string egiappdb:%s" % (reqKey))
+            return None
+    for reqKey in reqfieldsInt:
+        if not isinstance( parsedJson["egiappdb"][reqKey], int ):
+            log.error("Json does not encode as a int egiappdb:%s" % (reqKey))
+            return None
+    return {"status" : parsedJson["egiappdb"]["status"],
+        "details" : parsedJson["egiappdb"]["details"],
+        "submission_id" : parsedJson["egiappdb"]["submission_id"],
+    }
+    
 class uploaderEgiAppDb:
     def __init__(self):
         self.remotePrefix = None
@@ -90,6 +128,18 @@ class uploaderEgiAppDb:
         output = postdata(newUri,username, password, localpath, action, entity, response)
         self.log.info("Output:%s" % (str(output)))
         rc,stdout,stderr = output
+        if rc != 0:
+            return (rc,stdout,stderr)
+        parsedResult = parseResultSuccess(stdout)
+        if parsedResult == None:
+            return (2,stdout,stderr)
+        rc = 0
+        if parsedResult["status"] != "success":
+            rc = 3
+        #print("status:%s" % (parsedResult["status"]))
+        print("details:%s" % (parsedResult["details"]))
+        print("submission_id:%s" % (parsedResult["submission_id"]))
+        
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
         self.log = logging.getLogger("uploaderEgiAppDb.download")
