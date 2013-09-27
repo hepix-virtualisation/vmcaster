@@ -1,5 +1,12 @@
 Changelog
 
+vmcaster-0.0.21
+
+ * x509: Now reads the Certificates x509 extensions.
+ * Added check for presences of extension type 'keyUsage'
+ * Add check that 'Digital Signature' is in the array of acceptable usages.
+
+
 vmcaster-0.0.20
 
  * Added new command line options to support adding metadata from a file.
