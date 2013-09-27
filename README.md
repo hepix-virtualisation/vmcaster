@@ -299,6 +299,8 @@ with a prefix of "https://www.example.org/repos/prod/vmcaster" should be updated
 using a prefix of "user_name@www.example.org:/export/example.org/prod/vmcaster". 
 The section name is not significant and is just to group the attributes.
 
+# Protocols
+
 The following write protocols are currently supported: 
 
  * scp
@@ -315,6 +317,8 @@ For a long time this was the standard POSIX like write protocol for a file
 storage server called dCache which specializes in storing very large quantities 
 of data at the lowest price possible. 
 
+## Protocols : Example 'local'
+
 A second example using the local file system:
 
     [foo]
@@ -325,6 +329,33 @@ A second example using the local file system:
 
 Note: Publishing an image list without any images is the best way to decommission
 an image list when no images are expected to be requested ever again.
+
+## Protocols : Example 'egiappdb'
+
+Example publishign to the 'egiappdb'
+    
+    [appdb-dev]
+    server = "vmcaster.appdb-dev.marie.hellasgrid.gr"
+    protocol = "egiappdb"
+    uriMatch = ".*"
+    uriReplace = "egiappdb://example_user@vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/" 
+    
+
+
+A second example using the local file system:
+
+    [foo]
+    server = "gridvirt.desy.de"
+    protocol = "local"
+    uriMatch = "https://gridvirt.desy.de/"
+    uriReplace = "/tmp/"
+
+Note: Publishing an image list without any images is the best way to decommission
+an image list when no images are expected to be requested ever again.
+
+
+
+
 
 To update an image:
 -------------------
