@@ -5,7 +5,8 @@ vmcaster-0.0.21
  * x509: Now reads the Certificates x509 extensions.
  * Added check for presences of extension type 'keyUsage'
  * Add check that 'Digital Signature' is in the array of acceptable usages.
-
+ * Reorganisation for more uploaders.
+ * Added egiappdb protocol so suporting the App Db. 
 
 vmcaster-0.0.20
 
