@@ -833,6 +833,24 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
 
         smime = M2Crypto.SMIME.SMIME()
         x509 = M2Crypto.X509.load_cert(pathX509Cert)
+        get_ext_count = int(x509.get_ext_count())
+        extensionDict = {}
+        for i in range(get_ext_count):
+             extension =  x509.get_ext_at(i)
+             extensionDict[unicode(extension.get_name())] = unicode(extension.get_value())
+        #content = json.dumps(extensionDict,sort_keys=True, indent=4)
+        #print content
+        if not "keyUsage" in extensionDict.keys():
+            log.critical("Certificate does not caontain a keyUsage extension %s" % (pathX509Cert))
+            sys.exit(31)
+        foundKeyUsage = extensionDict["keyUsage"]
+        foundKeyUsageSplit = foundKeyUsage.split(', ')
+        if not u'Digital Signature' in foundKeyUsageSplit:
+            log.critical("Certificate doe not support Digital Signature: %s" % (pathX509Cert))
+            sys.exit(32)
+        
+        
+        #print extensionDict.keys()
         issuerSubject = str(x509.get_issuer())
         subject = str(x509.get_subject())
         
