@@ -7,6 +7,13 @@ vmcaster-0.0.21
  * Add check that 'Digital Signature' is in the array of acceptable usages.
  * Reorganisation for more uploaders.
  * Added egiappdb protocol so suporting the App Db. 
+ * Added short options for '--quiet' logging, '-q'.
+ * Added short options for '--verbose' logging, '-v'.
+ * Auto Guess the first version number if none set.
+ * Documentation update.
+ * Improved logging identifying 'special' metadata including "hv:dn", from endorser, "dc:identifier" from image and imagelist.
+ 
+ 
 
 vmcaster-0.0.20
 
