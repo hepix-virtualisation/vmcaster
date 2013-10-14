@@ -782,11 +782,8 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             else:
                 if pathX509Key == None:
                     pathX509Key = "%s/%s" % (pathX509Dir,"userkey.pem")
-                    
                 if pathX509Cert == None:
                     pathX509Cert = "%s/%s" % (pathX509Dir,"usercert.pem")
-                    
-                
         if pathX509Key == None:
             log.critical("Invalid Key path")
             sys.exit(21)
@@ -850,32 +847,6 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         if not imagepub.checkMissingFields(imagelistUUID,subject,issuerSubject):
             log.error("Image list has 1 or more required attributes missing.")
             sys.exit(20)
-        if pathX509Key == None or pathX509Cert == None:
-            if pathX509Dir == None:
-                if applicationHome == None:
-                    log.error("No HOME enviroment variable.")
-                    sys.exit(20)        
-                pathX509Dir = "%s/%s" % (applicationHome,".globus")
-                log.debug("Setting pathX509Dir=%s" % (pathX509Dir))
-            if not os.path.isdir(pathX509Dir):
-                log.warning("Directory '%s' does not exist, unable to guess certificates path." % (pathX509Dir))
-            else:
-                if pathX509Key == None:
-                    pathX509Key = "%s/%s" % (pathX509Dir,"userkey.pem")
-                if pathX509Cert == None:
-                    pathX509Cert = "%s/%s" % (pathX509Dir,"usercert.pem")
-        if pathX509Key == None:
-            log.critical("Invalid Key path")
-            sys.exit(21)
-        if pathX509Cert == None:
-            log.critical("Invalid certificate path")
-            sys.exit(22)
-        if not os.path.isfile(pathX509Key):
-            log.critical("Key not found at path '%s'" % (pathX509Key))
-            sys.exit(23)
-        if not os.path.isfile(pathX509Cert):
-            log.critical("Cert not found at path '%s'" % (pathX509Cert))
-            sys.exit(23)
         smime.load_key(pathX509Key,pathX509Cert)
         fp = open(str(tmpfilePath),'w')
         content = json.dumps(imageListAsDict,sort_keys=True, indent=4)
