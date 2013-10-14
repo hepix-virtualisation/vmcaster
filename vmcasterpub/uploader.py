@@ -38,6 +38,7 @@ class uploaderFacade(object):
     def __init__(self):
         self.log = logging.getLogger("uploaderFacade")
         self._uploaderImp = None
+        self._flags = None
         self.externalPrefix = None
     def HasImplementation(self):
         if hasattr(self, '_uploaderImp'):
@@ -47,7 +48,7 @@ class uploaderFacade(object):
     
     @Property
     def remotePrefix():
-        doc = "The person's name"
+        doc = "Remote upload prefix"
 
         def fget(self):
             if hasattr(self, '_uploaderImp'):
@@ -67,6 +68,30 @@ class uploaderFacade(object):
         def fdel(self):
             del self._remotePrefix
         return locals()
+    
+    @Property
+    def flags():
+        doc = "Flags for upload"
+
+        def fget(self):
+            if hasattr(self, '_uploaderImp'):
+                if self._uploaderImp != None:
+                    if hasattr(self._uploaderImp,'flags'):
+                        return self._uploaderImp.flags
+            return self._flags
+
+        def fset(self, name):
+            self._flags = name
+            if hasattr(self, '_uploaderImp'):
+                if self._uploaderImp != None:
+                    self._uploaderImp.flags = name 
+        def fdel(self):
+            del self._flags
+        return locals()
+    
+    
+    
+    
     @Property
     def uploader():
         doc = "Uploader type"
@@ -91,6 +116,7 @@ class uploaderFacade(object):
                 del(self._uploaderImp)
             if hasattr(self, '_uploaderImp'):
                 self._uploaderImp.remotePrefix = self.remotePrefix
+                self._uploaderImp.flags = self.flags
             else:
                 errorMsg = str("Invalid upload protocol sellected:'%s'" % (name))
                 error = InputError("Invalid Value")
