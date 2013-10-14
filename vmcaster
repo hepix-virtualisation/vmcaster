@@ -104,6 +104,7 @@ def main():
     p.add_option('--x509-dir', action ='store',help='Directory for x.509 certificates and keys.', metavar='VMCASTER_X509_DIR')
     p.add_option('--x509-cert', action ='store',help='Path of x.509 Certificate.', metavar='VMCASTER_X509_CERT')
     p.add_option('--x509-key', action ='store',help='Path of x.509 Key.', metavar='VMCASTER_X509_KEY')
+    p.add_option('--flag', action ='append',help='Upload flags', metavar='UPLOAD_FLAG')
     p.add_option('--list-imagelist', action ='store_true',help='list image lists by "dc:identifier".')
     p.add_option('--list-image', action ='store_true',help='list Images by "dc:identifier".')    
     p.add_option('--list-endorser', action ='store_true',help='list Endorsers by "hv:dn".')
@@ -201,9 +202,9 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     signingPathDefaultCert = None
     signingPathHome = None
     imagelistLifeTimeStr = "28"
-    
-    
+    uploadFlags = []
     dishCfg = None
+
     # Read enviroment variables
     if 'VMCASTER_LOG_CONF' in os.environ:
         logFile = os.environ['VMCASTER_LOG_CONF']
@@ -432,7 +433,8 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if options.config_file:
         dishCfg = options.config_file
     
-    
+    if options.flag:
+        uploadFlags = options.flag
     
     
     actionsLen = len(actions)
@@ -859,6 +861,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         fp.write(message_signed)
         fp.close()
         uploader = hostUploader(dishCfg)
+        uploader.flags = uploadFlags
         try:
             uploader.deleteFile(parsedUri['hostname'],uri)
         except InputError, E:
@@ -871,8 +874,10 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         rc,stdout,stderr = output
         if rc != 0:
             log.error("failed to upload file")
-            log.error("Upload produced the following output:\n%s" % (stdout))
-            log.error("Upload produced the following srderr:\n%s" % (stderr))
+            if len(stdout) > 0:
+                log.info("Upload produced the following output:\n%s" % (stdout))
+            if len(stderr) > 0:
+                log.info("Upload produced the following srderr:\n%s" % (stderr))
             sys.exit(77)
         imagepub.imagelist_key_update(imagelistUUID, "dc:date:created",dateNow)
         imagepub.imagelist_key_update(imagelistUUID, "dc:date:expires",dateExpires)
