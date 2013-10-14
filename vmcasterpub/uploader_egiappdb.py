@@ -35,7 +35,7 @@ def postdata(uri,username, password, imagelist, actionList, entity, response):
     try:
         page=urllib2.urlopen(req).read()
     except urllib2.HTTPError, e:
-        return e.code,"",e
+        return e.code,"",e.reason
     return 0,page,""
 
  
@@ -78,6 +78,23 @@ def parseResultSuccess(inputStr):
         "submission_id" : parsedJson["egiappdb"]["submission_id"],
     }
     
+def parseFlags(flags):
+    log = logging.getLogger("parseFlags")
+    output = []
+    for aflag in flags:
+        if not aflag.startswith("egiappdb:"):
+            log.debug("ignoring flag '%s'" % (aflag))
+            continue
+        splitLine = aflag[9:].split('=')
+        if len(splitLine) != 2:
+            log.debug("ignoring flag '%s' as no '=' sign." % (aflag))
+            continue
+        if splitLine[1] != 'true':
+            log.debug("ignoring flag '%s' as value != 'true'." % (aflag))
+            continue
+        output.append(splitLine[0])
+    return output
+    
 class uploaderEgiAppDb:
     def __init__(self):
         self.remotePrefix = None
@@ -101,6 +118,7 @@ class uploaderEgiAppDb:
     def replace(self,localpath,remotePath):
         self.log = logging.getLogger("uploaderEgiAppDb.replace")
         signedFile = ""
+        actionList = parseFlags(self.flags)
         for line in open(localpath):
             signedFile += line
         self.log.debug("localpath:%s" % (localpath))
@@ -110,9 +128,19 @@ class uploaderEgiAppDb:
         if uriParsed["user"] == None:
             return 1,"","Remote uri does not assign an upload user" 
         if uriParsed["scheme"] != "egiappdb":
-            print uriParsed["scheme"],remotePath
             return 1,"","Remote uri protocol is not 'egiappdb'" 
-        #self.log.debug("hostname:%s" % (uriParsed["hostname"]))
+        
+        
+        
+        self.log.debug("actionList:%s" % (actionList))
+        if len(actionList) == 0:
+            actionList = ['insert']
+            flagstringL = []
+            for actionItem in actionList:
+                flagstringL.append("egiappdb:%s=true" % (actionItem))
+            self.log.warning("No flags set for upload, defaulting flags to %s" % (flagstringL))
+        
+        
         newUriComponents = {
             "scheme" : "https",
             "path" : uriParsed["path"],
@@ -123,12 +151,12 @@ class uploaderEgiAppDb:
         newUri = uglyuri.uglyUriBuilder(newUriComponents)
         self.log.debug("Uploading uri:%s" % (newUri))
         password = getpass.getpass("Appdb password for '%s':" % (username))
-        actionList = ['insert']
         entity = 'imagelist'
         response = 'json'
         output = postdata(newUri,username, password, localpath, actionList, entity, response)
-        self.log.info("Output:%s" % (str(output)))
         rc,stdout,stderr = output
+        if rc == 0:
+            self.log.info("Output:%s" % (str(output)))
         if rc != 0:
             return (rc,stdout,stderr)
         parsedResult = parseResultSuccess(stdout)
