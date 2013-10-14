@@ -849,7 +849,11 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         if not imagepub.checkMissingFields(imagelistUUID,subject,issuerSubject):
             log.error("Image list has 1 or more required attributes missing.")
             sys.exit(20)
-        smime.load_key(pathX509Key,pathX509Cert)
+        try:
+            smime.load_key(pathX509Key,pathX509Cert)
+        except M2Crypto.EVP.EVPError, e:
+            log.error("Failed to load key : '%s', cert : '%s'." % (pathX509Key,pathX509Cert))
+            sys.exit(29)
         fp = open(str(tmpfilePath),'w')
         content = json.dumps(imageListAsDict,sort_keys=True, indent=4)
         buf = M2Crypto.BIO.MemoryBuffer(content)
