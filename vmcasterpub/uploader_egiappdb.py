@@ -6,36 +6,37 @@ import getpass
 import uglyuri
 import json
 
-def createXMLwrapper(action, entity, username, response, imagelist_data):
-   xml = '<?xml version="1.0" encoding="utf-8"?>'+\
-         '<appdbvmc>'+\
-	 '<action><![CDATA['+action+']]></action>'+\
-	 '<entity><![CDATA['+entity+']]></entity>'+\
-         '<response><![CDATA['+response+']]></response>'+\
-	 '<user><![CDATA['+username+']]></user>'+\
-	 '<imagelist><![CDATA['+imagelist_data+']]></imagelist>'+\
-	 '</appdbvmc>'
-   return xml
+def createXMLwrapper(actionList, entity, username, response, imagelist_data):
+    actionLines = ""
+    for action in actionList:
+        actionLines += "<action><![CDATA[%s]]></action>" % (action)
+    xml = """<?xml version="1.0" encoding="utf-8"?><appdbvmc>%s<entity><![CDATA[%s]]></entity><response><![CDATA[%s]]></response><user><![CDATA[%s]]></user><imagelist><![CDATA[%s]]></imagelist></appdbvmc>""" % (
+                actionLines,
+                entity,
+                response,
+                username,
+                imagelist_data
+            )
+    return xml
 
-def postdata(uri,username, password, imagelist, action, entity, response):
-   passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-   passman.add_password(None, uri, username, password)
-   authhandler = urllib2.HTTPBasicAuthHandler(passman)
-   opener = urllib2.build_opener(authhandler)
-   urllib2.install_opener(opener)
-
-   f = open(imagelist, 'r')
-   file_data = base64.b64encode(f.read())
-
-
-   data=createXMLwrapper(action, entity, username, response, file_data)
-   postdata=[('data',data)]
-
-   postdata=urllib.urlencode(postdata)
-   req=urllib2.Request(uri, postdata)
-   req.add_header("Content-type", "application/x-www-form-urlencoded")
-   page=urllib2.urlopen(req).read()
-   return 0,page,""
+def postdata(uri,username, password, imagelist, actionList, entity, response):
+    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    passman.add_password(None, uri, username, password)
+    authhandler = urllib2.HTTPBasicAuthHandler(passman)
+    opener = urllib2.build_opener(authhandler)
+    urllib2.install_opener(opener)
+    f = open(imagelist, 'r')
+    file_data = base64.b64encode(f.read())
+    data=createXMLwrapper(actionList, entity, username, response, file_data)
+    postdata=[('data',data)]
+    postdata=urllib.urlencode(postdata)
+    req=urllib2.Request(uri, postdata)
+    req.add_header("Content-type", "application/x-www-form-urlencoded")
+    try:
+        page=urllib2.urlopen(req).read()
+    except urllib2.HTTPError, e:
+        return e.code,"",e
+    return 0,page,""
 
  
 #postdata(username, password, imagelist)
@@ -122,10 +123,10 @@ class uploaderEgiAppDb:
         newUri = uglyuri.uglyUriBuilder(newUriComponents)
         self.log.debug("Uploading uri:%s" % (newUri))
         password = getpass.getpass("Appdb password for '%s':" % (username))
-        action = 'insert'
+        actionList = ['insert']
         entity = 'imagelist'
         response = 'json'
-        output = postdata(newUri,username, password, localpath, action, entity, response)
+        output = postdata(newUri,username, password, localpath, actionList, entity, response)
         self.log.info("Output:%s" % (str(output)))
         rc,stdout,stderr = output
         if rc != 0:
