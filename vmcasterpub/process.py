@@ -78,6 +78,9 @@ class hostUploader:
             raise InputError(E.msg)
         self.facard.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
         self.facard.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
+        if hasattr(self, 'flags'):
+            self.facard.flags = self.flags
+        
         
     def replaceFile(self,localPath,remoteHost,externalPath):
         
