@@ -818,8 +818,8 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         dateExpires = expiry.strftime(time_format_definition)
         imageListAsDict = imagepub.imageListShow(imagelistUUID)
         imageListAsDict[u'hv:imagelist'][u'hv:version'] = unicode(versionNew)
-        imageListAsDict[u'hv:imagelist'][u'dc:date:created'] = unicode(versionNew)
-        imageListAsDict[u'hv:imagelist'][u'hv:version'] = unicode(versionNew)
+        imageListAsDict[u'hv:imagelist'][u'dc:date:created'] = dateNow
+        imageListAsDict[u'hv:imagelist'][u'dc:date:expires'] = dateExpires
         uri = imagepub.imagelist_key_get(imagelistUUID,"hv:uri")
         if uri == None:
             log.error("Image list has no attribute 'hv:uri', image upload aborted.")
