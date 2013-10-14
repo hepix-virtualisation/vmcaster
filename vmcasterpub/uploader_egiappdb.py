@@ -10,14 +10,13 @@ def createXMLwrapper(actionList, entity, username, response, imagelist_data):
     actionLines = ""
     for action in actionList:
         actionLines += "<action><![CDATA[%s]]></action>" % (action)
-    xml = """<?xml version="1.0" encoding="utf-8"?><appdbvmc>%s<entity><![CDATA[%s]]></entity><response><![CDATA[%s]]></response><user><![CDATA[%s]]></user><imagelist><![CDATA[%s]]></imagelist></appdbvmc>""" % (
-                actionLines,
-                entity,
-                response,
-                username,
-                imagelist_data
-            )
-    return xml
+    xmlTemplate = """<?xml version="1.0" encoding="utf-8"?><appdbvmc>%(actionLines)s<entity><![CDATA[%(entity)s]]></entity><response><![CDATA[%(response)s]]></response><user><![CDATA[%(username)s]]></user><imagelist><![CDATA[%(imagelist_data)s]]></imagelist></appdbvmc>"""
+    data = {'actionLines': actionLines, 
+        'entity': entity,
+        'response' : response,
+        'username' : username,
+        'imagelist_data' : imagelist_data}
+    return xmlTemplate%data
 
 def postdata(uri,username, password, imagelist, actionList, entity, response):
     passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
