@@ -93,7 +93,6 @@ def checkVoms(requiredExtensions = set([])):
         return None
     return identity
 
-
 def main():
     """Runs program and handles command line options"""
     p = optparse.OptionParser(version = "%prog " + version)
@@ -801,6 +800,10 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             log.critical("Cert not found at path '%s'" % (pathX509Cert))
             sys.exit(23)
         
+        if imagepub.imageListShow(imagelistUUID) == None:
+            log.critical("Image list '%s' not found:" % (imagelistUUID))
+            sys.exit(23)
+        
         
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
         if versionOld == None:
@@ -808,21 +811,16 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         versionNew = bumpVersion(versionOld)
         if versionNew == None:
             versionNew = '0.0.1'
-        imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
-        
         now = datetime.datetime.utcnow()
         servicelength = datetime.timedelta(days=imagelistLifeTime)
         expiry = now + servicelength
         time_format_definition = "%Y-%m-%dT%H:%M:%SZ"
         dateNow = now.strftime(time_format_definition)
         dateExpires = expiry.strftime(time_format_definition)
-        imagepub.imagelist_key_update(imagelistUUID, "dc:date:created",dateNow)
-        imagepub.imagelist_key_update(imagelistUUID, "dc:date:expires",dateExpires)
-        
-        imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
-        
-        
-        
+        imageListAsDict = imagepub.imageListShow(imagelistUUID)
+        imageListAsDict[u'hv:imagelist'][u'hv:version'] = unicode(versionNew)
+        imageListAsDict[u'hv:imagelist'][u'dc:date:created'] = unicode(versionNew)
+        imageListAsDict[u'hv:imagelist'][u'hv:version'] = unicode(versionNew)
         uri = imagepub.imagelist_key_get(imagelistUUID,"hv:uri")
         if uri == None:
             log.error("Image list has no attribute 'hv:uri', image upload aborted.")
@@ -838,8 +836,6 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         for i in range(get_ext_count):
              extension =  x509.get_ext_at(i)
              extensionDict[unicode(extension.get_name())] = unicode(extension.get_value())
-        #content = json.dumps(extensionDict,sort_keys=True, indent=4)
-        #print content
         if not "keyUsage" in extensionDict.keys():
             log.critical("Certificate does not caontain a keyUsage extension %s" % (pathX509Cert))
             sys.exit(31)
@@ -848,16 +844,12 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         if not u'Digital Signature' in foundKeyUsageSplit:
             log.critical("Certificate doe not support Digital Signature: %s" % (pathX509Cert))
             sys.exit(32)
-        
-        
-        #print extensionDict.keys()
         issuerSubject = str(x509.get_issuer())
         subject = str(x509.get_subject())
-        
+
         if not imagepub.checkMissingFields(imagelistUUID,subject,issuerSubject):
             log.error("Image list has 1 or more required attributes missing.")
             sys.exit(20)
-        
         if pathX509Key == None or pathX509Cert == None:
             if pathX509Dir == None:
                 if applicationHome == None:
@@ -870,11 +862,8 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             else:
                 if pathX509Key == None:
                     pathX509Key = "%s/%s" % (pathX509Dir,"userkey.pem")
-                    
                 if pathX509Cert == None:
                     pathX509Cert = "%s/%s" % (pathX509Dir,"usercert.pem")
-                    
-                
         if pathX509Key == None:
             log.critical("Invalid Key path")
             sys.exit(21)
@@ -887,24 +876,17 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         if not os.path.isfile(pathX509Cert):
             log.critical("Cert not found at path '%s'" % (pathX509Cert))
             sys.exit(23)
-        
         smime.load_key(pathX509Key,pathX509Cert)
         fp = open(str(tmpfilePath),'w')
-        
-        content = json.dumps(imagepub.imageListShow(imagelistUUID),sort_keys=True, indent=4)
-        
+        content = json.dumps(imageListAsDict,sort_keys=True, indent=4)
         buf = M2Crypto.BIO.MemoryBuffer(content)
         p7 = smime.sign(buf,M2Crypto.SMIME.PKCS7_DETACHED)
         buf = M2Crypto.BIO.MemoryBuffer(content)
         out = M2Crypto.BIO.MemoryBuffer()
         smime.write(out, p7, buf)
         message_signed = str(out.read())
-        
-        
-        
         fp.write(message_signed)
         fp.close()
-        
         uploader = hostUploader(dishCfg)
         try:
             uploader.deleteFile(parsedUri['hostname'],uri)
@@ -921,6 +903,10 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             log.error("Upload produced the following output:\n%s" % (stdout))
             log.error("Upload produced the following srderr:\n%s" % (stderr))
             sys.exit(77)
+        imagepub.imagelist_key_update(imagelistUUID, "dc:date:created",dateNow)
+        imagepub.imagelist_key_update(imagelistUUID, "dc:date:expires",dateExpires)
+        imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
+
         
 if __name__ == "__main__":
     main()
