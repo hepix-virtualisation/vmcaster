@@ -33,8 +33,9 @@ def postdata(uri,username, password, imagelist, actionList, entity, response):
     req.add_header("Content-type", "application/x-www-form-urlencoded")
     try:
         page=urllib2.urlopen(req).read()
-    except urllib2.HTTPError, e:
-        return e.code,"",e.reason
+#    except urllib2.error.HTTPError, e:
+    except urllib2.URLError, e:
+        return e.code,"","HTTP error (" + str(e.code) + ")"
     return 0,page,""
 
  
@@ -75,11 +76,13 @@ def parseResultSuccess(inputStr):
     return {"status" : parsedJson["egiappdb"]["status"],
         "details" : parsedJson["egiappdb"]["details"],
         "submission_id" : parsedJson["egiappdb"]["submission_id"],
+        "errors" : parsedJson["egiappdb"]["errors"],
     }
     
 def parseFlags(flags):
     log = logging.getLogger("parseFlags")
-    output = []
+    output = ['insert','enable']
+    flagsgiven=0
     for aflag in flags:
         if not aflag.startswith("egiappdb:"):
             log.debug("ignoring flag '%s'" % (aflag))
@@ -88,11 +91,19 @@ def parseFlags(flags):
         if len(splitLine) != 2:
             log.debug("ignoring flag '%s' as no '=' sign." % (aflag))
             continue
+        flagsgiven=1
         if splitLine[1] != 'true':
-            log.debug("ignoring flag '%s' as value != 'true'." % (aflag))
-            continue
-        output.append(splitLine[0])
-    return output
+            log.debug("remove (if exists) flag '%s' as value != 'true'." % (aflag))
+            if output.count(splitLine[0]) > 0:
+                output.remove(splitLine[0])
+        else:
+            if output.count(splitLine[0]) == 0:
+               output.append(splitLine[0])
+    if flagsgiven == 1:
+       return output
+    else:
+       return []
+
     
 class uploaderEgiAppDb:
     def __init__(self):
@@ -133,7 +144,7 @@ class uploaderEgiAppDb:
         
         self.log.debug("actionList:%s" % (actionList))
         if len(actionList) == 0:
-            actionList = ['insert']
+            actionList = ['insert','enable']
             flagstringL = []
             for actionItem in actionList:
                 flagstringL.append("egiappdb:%s=true" % (actionItem))
@@ -164,10 +175,16 @@ class uploaderEgiAppDb:
         rc = 0
         if parsedResult["status"] != "success":
             rc = 3
-        #print("status:%s" % (parsedResult["status"]))
+            
+        errormsg=parsedResult["errors"][2]["message"]
+
+        print("status:%s" % (parsedResult["status"]))
         print("details:%s" % (parsedResult["details"]))
         print("submission_id:%s" % (parsedResult["submission_id"]))
-        
+
+        if parsedResult["status"] != "success":
+           print("error message:%s" % (errormsg))        
+
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
         self.log = logging.getLogger("uploaderEgiAppDb.download")
