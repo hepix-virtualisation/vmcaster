@@ -1,5 +1,17 @@
 Changelog
 
+
+vmcaster-0.0.22
+
+ * Added flags to vmcaster command line.
+ * Pass flags to each implementation of image(list) uploader.
+ * Improved handling on invalid imagelist.
+ * Only increment version on successful image list update.
+ * Only set creation/expiry date on successful image list update.
+ * Removed some duplicate code
+ * Refactor AppDB code to support multiple actions.
+ * Improve presentation of AppDb output as error code and error text.
+
 vmcaster-0.0.21
 
  * x509: Now reads the Certificates x509 extensions.
