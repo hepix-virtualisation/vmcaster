@@ -523,15 +523,15 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     # Now check for required fields
     
     if endorserValue == None and endorser_key_value_add_req == True:
-        log.error("Missing '--key-value-endorser'" % (dishCfg))
+        log.error("Missing '--key-value-endorser'")
         sys.exit(1)
     
     if image_key_value == None and image_key_value_add_req == True:
-        log.error("Missing '--key-value-image'" % (dishCfg))
+        log.error("Missing '--key-value-image'")
         sys.exit(1)
     
     if imagelist_key_value == None and imagelist_key_value_add_req == True:
-        log.error("Missing '--key-value-image'" % (dishCfg))
+        log.error("Missing '--key-value-imagelist'")
         sys.exit(1)
     
     
