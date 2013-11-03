@@ -1,5 +1,5 @@
 Vmcaster is a simple tool for managing and updating your published 
-virtual machines image lists. Following the Hepix image list format.
+virtual machines image lists. Following the HEPiX image list format.
 
 vmcaster software is available here:
 
@@ -29,7 +29,7 @@ Internally the application uses a simple SQL database, SQLite for storing
 image lists and multiple back ends managing uploading of images / images lists 
 using a facade pattern. This allows transfer protocol to be derived from the 
 meta data of the image list and a configuration file, updates need much less 
-effort.
+effort. 
 
 
 Quick Start
@@ -311,10 +311,15 @@ This is the standard file transfer tool from the openssh project.
 
 This is when you share a file system with the public server.
 
+ * egiappdb
+ 
+This is the native protocol for the EGI AppDB. This allows you to use 
+vmcaster as a command line tool for updating imagelists.
+
  * gsidcap
 
 For a long time this was the standard POSIX like write protocol for a file 
-storage server called dCache which specializes in storing very large quantities 
+storage server called dCache which specialises in storing very large quantities 
 of data at the lowest price possible. 
 
 ## Protocols : Example 'local'
@@ -332,7 +337,7 @@ an image list when no images are expected to be requested ever again.
 
 ## Protocols : Example 'egiappdb'
 
-Example publishign to the 'egiappdb'
+Example publishing to the 'egiappdb'
     
     [appdb-dev]
     server = "vmcaster.appdb-dev.marie.hellasgrid.gr"
@@ -340,6 +345,13 @@ Example publishign to the 'egiappdb'
     uriMatch = ".*"
     uriReplace = "egiappdb://example_user@vmcaster.appdb-dev.marie.hellasgrid.gr/vmlist/submit/sso/" 
     
+    [appdb] 
+    server = "vmcaster.appdb.egi.eu" 
+    protocol = "egiappdb" 
+    uriMatch = ".*" 
+    uriReplace = "egiappdb://_YOUR_EGI_SSO_USERNAME_@vmcaster.appdb.egi.eu/vmlist/submit/sso/"
+    
+
 
 
 A second example using the local file system:
@@ -352,6 +364,32 @@ A second example using the local file system:
 
 Note: Publishing an image list without any images is the best way to decommission
 an image list when no images are expected to be requested ever again.
+
+# uriMatch and uriReplace
+
+It should be noted that the external download uri is used to generate upload path that is used.
+
+The meta data in the images lists, 'hv:uri' is used to generate the upload
+path for the image list. Each image in an imagelist must also has a 'hv:uri',
+this is also used to generate the path for uploading images. Processed with 
+the 'regular expression' matched by 'uriMatch' and replaced with value of 
+the key in 'uriReplace'. The best uriMatch is the most specific, but due 
+to the flexibility it offers the user even very generic 'uriMatch' values 
+can be used.
+
+    uriMatch = ".*/"
+
+This is a near universal 'uriMatch' value as it will always leave some part 
+of the 'filename' of the External URI in the upload path. Normally I would
+recommend including at least the hostname and the shared root path for example:
+
+    uriMatch = "https://www.example.org/repos/imagelist"
+
+Only in the case of uploading imagelists over the 'egiappdb' should you ever 
+use the expression ".*" as this will result in all files being uploaded to 
+the same location.
+
+
 
 
 
