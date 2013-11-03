@@ -1,5 +1,15 @@
 Changelog
 
+vmcaster-0.0.23
+
+ * Added more warnings with badly picked 'uriMatch' values.
+ * Added some debug level logging to upload paths to help debug badly picked 
+   'uriMatch' values.
+ * Fixed bug in uploader facard.
+ * Fixed stack trace casuing logging of errors.
+ * Documentation Additions.
+ * Documentation spelling fixes.
+
 
 vmcaster-0.0.22
 
@@ -23,7 +33,8 @@ vmcaster-0.0.21
  * Added short options for '--verbose' logging, '-v'.
  * Auto Guess the first version number for all images if none set.
  * Documentation update.
- * Improved logging identifying 'special' metadata including "hv:dn", from endorser, "dc:identifier" from image and imagelist.
+ * Improved logging identifying 'special' metadata including "hv:dn", from endorser,
+   "dc:identifier" from image and imagelist.
  
  
 
@@ -49,7 +60,8 @@ vmcaster-0.0.18
 vmcaster-0.0.17
 
  * Added licence to packaging.
- * Catch images without external URI on upload and make clear error message stating URI is required.
+ * Catch images without external URI on upload and make clear error message 
+   stating URI is required.
  * Catch images without version number and default version number to 0.0.1.
  * Improve error message when attributes are missing.
  * Update documentation.
@@ -73,7 +85,8 @@ vmcaster-0.0.14
  * Changed the environment variable prefix from "DISH" to "VMCASTER"
  * changed the configuration section variable "writeprotocol" to "protocol"
  * Fixed logging errors.
- * Changed README to README.md and reformatted documentation from text to markdown format.
+ * Changed README to README.md and reformatted documentation from text to 
+   markdown format.
 
 vmcaster-0.0.13
 
