@@ -97,7 +97,10 @@ class uploaderFacade(object):
         doc = "Uploader type"
 
         def fget(self):
-            return self._uploaderName
+            if hasattr(self, '_uploaderName'):
+                return self._uploaderName
+            else:
+                return None
 
         def fset(self, name):
             self._uploader = name
@@ -146,7 +149,17 @@ class uploaderFacade(object):
             self.log.info("match=%s" % (self.externalPrefix))
             self.log.info("replace=%s" % (self.remotePrefix))
             return output
-        return re.sub(self.externalPrefix, self.remotePrefix, externalURI)
+        output = re.sub(self.externalPrefix, self.remotePrefix, externalURI)
+        if self.uploader == "egiappdb":
+            if output != self.remotePrefix:
+                self.log.warning("Protocol '%s' attempted with a poor uriMatch settings for '%s'." % (self.uploader,externalURI))
+        else:
+            if output == self.remotePrefix:
+                self.log.warning("Protocol '%s' attempted with a poor uriMatch settings for '%s'." % (self.uploader,externalURI))
+        
+            
+            
+        return output
         
         
     def download(self,localpath,externalURI):
@@ -159,7 +172,10 @@ class uploaderFacade(object):
             return self._uploaderImp.upload(localpath,remotepath)
     def replace(self,localpath,externalURI):
         if hasattr(self, '_uploaderImp'):
+            self.log.debug('localpath =%s' % (localpath))
+            self.log.debug('externalURI =%s' % (externalURI))
             remotepath = self.transforExtUri(externalURI)
+            self.log.debug('remotepath =%s' % (remotepath))
             return self._uploaderImp.replace(localpath,remotepath)
     def delete(self,externalURI):
         if hasattr(self, '_uploaderImp'):
