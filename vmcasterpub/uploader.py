@@ -103,7 +103,7 @@ class uploaderFacade(object):
                 return None
 
         def fset(self, name):
-            self._uploader = name
+            self._uploaderName = name
             if name == "gsidcap":
                 self._uploaderImp = uploaderDcap.uploaderDcap()
             elif name == "scp":
@@ -139,8 +139,8 @@ class uploaderFacade(object):
             self.log.info("match=%s" % (self.externalPrefix))
             self.log.info("replace=%s" % (self.remotePrefix))
             return output
-        self.log.info("externalPrefix=%s" % (self.externalPrefix))
-        self.log.info("externalURI=%s" % (externalURI))
+        self.log.debug("externalPrefix=%s" % (self.externalPrefix))
+        self.log.debug("externalURI=%s" % (externalURI))
         
         match = re.match(self.externalPrefix,externalURI)
         if match == None:
