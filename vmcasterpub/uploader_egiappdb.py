@@ -7,16 +7,16 @@ import uglyuri
 import json
 
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
-        def __init__(self, key, cert):
-                urllib2.HTTPSHandler.__init__(self)
-                self.key = key
-                self.cert = cert
+    def __init__(self, key, cert):
+        urllib2.HTTPSHandler.__init__(self)
+        self.key = key
+        self.cert = cert
 
-        def https_open(self, req):
-                return self.do_open(self.getConnection, req)
+    def https_open(self, req):
+        return self.do_open(self.getConnection, req)
 
-        def getConnection(self, host, timeout=300):
-                return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+    def getConnection(self, host, timeout=300):
+        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
 
 def createXMLwrapper(actionList, entity, username, response, imagelist_data):
@@ -32,19 +32,18 @@ def createXMLwrapper(actionList, entity, username, response, imagelist_data):
     return xmlTemplate%data
 
 def postdata(uri, username, password, authmethod, imagelist, actionList, entity, response):
-
     if authmethod != "x509":
-       passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-       passman.add_password(None, uri, username, password)
-       authhandler = urllib2.HTTPBasicAuthHandler(passman)
-       opener = urllib2.build_opener(authhandler)
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        passman.add_password(None, uri, username, password)
+        authhandler = urllib2.HTTPBasicAuthHandler(passman)
+        opener = urllib2.build_opener(authhandler)
     else:
-       usercert = os.getenv('VMCASTER_X509_CERT', os.environ['HOME']+'/.globus/usercert.pem')
-       userkey = os.getenv('VMCASTER_X509_KEY', os.environ['HOME']+'/.globus/userkey.pem')
-       username = 'x509'
-       print 'Cert to be used: '+usercert
-       print 'Key to be used: '+userkey
-       opener = urllib2.build_opener(HTTPSClientAuthHandler(userkey, usercert))
+        usercert = os.getenv('VMCASTER_X509_CERT', os.environ['HOME']+'/.globus/usercert.pem')
+        userkey = os.getenv('VMCASTER_X509_KEY', os.environ['HOME']+'/.globus/userkey.pem')
+        username = 'x509'
+        print 'Cert to be used: '+usercert
+        print 'Key to be used: '+userkey
+        opener = urllib2.build_opener(HTTPSClientAuthHandler(userkey, usercert))
 
     urllib2.install_opener(opener)
     f = open(imagelist, 'r')
@@ -185,15 +184,15 @@ class uploaderEgiAppDb:
         newUri = uglyuri.uglyUriBuilder(newUriComponents)
         self.log.debug("Uploading uri:%s" % (newUri))
 
-       username=''
-       password=''
+        username=''
+        password=''
 
-       if authmethod != 'x509':
-           username = uriParsed["user"]
-          password = getpass.getpass("Appdb password for '%s':" % (username))
-          newUri=newUri.strip("/")+'/sso/'
-       else:
-          newUri=newUri.strip("/")+'/x509/'
+        if authmethod != 'x509':
+            username = uriParsed["user"]
+            password = getpass.getpass("Appdb password for '%s':" % (username))
+            newUri=newUri.strip("/")+'/sso/'
+        else:
+            newUri=newUri.strip("/")+'/x509/'
 
         entity = 'imagelist'
         response = 'json'
@@ -217,7 +216,7 @@ class uploaderEgiAppDb:
         print("submission_id:%s" % (parsedResult["submission_id"]))
 
         if parsedResult["status"] != "success":
-           print("error message:%s" % (errormsg))        
+            print("error message:%s" % (errormsg))        
 
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
