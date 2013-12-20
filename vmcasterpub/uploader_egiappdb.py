@@ -185,15 +185,15 @@ class uploaderEgiAppDb:
         newUri = uglyuri.uglyUriBuilder(newUriComponents)
         self.log.debug("Uploading uri:%s" % (newUri))
 
-       username=''
-       password=''
+        username=''
+        password=''
 
-       if authmethod != 'x509':
-           username = uriParsed["user"]
-          password = getpass.getpass("Appdb password for '%s':" % (username))
-          newUri=newUri.strip("/")+'/sso/'
-       else:
-          newUri=newUri.strip("/")+'/x509/'
+        if authmethod != 'x509':
+            username = uriParsed["user"]
+            password = getpass.getpass("Appdb password for '%s':" % (username))
+            newUri=newUri.strip("/")+'/sso/'
+        else:
+            newUri=newUri.strip("/")+'/x509/'
 
         entity = 'imagelist'
         response = 'json'
@@ -217,7 +217,7 @@ class uploaderEgiAppDb:
         print("submission_id:%s" % (parsedResult["submission_id"]))
 
         if parsedResult["status"] != "success":
-           print("error message:%s" % (errormsg))        
+            print("error message:%s" % (errormsg))        
 
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
