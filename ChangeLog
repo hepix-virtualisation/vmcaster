@@ -9,7 +9,12 @@ vmcaster-0.0.23
  * Fixed stack trace casuing logging of errors.
  * Documentation Additions.
  * Documentation spelling fixes.
-
+ * Appdb upload improvements from Marios Chatziangelou
+    Enviroment variable to set authorisation mode VMCASTER_EGIAPPDB_AUTHN with default as x509
+ * Spelling errors to documentation
+ * Documentation improvements.
+ * Better error handling for the configuration of keys.
+ * documentation on egiappdb configurations.
 
 vmcaster-0.0.22
 
