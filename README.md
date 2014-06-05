@@ -438,6 +438,15 @@ To update and sign image list.
         --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
         --upload-imagelist
 
+By default imagelists have a fixed lifetime of 28 days. To set overide the
+default on the command line. The following example sets an imagelist to 
+expire after 2 months.
+
+    $ vmcaster \
+        --lifetime-imagelist 56 \
+        --select-imagelist 9b6fad19-d913-4cca-b77d-c4b4fcd9dc36 \
+        --upload-imagelist
+
 Clients
 -------
 
@@ -491,6 +500,12 @@ value is defaulted to "$HOME/.globus/userkey.pem".
 
 Sets the default path for the users x.509 user key. If not set this 
 value is defaulted to "$HOME/.globus/usercert.pem".
+
+* VMCASTER_IMAGELIST_LIFETIME
+
+Sets the default imagelist lifetime in days. Please note that setting the 
+life time longer than the certificate expiry date that is used to sign the 
+imagelist will not extend the lifetime longer than the certificate.
 
 
 Road map
