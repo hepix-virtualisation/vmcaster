@@ -12,7 +12,9 @@ import re
 import sys
 
 import logging
-def Property(func):
+
+
+def Property2(func):
     return property(**func())
 
 class Error(Exception):

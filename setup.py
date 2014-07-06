@@ -1,15 +1,26 @@
 from sys import version_info
 from vmcasterpub.__version__ import version
 if version_info < (2, 6):
-	from distutils.core import setup
-else:
-	try:
-        	from setuptools import setup, find_packages
-	except ImportError:
-        	from ez_setup import use_setuptools
-        	use_setuptools()
-        	from setuptools import setup, find_packages
+    import sys
+    print "Please use a newer version of python"
+    sys.exit(1)
 
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+	try:
+            from distutils.core import setup
+	except ImportError:
+            from ez_setup import use_setuptools
+            use_setuptools()
+            from setuptools import setup, find_packages
+
+# we want this module for nosetests
+try:
+    import multiprocessing
+except ImportError:
+    # its not critical if this fails though.
+    pass
 
 setup(name='vmcaster',
     version=version,
@@ -20,6 +31,7 @@ setup(name='vmcaster',
     license='Apache License (2.0)',
     install_requires=[
        "sqlalchemy>=0.5",
+       "M2Crypto>=0.16",
         ],
     url = 'https://svnsrv.desy.de/desy/grid-virt/org.desy.dish.updator',
     classifiers=[
@@ -36,4 +48,13 @@ setup(name='vmcaster',
     scripts=['vmcaster'],
     data_files=[('/usr/share/doc/vmcaster',['README.md','ChangeLog','LICENSE']),
         ('/etc/vmcaster',['vmcaster.cfg.template'])],
+    tests_require=[
+        'coverage >= 3.0',
+        'nose >= 1.1.0',
+        'mock',
+    ],
+    setup_requires=[
+        'nose',
+    ],
+    test_suite = 'nose.collector',
     )

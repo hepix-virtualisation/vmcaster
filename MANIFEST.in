@@ -3,3 +3,4 @@ include README.md
 include logger.conf
 include ChangeLog
 include vmcaster.cfg.template 
+include tests/*.py
