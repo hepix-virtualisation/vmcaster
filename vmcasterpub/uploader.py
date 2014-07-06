@@ -14,7 +14,7 @@ import sys
 import logging
 
 
-def Property2(func):
+def Property(func):
     return property(**func())
 
 class Error(Exception):
