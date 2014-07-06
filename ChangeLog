@@ -1,5 +1,11 @@
 Changelog
 
+vmcaster-0.0.24
+
+ * Added nosetest unit test framework.
+ * changed to distutils as default setup.py framework.
+ * Improved documentation.
+
 vmcaster-0.0.23
 
  * Added more warnings with badly picked 'uriMatch' values.
