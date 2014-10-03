@@ -280,11 +280,12 @@ class imagelistpub:
 
     def imageListList(self):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Imagelist)
+        query_imagelists = Session.query(model.ImageListImage,model.Image.identifier).\
+            filter(model.Image.id ==  model.ImageListImage.fkImage)
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')            
         for imagelist in query_imagelists:
-            print imagelist.identifier
+            print imagelist
         
     def imageListAdd(self,UUID):
         Session = self.SessionFactory()
@@ -297,6 +298,23 @@ class imagelistpub:
         Session.add(newImage)
         Session.commit()
         return True
+
+
+
+    def imagelist_list_image(self,imagelistUUID):
+        
+
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.ImageListImage).\
+                filter(model.Imagelist.identifier == UUID ).\
+                filter(model.ImageListImage.fkImageList == model.Imagelist.id)
+        if query_imagelists.count() == 0:
+            self.log.warning('Imagelist already exists')
+            return False
+        for item in  query_imagelists:
+            item.fkImageList
+            
+            
 
     def imagesDel(self,UUID):
         Session = self.SessionFactory()
@@ -699,7 +717,4 @@ class imagelistpub:
             if not foundEndorser:
                 self.log.error("Could not find an endorser matching your certificate '%s' issued by '%s'." % (subject,issuerSub))
                 return False
-        return True
-
-    def imagelist_list_image(self,imagelistUUID):
         return True
