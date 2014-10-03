@@ -302,18 +302,17 @@ class imagelistpub:
 
 
     def imagelist_list_image(self,imagelistUUID):
-        
-
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.ImageListImage).\
-                filter(model.Imagelist.identifier == UUID ).\
-                filter(model.ImageListImage.fkImageList == model.Imagelist.id)
+        query_imagelists = Session.query(model.Image).\
+                filter(model.Imagelist.identifier == imagelistUUID).\
+                filter(model.ImageListImage.fkImageList == model.Imagelist.id).\
+                filter(model.ImageListImage.fkImage == model.Image.id)
         if query_imagelists.count() == 0:
             self.log.warning('Imagelist already exists')
             return False
         for item in  query_imagelists:
-            item.fkImageList
-            
+            print item.identifier
+        return True
             
 
     def imagesDel(self,UUID):
