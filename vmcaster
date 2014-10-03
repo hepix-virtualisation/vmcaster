@@ -573,7 +573,12 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     
     
     if 'imagelist_list_image' in actions:
-        imagepub.endorserList()
+        output = imagepub.imagelist_list_image(imagelistUUID)
+        if output == None:
+            return
+        
+        
+        
     
     if 'imagelist_list' in actions:
         imagepub.imageListList()

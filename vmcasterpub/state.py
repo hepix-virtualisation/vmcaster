@@ -700,3 +700,6 @@ class imagelistpub:
                 self.log.error("Could not find an endorser matching your certificate '%s' issued by '%s'." % (subject,issuerSub))
                 return False
         return True
+
+    def imagelist_list_image(self,imagelistUUID):
+        return True
