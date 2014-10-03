@@ -280,7 +280,7 @@ class imagelistpub:
 
     def imageListList(self):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Image).\
+        query_imagelists = Session.query(model.Imagelist).\
             filter(model.Image.id ==  model.ImageListImage.fkImage)
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')            
@@ -309,7 +309,7 @@ class imagelistpub:
                 filter(model.ImageListImage.fkImage == model.Image.id)
         images = set([])
         if query_imagelists.count() == 0:
-            self.log.warning('Imagelist already exists')
+            self.log.warning('No Imagelists with Images found for %s' % (imagelistUUID))
             return images
         for item in  query_imagelists:
              images.add(str(item.identifier))
@@ -323,7 +323,7 @@ class imagelistpub:
                 filter(model.Endorsement.fkImageList == model.Imagelist.id)
         images = set([])
         if query_imagelists.count() == 0:
-            self.log.warning('Imagelist already exists')
+            self.log.warning('No Imagelists with Images found for %s '% (imagelistUUID))
             return images
         for item in  query_imagelists:
              images.add(str(item.subject))

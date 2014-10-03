@@ -3,6 +3,7 @@ Changelog
 vmcaster-0.0.26
 
  * New command line option '--imagelist-list-endorser'
+ * Bugfix : listsings of imagelists
 
 vmcaster-0.0.25
 
