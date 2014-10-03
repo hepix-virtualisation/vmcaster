@@ -438,7 +438,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         uploadFlags = options.flag
     
     if options.imagelist_list_image:
-        image_req = True
+        imagelist_req = True
         actions.add('imagelist_list_image')
 
     actionsLen = len(actions)
@@ -573,7 +573,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     
     
     if 'imagelist_list_image' in actions:
-        imagepub.imageListList(imagelistUUID)
+        imagepub.endorserList()
     
     if 'imagelist_list' in actions:
         imagepub.imageListList()
