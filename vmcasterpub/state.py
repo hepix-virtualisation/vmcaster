@@ -301,19 +301,33 @@ class imagelistpub:
 
 
 
-    def imagelist_list_image(self,imagelistUUID):
+    def ImageList_List_Image(self,imagelistUUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Image).\
                 filter(model.Imagelist.identifier == imagelistUUID).\
                 filter(model.ImageListImage.fkImageList == model.Imagelist.id).\
                 filter(model.ImageListImage.fkImage == model.Image.id)
+        images = set([])
         if query_imagelists.count() == 0:
             self.log.warning('Imagelist already exists')
-            return False
+            return images
         for item in  query_imagelists:
-            print item.identifier
-        return True
-            
+             images.add(str(item.identifier))
+        return images
+
+    def ImageList_List_Endorser(self,imagelistUUID):
+        Session = self.SessionFactory()
+        query_imagelists = Session.query(model.Endorser).\
+                filter(model.Imagelist.identifier == imagelistUUID).\
+                filter(model.Endorsement.fkEndorser == model.Endorser.id).\
+                filter(model.Endorsement.fkImageList == model.Imagelist.id)
+        images = set([])
+        if query_imagelists.count() == 0:
+            self.log.warning('Imagelist already exists')
+            return images
+        for item in  query_imagelists:
+             images.add(str(item.subject))
+        return images       
 
     def imagesDel(self,UUID):
         Session = self.SessionFactory()

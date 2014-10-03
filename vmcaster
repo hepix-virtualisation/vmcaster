@@ -134,6 +134,8 @@ Expect to type in your grid certificate password to sign a new image list, and t
     
     p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind endorser to image list. This option requires an "image list" and an "endorser" selection.')
     p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind endorser from image list. This option requires an "image list" and an "endorser" selection.')
+    p.add_option('--imagelist-list-endorser',action ='store_true',help='List bound image from image list. This option requires an "image list" selection.')
+
     p.add_option('--imagelist-add-image', action ='store_true',help='Bind image to image list. This option requires an "image list" and an "image" selection.')
     p.add_option('--imagelist-del-image', action ='store_true',help='Unbind image from image list. This option requires an "image list" and an "image" selection.')
     p.add_option('--imagelist-list-image',action ='store_true',help='List bound image from image list. This option requires an "image list" selection.')
@@ -440,6 +442,9 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if options.imagelist_list_image:
         imagelist_req = True
         actions.add('imagelist_list_image')
+    if options.imagelist_list_endorser:
+        imagelist_req = True
+        actions.add('imagelist_list_endorser')
 
     actionsLen = len(actions)
     if actionsLen == 0:
@@ -573,9 +578,18 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     
     
     if 'imagelist_list_image' in actions:
-        output = imagepub.imagelist_list_image(imagelistUUID)
+        output = imagepub.ImageList_List_Image(imagelistUUID)
         if output == None:
             return
+        for item in output:
+            print item
+        
+    if 'imagelist_list_endorser' in actions:
+        output = imagepub.ImageList_List_Endorser(imagelistUUID)
+        if output == None:
+            return
+        for item in output:
+            print item
         
         
         
