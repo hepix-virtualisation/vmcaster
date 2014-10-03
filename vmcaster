@@ -136,7 +136,8 @@ Expect to type in your grid certificate password to sign a new image list, and t
     p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind endorser from image list. This option requires an "image list" and an "endorser" selection.')
     p.add_option('--imagelist-add-image', action ='store_true',help='Bind image to image list. This option requires an "image list" and an "image" selection.')
     p.add_option('--imagelist-del-image', action ='store_true',help='Unbind image from image list. This option requires an "image list" and an "image" selection.')
-    
+    p.add_option('--imagelist-list-image',action ='store_true',help='List bound image from image list. This option requires an "image list" selection.')
+
 
     p.add_option('--keys-imagelist', action ='store_true',help='List image list metadata keys. . This option requires an "image" selection.')
     p.add_option('--keys-image', action ='store_true',help='List image metadata keys. This option requires an "image" selection.')
@@ -436,7 +437,10 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if options.flag:
         uploadFlags = options.flag
     
-    
+    if options.imagelist_list_image:
+        image_req = True
+        actions.add('imagelist_list_image')
+
     actionsLen = len(actions)
     if actionsLen == 0:
         log.error('No actions added')
@@ -568,7 +572,8 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagepub.imageListImageDisconnect(imagelistUUID,imageUuid)
     
     
-    
+    if 'imagelist_list_image' in actions:
+        imagepub.imageListList(imagelistUUID)
     
     if 'imagelist_list' in actions:
         imagepub.imageListList()
