@@ -280,8 +280,7 @@ class imagelistpub:
 
     def imageListList(self):
         Session = self.SessionFactory()
-        query_imagelists = Session.query(model.Imagelist).\
-            filter(model.Image.id ==  model.ImageListImage.fkImage)
+        query_imagelists = Session.query(model.Imagelist)
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')            
         for imagelist in query_imagelists:
