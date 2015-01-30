@@ -15,16 +15,13 @@ except ImportError:
             use_setuptools()
             from setuptools import setup, find_packages
 
-<<<<<<< HEAD
-=======
-# we want this module for nosetests
 try:
     import multiprocessing
 except ImportError:
     # its not critical if this fails though.
     pass
 
->>>>>>> 4cb1dd8e66b5fefe50854c3f6e08722766345e39
+
 setup(name='vmcaster',
     version=version,
     description="""vmcaster is a simple tool for managing and updating your published virtual machines image lists. Following the Hepix image list format.""",
@@ -49,10 +46,7 @@ setup(name='vmcaster',
         ],
     packages=['vmcasterpub'],
     scripts=['vmcaster'],
-<<<<<<< HEAD
-    data_files=[('share/doc/vmcatcher-%s' % (version),['README.md','ChangeLog','LICENSE']),
-        ('etc',['vmcaster.cfg.template'])],
-=======
+
     data_files=[('/usr/share/doc/vmcaster',['README.md','ChangeLog','LICENSE']),
         ('/etc/vmcaster',['vmcaster.cfg.template'])],
     tests_require=[
@@ -64,5 +58,4 @@ setup(name='vmcaster',
         'nose',
     ],
     test_suite = 'nose.collector',
->>>>>>> 4cb1dd8e66b5fefe50854c3f6e08722766345e39
     )
