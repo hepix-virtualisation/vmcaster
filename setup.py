@@ -10,7 +10,6 @@ else:
         	use_setuptools()
         	from setuptools import setup, find_packages
 
-
 setup(name='vmcaster',
     version=version,
     description="""vmcaster is a simple tool for managing and updating your published virtual machines image lists. Following the Hepix image list format.""",
@@ -34,6 +33,6 @@ setup(name='vmcaster',
         ],
     packages=['vmcasterpub'],
     scripts=['vmcaster'],
-    data_files=[('/usr/share/doc/vmcaster',['README.md','ChangeLog','LICENSE']),
-        ('/etc/vmcaster',['vmcaster.cfg.template'])],
+    data_files=[('share/doc/vmcatcher-%s' % (version),['README.md','ChangeLog','LICENSE']),
+        ('etc',['vmcaster.cfg.template'])],
     )
