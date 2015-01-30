@@ -1,5 +1,20 @@
 Changelog
 
+vmcaster-0.0.26
+
+ * New command line option '--imagelist-list-endorser'
+ * Bugfix : listsings of imagelists
+
+vmcaster-0.0.25
+
+ * New command line option '--imagelist-list-image'
+
+vmcaster-0.0.24
+
+ * Added nosetest unit test framework.
+ * changed to distutils as default setup.py framework.
+ * Improved documentation.
+
 vmcaster-0.0.23
 
  * Added more warnings with badly picked 'uriMatch' values.

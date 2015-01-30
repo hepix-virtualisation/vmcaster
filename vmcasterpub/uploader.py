@@ -12,6 +12,8 @@ import re
 import sys
 
 import logging
+
+
 def Property(func):
     return property(**func())
 
