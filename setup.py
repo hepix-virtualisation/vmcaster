@@ -15,12 +15,12 @@ except ImportError:
             use_setuptools()
             from setuptools import setup, find_packages
 
-# we want this module for nosetests
 try:
     import multiprocessing
 except ImportError:
     # its not critical if this fails though.
     pass
+
 
 setup(name='vmcaster',
     version=version,
@@ -46,6 +46,7 @@ setup(name='vmcaster',
         ],
     packages=['vmcasterpub'],
     scripts=['vmcaster'],
+
     data_files=[('/usr/share/doc/vmcaster',['README.md','ChangeLog','LICENSE']),
         ('/etc/vmcaster',['vmcaster.cfg.template'])],
     tests_require=[
