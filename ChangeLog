@@ -1,5 +1,9 @@
 Changelog
 
+vmcaster-0.0.27
+
+ * Changed package dependencies
+
 vmcaster-0.0.26
 
  * New command line option '--imagelist-list-endorser'
