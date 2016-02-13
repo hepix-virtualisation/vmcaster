@@ -1,5 +1,9 @@
 Changelog
 
+vmcaster-0.0.28
+
+ * Add package dependency python-magic
+
 vmcaster-0.0.27
 
  * Changed package dependencies
