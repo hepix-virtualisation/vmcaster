@@ -92,7 +92,6 @@ def bumpVersion(versionString, versionLevel = 0):
     length = len(split)
     indexs = range(0,length )
     indexs.reverse()
-    indexToBeBumped = -1
     indexCounter = -1
     output = ""
     for i in indexs:
