@@ -18,8 +18,8 @@ class downloader(downloader_base.downloader):
             headers["Authorization"] = "Basic %s" % (auth)
         try:
             con.request("GET" , self.path, headers=headers)
-        except socket.gaierror, E:
-            output['error'] = E.strerror
+        except socket.gaierror as exp:
+            output['error'] = exp.strerror
             output['code'] = 404
             return output
         responce =  con.getresponse()
