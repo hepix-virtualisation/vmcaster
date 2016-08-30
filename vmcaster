@@ -36,8 +36,8 @@ import magic
 
 import optparse
 
-        
-    
+
+
 
 
 def checkVoms(requiredExtensions = set([])):
@@ -65,7 +65,7 @@ def checkVoms(requiredExtensions = set([])):
             os.kill(process.pid, signal.SIGKILL)
             processRc = -9
             break
-    
+
     if processRc != 0:
         log.error("Failed to run voms-proxy-info sucessfully")
         log.info("stdout:%s" % (stdout))
@@ -106,32 +106,37 @@ def main():
     p.add_option('--x509-key', action ='store',help='Path of x.509 Key.', metavar='VMCASTER_X509_KEY')
     p.add_option('--flag', action ='append',help='Upload flags', metavar='UPLOAD_FLAG')
     p.add_option('--list-imagelist', action ='store_true',help='list image lists by "dc:identifier".')
-    p.add_option('--list-image', action ='store_true',help='list Images by "dc:identifier".')    
+    p.add_option('--list-image', action ='store_true',help='list Images by "dc:identifier".')
     p.add_option('--list-endorser', action ='store_true',help='list Endorsers by "hv:dn".')
-    
+
     p.add_option('--import-imagelist-smime', action ='store',help='Import a signed imagelist from path.', metavar='IMAGE_PATH')
     p.add_option('--import-imagelist-json', action ='store',help='Import an image list as json.', metavar='IMAGE_PATH')
-        
+
     p.add_option('--upload-image', action ='store',help='Path for image to be uploaded. The image format should be detected automatically and compressed if needed.')
-    p.add_option('--upload-imagelist', action ='store_true',help="""Update the image list with a newly signed image list. 
+    p.add_option('--upload-imagelist', action ='store_true',help="""Update the image list with a newly signed image list.
 Expect to type in your grid certificate password to sign a new image list, and then transfer the new image list and replace the master copy.""")
+
+    p.add_option('--download-imagelist', action ='store_true',help="Download the imagelist to allow updating from multiple image generators.")
+    p.add_option('--download-imagelist-flags', action ='store',help="""Imagelist download merging flags.
+Use with --download-imagelist""")
+
     p.add_option('--lifetime-imagelist', action ='store',help="""Set the length of the imagelist lifetime in days. To be used in conjuction with '--upload-imagelist'. Defaults to 28 days.""", metavar='VMCASTER_IMAGELIST_LIFETIME')
     p.add_option('--select-imagelist', action ='store',help='Select "imagelist" by "dc:identifier".', metavar='IMAGELIST_UUID')
     p.add_option('--select-image', action ='store',help='Select "image" by "dc:identifier"', metavar='IMAGELIST_UUID')
     p.add_option('--select-endorser', action ='store',help='Select "endorser" by "hv:dn".', metavar='ENDORSER_UUID')
-    
+
     p.add_option('--show-imagelist', action ='store_true',help='Write json image list. This option requires an "image list" selection.')
-    p.add_option('--show-image', action ='store_true',help='Write json image metadata. This option requires an "image" selection.')        
+    p.add_option('--show-image', action ='store_true',help='Write json image metadata. This option requires an "image" selection.')
     p.add_option('--show-endorser', action ='store_true',help='Write json endorser metadata by "hv:dn". This option requires an "endorser" selection.')
-        
+
     p.add_option('--add-imagelist', action ='store_true',help='Image list create. This option requires an "image list" selection.')
     p.add_option('--add-image', action ='store_true',help='Image create.')
     p.add_option('--add-endorser', action ='store_true',help='Endorser create.')
-    
+
     p.add_option('--del-imagelist', action ='store_true',help='Image list delete. This option requires an "image list" selection.')
     p.add_option('--del-image', action ='store_true',help='Image delete. This option requires an "image" selection.')
     p.add_option('--del-endorser', action ='store',help='Endorser delete.')
-    
+
     p.add_option('--imagelist-add-endorser', action ='store_true',help='Bind endorser to image list. This option requires an "image list" and an "endorser" selection.')
     p.add_option('--imagelist-del-endorser', action ='store_true',help='Unbind endorser from image list. This option requires an "image list" and an "endorser" selection.')
     p.add_option('--imagelist-list-endorser',action ='store_true',help='List bound image from image list. This option requires an "image list" selection.')
@@ -144,7 +149,7 @@ Expect to type in your grid certificate password to sign a new image list, and t
     p.add_option('--keys-imagelist', action ='store_true',help='List image list metadata keys. . This option requires an "image" selection.')
     p.add_option('--keys-image', action ='store_true',help='List image metadata keys. This option requires an "image" selection.')
     p.add_option('--keys-endorser', action ='store',help='List endorser metadata keys. This option requires an "endorser" selection.')
-    p.add_option('--key-set-endorser', action ='store',help="""Endorser metadata key to create/overwrite. 
+    p.add_option('--key-set-endorser', action ='store',help="""Endorser metadata key to create/overwrite.
 As guidance keys should follow a pattern of "namespace:type".
 This option requires an "endorser" selection and a "--key-value-endorser" """)
     p.add_option('--key-set-imagelist', action ='store',help="""Image list metadata key to create/overwrite.
@@ -153,20 +158,20 @@ This option requires an "image list" selection and a "--key-value-imagelist" par
     p.add_option('--key-set-image', action ='store',help="""Image metadata key to create/overwrite.
 As guidance keys should follow a pattern of "namespace:type".
 This option requires an "image" selection and a "--key-value-image" parameter.""")
-    
+
     p.add_option('--key-del-imagelist', action ='store',help='image list metadata key to delete. This option requires an "image" selection.')
     p.add_option('--key-del-image', action ='store',help='Image metadata key to delete. This option requires an "image" selection.')
     p.add_option('--key-del-endorser', action ='store_true',help='Endorser metadata key to delete. This option requires an "endorser" selection.')
-    
+
     p.add_option('--key-value-imagelist', action ='store',help='Image list metadata value to set. This option requires an "imagelist" selection and a "--key-set-imagelist" parameter.')
     p.add_option('--key-value-imagelist-file', action ='store',help='Image list metadata value to set from a file. This option requires an "imagelist" selection and a "--key-set-imagelist" parameter.')
     p.add_option('--key-value-image', action ='store',help='Image metadata value to set. This option requires an "image" selection and a "--key-set-image" parameter.')
     p.add_option('--key-value-image-file', action ='store',help='Image metadata value to set from a file. This option requires an "image" selection and a "--key-set-image" parameter.')
     p.add_option('--key-value-endorser', action ='store',help='Endorser metadata value to set. This option requires an "endorser" selection and a "--key-set-endorser" parameter.')
     p.add_option('--key-value-endorser-file', action ='store',help='Endorser metadata value to set from a file. This option requires an "endorser" selection and a "--key-set-endorser" parameter.')
-        
+
     options, arguments = p.parse_args()
-    
+
     # Set up basic variables
     logFile = None
     databaseConnectionString = None
@@ -187,10 +192,10 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     image_key_value_file = None
     endorserSub = None
     endorser_req  = False
-    
+
     endorserKey = None
     endorserKeyReq = False
-    
+
     endorserValue = None
     endorserValueReq = False
     endorserValue_file = None
@@ -200,13 +205,16 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     pathX509Key = None
     pathX509Cert = None
     pathX509Dir = None
-    
+
     signingPathDefaultKey = None
     signingPathDefaultCert = None
     signingPathHome = None
     imagelistLifeTimeStr = "28"
     uploadFlags = []
     dishCfg = None
+
+    # download imagelist variables
+    download_imagelist_flags = set([])
 
     # Read enviroment variables
     if 'VMCASTER_LOG_CONF' in os.environ:
@@ -217,7 +225,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         dishCfg = os.environ['VMCASTER_CFG']
     if 'HOME' in os.environ:
         applicationHome = os.environ['HOME']
-    
+
     if 'VMCASTER_X509_DIR' in os.environ:
         pathX509Dir = os.environ['VMCASTER_X509_DIR']
     if 'VMCASTER_X509_KEY' in os.environ:
@@ -228,9 +236,9 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if 'VMCASTER_IMAGELIST_LIFETIME' in os.environ:
         imagelistLifeTimeStr = os.environ['VMCASTER_IMAGELIST_LIFETIME']
 
-    
+
     # Set up log file
-    
+
     LoggingLevel = logging.WARNING
     LoggingLevelCounter = 2
     if options.verbose:
@@ -253,7 +261,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         LoggingLevel = logging.FATAL
     if LoggingLevelCounter >= 5:
         LoggingLevel = logging.CRITICAL
-    
+
     if options.logcfg:
         logFile = options.logcfg
     if logFile != None:
@@ -265,22 +273,22 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             log.error("Logfile configuration file '%s' was not found." % (options.log_config))
             sys.exit(1)
     else:
-        
+
         logging.basicConfig(level=LoggingLevel)
     log = logging.getLogger("main")
     # Now process command line
     actions = set([])
-    
+
     if options.select_endorser:
         endorserSub = options.select_endorser
 
     if options.list_endorser:
         actions.add('endorser_list')
-        
+
     if options.show_endorser:
         actions.add('endorser_show')
         endorser_req = True
-        
+
     if options.add_endorser:
         actions.add('endorser_add')
         endorser_req = True
@@ -294,7 +302,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         endorser_req = True
         endorser_key_value_add_req = True
         endorserKey = options.key_set_endorser
-        
+
     if options.key_del_endorser:
         actions.add('endorser_key_del')
         endorser_req = True
@@ -302,12 +310,12 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if options.key_value_endorser:
         endorserValue = options.key_value_endorser
         endorser_req = True
-    
+
     if options.key_value_endorser_file:
         endorserValue_file = options.key_value_endorser_file
         endorser_req = True
-    
-    
+
+
     if options.imagelist_add_endorser:
         endorser_req = True
         imagelist_req = True
@@ -316,7 +324,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         endorser_req = True
         imagelist_req = True
         actions.add('disconnect')
-        
+
     if options.imagelist_add_image:
         image_req = True
         imagelist_req = True
@@ -325,7 +333,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         image_req = True
         imagelist_req = True
         actions.add('imagelist_image_unbind')
-    
+
     if options.select_imagelist:
         imagelistUUID = options.select_imagelist
     if options.list_imagelist:
@@ -335,7 +343,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagelist_req = True
     if options.lifetime_imagelist:
         imagelistLifeTimeStr = options.lifetime_imagelist
-    
+
     if options.add_imagelist:
         actions.add('imagelist_add')
         imagelist_req = True
@@ -343,15 +351,15 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if options.del_imagelist:
         actions.add('imagelist_del')
         imagelist_req = True
-    
+
     if options.show_imagelist:
         actions.add('imagelist_show')
         imagelist_req = True
-        
+
     if options.keys_imagelist:
         actions.add('imagelist_keys')
         imagelist_req = True
-        
+
     if options.key_set_imagelist:
         actions.add('imagelist_key_update')
         imagelist_req = True
@@ -361,7 +369,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         actions.add('imagelist_key_del')
         imagelist_req = True
         imagelist_key = options.key_del_imagelist
-      
+
     if options.key_value_imagelist:
         actions.add('imagelist_key_update')
         imagelist_req = True
@@ -374,33 +382,39 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagelist_key_set_req = True
         imagelist_key_value_file = options.key_value_imagelist_file
 
+    if options.download_imagelist:
+        actions.add('download_imagelist')
+        imagelist_req = True
+
+    if options.download_imagelist_flags:
+        download_imagelist_flags = set(options.download_imagelist_flags.split(","))
 
     if options.import_imagelist_smime:
         actions.add('imagelist_import_smime')
-        
+
         imagelist_import_smime = options.import_imagelist_smime
     if options.import_imagelist_json:
         actions.add('imagelist_import_json')
-        
+
         imagelist_import_json = options.import_imagelist_json
     if options.list_image:
         actions.add('image_list')
     if options.select_image:
         imageUuid = options.select_image
-    
+
     if options.add_image:
         actions.add('image_add')
         image_req = True
-        
-        
+
+
     if options.del_image:
         actions.add('image_del')
         image_req = True
-    
+
     if options.show_image:
         actions.add('image_show')
         image_req = True
-    
+
     if options.keys_image:
         actions.add('image_keys')
         imagelist_req = True
@@ -417,13 +431,13 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         image_req = True
         image_key_req = True
         image_key_value = options.key_value_image
-    
+
     if options.key_value_image_file:
         actions.add('image_key_update')
         image_req = True
         image_key_req = True
         image_key_value_file = options.key_value_image_file
-    
+
     if options.upload_image:
         actions.add('image_upload')
         imageFileLocal = options.upload_image
@@ -435,10 +449,10 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         databaseConnectionString = options.database
     if options.config_file:
         dishCfg = options.config_file
-    
+
     if options.flag:
         uploadFlags = options.flag
-    
+
     if options.imagelist_list_image:
         imagelist_req = True
         actions.add('imagelist_list_image')
@@ -453,15 +467,15 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if actionsLen > 1:
         log.error('To many actions added')
         sys.exit(1)
-    
+
     # Now default unset values
-    
+
     if databaseConnectionString == None:
         databaseConnectionString = 'sqlite:///vmcaster.db'
         log.info("Defaulting DB connection to '%s'" % (databaseConnectionString))
-    
+
     # Now over ride the values when setting a file
-    
+
     if endorserValue_file != None:
         if not os.path.isfile(endorserValue_file):
             log.error("Invalid --key-value-endorser-file is not a file :'%s'" % (endorserValue_file))
@@ -495,7 +509,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
 
 
     # Now check for required fields
-    
+
     if imagelist_req:
         if imagelistUUID == None:
             log.error('Image list UUID is needed ("dc:identifier")')
@@ -516,7 +530,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             dishCfg = dishCfgNew
         else:
             log.info("Found config at '%s'" % (dishCfg))
-        
+
     try:
         imagelistLifeTime = int(imagelistLifeTimeStr)
     except ValueError,E:
@@ -528,33 +542,34 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if not os.path.isfile(dishCfg):
         log.error("Configuration file '%s' was not found." % (dishCfg))
         sys.exit(1)
-    
+
+
     # Now check for required fields
-    
+
     if endorserValue == None and endorser_key_value_add_req == True:
         log.error("Missing '--key-value-endorser'")
         sys.exit(1)
-    
+
     if image_key_value == None and image_key_value_add_req == True:
         log.error("Missing '--key-value-image'")
         sys.exit(1)
-    
+
     if imagelist_key_value == None and imagelist_key_value_add_req == True:
         log.error("Missing '--key-value-imagelist'")
         sys.exit(1)
-    
-    
+
+
     # now do the work.
 
     imagepub = dishpubstate.imagelistpub(databaseConnectionString)
-    
+
     if 'endorser_list' in actions:
         imagepub.endorserList()
     if 'endorser_show' in actions:
         output = json.dumps(imagepub.endorserDump(endorserSub),sort_keys=True, indent=4)
         if output != None:
             print output
-    
+
     if 'endorser_add' in actions:
         imagepub.endorserAdd(endorserSub)
     if 'endorser_del' in actions:
@@ -563,57 +578,57 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagepub.endorserMetadataUpdate(endorserSub,endorserKey,endorserValue)
     if 'endorser_key_del' in actions:
         imagepub.endorserMetadataDel(endorserSub,endorserKey)
-    
+
     if 'connect' in actions:
         imagepub.imageListEndorserConnect(imagelistUUID,endorserSub)
 
     if 'disconnect' in actions:
         imagepub.imageListEndorserDisconnect(imagelistUUID,endorserSub)
-    
+
     if 'imagelist_image_bind' in actions:
         imagepub.imageListImageConnect(imagelistUUID,imageUuid)
 
     if 'imagelist_image_unbind' in actions:
         imagepub.imageListImageDisconnect(imagelistUUID,imageUuid)
-    
-    
+
+
     if 'imagelist_list_image' in actions:
         output = imagepub.ImageList_List_Image(imagelistUUID)
         if output == None:
             return
         for item in output:
             print item
-        
+
     if 'imagelist_list_endorser' in actions:
         output = imagepub.ImageList_List_Endorser(imagelistUUID)
         if output == None:
             return
         for item in output:
             print item
-        
-        
-        
-    
+
+
+
+
     if 'imagelist_list' in actions:
         imagepub.imageListList()
     if 'imagelist_show' in actions:
         output = json.dumps(imagepub.imageListShow(imagelistUUID),sort_keys=True, indent=4)
         if output != None:
             print output
-    
+
     if 'imagelist_add' in actions:
         imagepub.imageListAdd(imagelistUUID)
-    
+
     if 'imagelist_del' in actions:
         imagepub.imagesDel(imagelistUUID)
     if 'imagelist_key_update' in actions:
         imagepub.imagelist_key_update(imagelistUUID, imagelist_key, imagelist_key_value)
     if 'imagelist_key_del' in actions:
         imagepub.imagelist_key_del(imagelistUUID, imagelist_key)
-    
+
     if 'imagelist_import_smime' in actions:
-        
-        
+
+
         fp = open (imagelist_import_smime)
         inportText = fp.read()
         buf = M2Crypto.BIO.MemoryBuffer(str(inportText))
@@ -628,15 +643,15 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         except ValueError:
             log.error("Failed to parse JSON.")
             sys.exit(20)
-            
+
         if candidate == None:
             log.error("No JSON content.")
             sys.exit(21)
-        
+
         imagepub.importer(candidate)
-        
-        
-        
+
+
+
     if 'image_list' in actions:
         images = imagepub.imageList()
         for item in images:
@@ -648,22 +663,22 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         output = json.dumps(imagepub.imageShow(imageUuid),sort_keys=True, indent=4)
         if output != None:
             print output
-        
+
     if 'image_del' in actions:
         imagepub.imageDelete(imageUuid)
         return
-    
-    
-    
+
+
+
     if 'image_key_update' in actions:
         imagepub.image_key_update(imageUuid ,image_key, image_key_value)
     if 'image_key_del' in actions:
         imagepub.image_key_delete(imageUuid, image_key_del)
     if 'image_keys' in actions:
         imagepub.image_keys(imagelistUUID, imageUuid)
-        
-        
-    
+
+
+
     if 'image_upload' in actions:
         listOfImagelists = imagepub.image_get_imagelist(imageUuid)
         if len(listOfImagelists) == 0:
@@ -682,7 +697,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             rFeildList = reuiredImageType.split(".")
             mappings = { 'bz2' : "bzip2 compressed data",
                 'gz' : "gzip compressed data" }
-            
+
             shouldCompress = False
             if rFeildList[-1] in mappings.keys():
                 if sFieldList[0] != mappings[rFeildList[-1]]:
@@ -724,11 +739,11 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
             m.update(line)
 
         sha512 = imagepub.image_key_get(imageUuid,"sl:checksum:sha512")
-        
+
         if sha512 == m.hexdigest():
             log.warning("Image unchanged, aborting uppdate.")
             sys.exit(0)
-        
+
         # Generate a new URI based on the old one.
         uri = imagepub.image_key_get(imageUuid,"hv:uri")
         if uri == None:
@@ -739,21 +754,21 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         log.debug("old image path=%s" % (oldpath))
         directory = os.path.dirname(oldpath)
         log.debug("old base directory=%s" % (directory))
-        
+
         curtime = datetime.datetime.utcnow()
         extension = "img"
         if reuiredImageType != None:
             extension = reuiredImageType
         imageName = "%s_%s.%s" % (imageUuid,curtime.strftime("%Y-%m-%d_%H-%M-%S"),extension)
         newPath = os.path.join(directory, imageName)
-        
+
         parsedUri['path'] = newPath
         uri = uglyUriBuilder(parsedUri)
 
-        
-        
+
+
         log.debug("new image uri=%s" % (uri))
-        
+
         timeout = 10000
         uploader = hostUploader(dishCfg)
         try:
@@ -780,7 +795,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagepub.image_key_update(imageUuid, "hv:version",versionNew)
         uri = uglyUriBuilder(parsedUri)
         imagepub.image_key_update(imageUuid,  "hv:uri", uri)
-        
+
     if 'imagelist_import_json' in actions:
         f = open(imagelist_import_json)
         try:
@@ -788,19 +803,19 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         except ValueError:
             log.error("Failed to parse JSON.")
             sys.exit(20)
-            
+
         if candidate == None:
             log.error("No JSON content.")
             sys.exit(21)
-        
+
         imagepub.importer(candidate)
-        
+
     if 'imagelist_upload' in actions:
         if pathX509Key == None or pathX509Cert == None:
             if pathX509Dir == None:
                 if applicationHome == None:
                     log.error("No HOME enviroment variable.")
-                    sys.exit(20)        
+                    sys.exit(20)
                 pathX509Dir = "%s/%s" % (applicationHome,".globus")
                 log.debug("Setting pathX509Dir=%s" % (pathX509Dir))
             if not os.path.isdir(pathX509Dir):
@@ -822,12 +837,12 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         if not os.path.isfile(pathX509Cert):
             log.critical("Cert not found at path '%s'" % (pathX509Cert))
             sys.exit(23)
-        
+
         if imagepub.imageListShow(imagelistUUID) == None:
             log.critical("Image list '%s' not found:" % (imagelistUUID))
             sys.exit(23)
-        
-        
+
+
         versionOld = imagepub.imagelist_key_get(imagelistUUID, "hv:version")
         if versionOld == None:
             versionOld = "0.0.0"
@@ -911,7 +926,11 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         imagepub.imagelist_key_update(imagelistUUID, "dc:date:expires",dateExpires)
         imagepub.imagelist_key_update(imagelistUUID, "hv:version",versionNew)
 
-        
+
+    if 'download_imagelist' in actions:
+        imagepub.download_imagelist(imagelistUUID, download_imagelist_flags)
+
+
 if __name__ == "__main__":
     main()
-    
+

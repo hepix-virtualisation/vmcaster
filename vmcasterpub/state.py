@@ -1,4 +1,4 @@
-
+import smimeX509validation
 import sys
 if sys.version_info < (2, 4):
     print "Your python interpreter is too old. Please consider upgrading."
@@ -47,6 +47,7 @@ import urlparse
 import subprocess
 import time
 import types
+import downloader
 
 
 
@@ -107,12 +108,12 @@ class imagelistpub:
         model.init(self.engine)
         self.SessionFactory = sessionmaker(bind=self.engine)
         #self.Session = self.SessionFactory()
-    
+
     def endorserList(self):
         Session = self.SessionFactory()
         query_endorser = Session.query(model.Endorser)
         if query_endorser.count() == 0:
-            self.log.warning('No endorsers found')            
+            self.log.warning('No endorsers found')
         for endorser in query_endorser:
             print endorser.subject
 
@@ -133,7 +134,7 @@ class imagelistpub:
             filter(model.Endorser.subject == subject)
         if query_endorser.count() == 0:
             self.log.warning("Endorser does not exist.")
-            return False      
+            return False
         for item in query_endorser:
             Session.delete(item)
         Session.commit()
@@ -166,7 +167,7 @@ class imagelistpub:
 
     def endorserMetadataDel(self, subject,key):
         self.log.error("not implemented yet")
-    
+
     def endorserDump(self, subject):
         Session = self.SessionFactory()
         query_endorser = Session.query(model.Endorser).\
@@ -185,7 +186,7 @@ class imagelistpub:
                 value = int(item.value)
             except ValueError:
                 value = str(item.value)
-            
+
             output[str(item.key)] = value
         return output
 
@@ -228,11 +229,11 @@ class imagelistpub:
             return False
         for item in queryEndorsements:
             Session.delete(item)
-            
+
         Session.commit()
         return True
-    
-    
+
+
     def imageListImageConnect(self, imagelistUUID,imageUUID):
         Session = self.SessionFactory()
         queryimageBindings = Session.query(model.ImageListImage).\
@@ -260,8 +261,8 @@ class imagelistpub:
         Session.add(imageBinding)
         Session.commit()
         return True
-    
-    
+
+
     def imageListImageDisconnect(self, imagelistUUID,imageUUID):
         Session = self.SessionFactory()
         queryImageListImage = Session.query(model.ImageListImage).\
@@ -276,16 +277,16 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
-    
+
 
     def imageListList(self):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist)
         if query_imagelists.count() == 0:
-            self.log.warning('No imagelists found')            
+            self.log.warning('No imagelists found')
         for imagelist in query_imagelists:
             print imagelist.identifier
-        
+
     def imageListAdd(self,UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
@@ -326,7 +327,7 @@ class imagelistpub:
             return images
         for item in  query_imagelists:
              images.add(str(item.subject))
-        return images       
+        return images
 
     def imagesDel(self,UUID):
         Session = self.SessionFactory()
@@ -341,10 +342,10 @@ class imagelistpub:
         query_imagelist_images = Session.query(model.Image).\
                 filter(model.Image.identifier == UUID )
         count = query_imagelist_images.count()
-        
+
         imagesarray = []
         if query_imagelist_images.count() > 0:
-            
+
             for image in query_imagelist_images:
                 imagemetadata = {u"dc:identifier" : str(image.identifier)}
                 query_imageMetadata = Session.query(model.ImageMetadata).\
@@ -357,8 +358,8 @@ class imagelistpub:
                         imagemetadata[imageItem.key] = imageItem.value
                 return imagemetadata
         return None
- 
-        
+
+
     def imageListShow(self,UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
@@ -377,7 +378,7 @@ class imagelistpub:
                 filter(model.Imagelist.identifier == UUID ).\
                 filter(model.ImageListImage.fkImageList == model.Imagelist.id).\
                 filter(model.ImageListImage.fkImage == model.Image.id)
-                
+
         if query_imagelist_images.count() > 0:
             imagesarray = []
             for image in query_imagelist_images:
@@ -397,7 +398,7 @@ class imagelistpub:
                 imagesarray.append({u'hv:image' : imagemetadata})
             outModel[u'hv:images'] = imagesarray
         outModel[u'dc:identifier'] = imagelist.identifier
-            
+
         query_endorser = Session.query(model.Endorser).\
                 filter(model.Imagelist.identifier == UUID ).\
                 filter(model.Endorsement.fkImageList ==  model.Imagelist.id).\
@@ -412,7 +413,7 @@ class imagelistpub:
                 filter(model.Endorsement.fkImageList ==  model.Imagelist.id).\
                 filter(model.Endorsement.fkEndorser ==  model.Endorser.id).\
                 filter(model.EndorserMetadata.fkEndorser == model.Endorser.id)
-                
+
             for metasdata in query_metaData:
                 endorserMetadata[metasdata.key] = metasdata.value
             endorserMetadata["hv:dn"] = endorser.subject
@@ -422,7 +423,7 @@ class imagelistpub:
                 outModel['hv:endorser'] = endorserList[0]
             else:
                 outModel['hv:endorser'] = endorserList
-            
+
         return {'hv:imagelist' : outModel}
     def imagelist_key_get(self,imageListUuid, imagelist_key):
         self.log.debug("start:imagelist_key_get(%s,%s,%s)" % (self,imageListUuid, imagelist_key))
@@ -431,15 +432,15 @@ class imagelistpub:
                 filter(model.Imagelist.identifier == imageListUuid).\
                 filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
                 filter(model.ImagelistMetadata.key == imagelist_key)
-                
+
         if query_imagelists.count() == 0:
             self.log.warning("No imagelist key '%s' found" % (imagelist_key))
             return None
         newMetaData = query_imagelists.one()
         output = newMetaData.value
         return str(output)
-        
-        
+
+
     def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
         self.log.debug("start:imagelist_key_update %s - %s - %s" % (imageListUuid, imagelist_key, imagelist_key_value))
         Session = self.SessionFactory()
@@ -483,7 +484,7 @@ class imagelistpub:
         return True
 
 
-                
+
     def imageList(self):
         output = []
         Session = self.SessionFactory()
@@ -491,7 +492,7 @@ class imagelistpub:
         for item in query_image:
             output.append(str(item.identifier))
         return output
-    
+
     def image_get_imagelist(self,imageUuid):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist.identifier).\
@@ -518,10 +519,10 @@ class imagelistpub:
             return None
         outputRow = query_imagelists.one()
         return str(outputRow.value)
-        
+
     def image_key_update(self, imageUuid ,image_key, image_value):
         Session = self.SessionFactory()
-        
+
         query_image = Session.query(model.Image).\
                 filter(model.Image.identifier == imageUuid)
         if query_image.count() == 0:
@@ -587,7 +588,7 @@ class imagelistpub:
         newImage = model.Image(UUID)
         Session.add(newImage)
         Session.commit()
-        return True   
+        return True
 
     def imageDelete(self,ImageUUID):
         Session = self.SessionFactory()
@@ -661,7 +662,7 @@ class imagelistpub:
                 continue
             value = content[key]
             self.imagelist_key_update(identifier,key,value)
-        return True        
+        return True
 
 
     def checkMissingFields(self,imagelistUUID,subject,issuerSub):
@@ -706,7 +707,7 @@ class imagelistpub:
         else:
             #we have endorsers
             endorserUntypedList = imageliststuff["hv:endorser"]
-            
+
             if type(endorserUntypedList) is dict:
                 endorserUntypedList = [endorserUntypedList]
             if len(endorserUntypedList) == 0:
@@ -730,3 +731,50 @@ class imagelistpub:
                 self.log.error("Could not find an endorser matching your certificate '%s' issued by '%s'." % (subject,issuerSub))
                 return False
         return True
+
+
+    def download_imagelist(self, imagelistUUID, flags):
+        Session = self.SessionFactory()
+        query_imagelist_uri = Session.query(model.ImagelistMetadata).\
+                filter(model.Imagelist.identifier == imagelistUUID).\
+                filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
+                filter(model.ImagelistMetadata.key == 'hv:uri')
+
+
+        if query_imagelist_uri.count() == 0:
+            self.log.warning('image list uri not found')
+            return True
+        uri = None
+        for item in query_imagelist_uri:
+            uri = item.value
+        if uri is None:
+            self.log.error('image list uri not found')
+            return True
+        content = downloader.downloader(uri)
+        if content is None:
+            self.log.error("Content is None.")
+            sys.exit(22)
+        anchor = smimeX509validation.LoadDirChainOfTrust("/etc/grid-security/certificates/")
+        smimeProcessor = smimeX509validation.smimeX509validation(anchor)
+        try:
+            smimeProcessor.Process(content["responce"])
+        except smimeX509validation.truststore.TrustStoreError,E:
+            self.log.error("Validate text '%s' produced error '%s'" % (uri,E))
+            self.log.debug("Downloaded=%s" % (resultDict['responce']))
+            return False
+        except smimeX509validation.smimeX509ValidationError,E:
+            self.log.error("Validate text '%s' produced error '%s'" % (uri,E))
+            self.log.debug("Downloaded=%s" % (uri))
+            return False
+        if not smimeProcessor.verified:
+            self.log.error("Failed to  verify text '%s'" % (content))
+            return False
+        try:
+            candidate = json.loads(smimeProcessor.InputDaraStringIO.getvalue())
+        except ValueError:
+            self.log.error("Failed to parse JSON.")
+            sys.exit(20)
+        if candidate == None:
+            self.log.error("No JSON content.")
+            sys.exit(21)
+        self.importer(candidate)
