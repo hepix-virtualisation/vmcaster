@@ -1,8 +1,8 @@
-import urlparse 
 import subprocess
 import time
 import logging
 import os
+import signal
 
 log = logging.getLogger(__name__)
 
@@ -43,12 +43,15 @@ class uploaderLocal:
             return self.remotePrefix + remotePath
         else:
             return remotePath
+
+
     def exists(self,remotePath):
-        fuill = "%s/%s" % (prefix[1],remotePath)
+        fuill = self._getfilepath(remotePath)
         cmd = "stat %s" % (fuill)
         log.debug(cmd)
         timeout = 10
         return runpreloadcommand(cmd,timeout)
+
         
     def delete(self,remotePath):
         cmd = "rm %s" % (remotePath)
