@@ -4,6 +4,8 @@ import time
 import logging
 import os
 
+log = logging.getLogger(__name__)
+
 
 def runpreloadcommand(cmd,timeout):
     process = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -45,7 +47,7 @@ class uploaderScp:
         prefix = self.remotePrefix.split(":")
         fuill = "%s/%s" % (prefix[1],remotePath)
         cmd = "ssh %s stat %s" % (prefix[0],fuill)
-        print cmd
+        log.debug(cmd)
         timeout = 10
         return runpreloadcommand(cmd,timeout)
         
