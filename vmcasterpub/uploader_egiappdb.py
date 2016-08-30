@@ -1,10 +1,13 @@
 import urllib2, urllib, base64, httplib
-import sys, string, os, getopt
+import os
 import getpass
 import logging
-import getpass
 import uglyuri
 import json
+
+
+log = logging.getLogger(__name__)
+
 
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
     def __init__(self, key, cert):
@@ -41,8 +44,8 @@ def postdata(uri, username, password, authmethod, imagelist, actionList, entity,
         usercert = os.getenv('VMCASTER_X509_CERT', os.environ['HOME']+'/.globus/usercert.pem')
         userkey = os.getenv('VMCASTER_X509_KEY', os.environ['HOME']+'/.globus/userkey.pem')
         username = 'x509'
-        print 'Cert to be used: '+usercert
-        print 'Key to be used: '+userkey
+        log.info('Cert to be used: {usercert}'.format(usercert=usercert))
+        log.info('Key to be used: {usercert}'.format(usercert=usercert))
         opener = urllib2.build_opener(HTTPSClientAuthHandler(userkey, usercert))
 
     urllib2.install_opener(opener)
@@ -56,8 +59,8 @@ def postdata(uri, username, password, authmethod, imagelist, actionList, entity,
     try:
         page=urllib2.urlopen(req).read()
 #    except urllib2.error.HTTPError, e:
-    except urllib2.URLError, e:
-        return e.code,"","HTTP error (" + str(e.code) + ")"
+    except urllib2.URLError as exp:
+        return exp.code,"","HTTP error (" + str(exp.code) + ")"
     return 0,page,""
 
  
@@ -144,7 +147,7 @@ class uploaderEgiAppDb:
         
     def upload(self,localpath,remotePath):
         for line in open(localpath):
-            print line
+            print (line)
         return self.replace(localpath,remotePath)
 
     def replace(self,localpath,remotePath):
@@ -219,13 +222,15 @@ class uploaderEgiAppDb:
             print("error message:%s" % (errormsg))        
 
         return (rc,stdout,stderr)
+
     def download(self,remotePath,localpath):
+        log.error("programming error this code is not available")
         self.log = logging.getLogger("uploaderEgiAppDb.download")
         cmd = "scp %s %s" % (remotePath,localpath)
         self.log.info("Attempting:%s" % (cmd))
-        rc,stdout,stderr = runpreloadcommand(cmd,10)
-        if rc != 0:
-            self.log.debug(cmd)
-            self.log.error( stderr)
-            return (rc,stdout,stderr)
-        return (rc,stdout,stderr)
+        #rc,stdout,stderr = runpreloadcommand(cmd,10)
+        #if rc != 0:
+        #    self.log.debug(cmd)
+        #    self.log.error( stderr)
+        #    return (rc,stdout,stderr)
+        #return (rc,stdout,stderr)
