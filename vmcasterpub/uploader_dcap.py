@@ -1,8 +1,8 @@
-import urlparse 
 import subprocess
 import time
 import logging
 import os
+import signal
 
 
 log = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ def runpreloadcommand(cmd,timeout,preload):
             os.kill(process.pid, signal.SIGKILL)
             processRc = -9
             break
-    
+
     return (processRc,stdout,stderr)
 
 def gsiDcapCopy(src,dest,timeout = 60):
@@ -81,13 +81,13 @@ class uploaderDcap:
         timeout = 10
         preload = "/usr/lib64/libpdcap.so.1"
         return runpreloadcommand(cmd,timeout,preload)
-        
+
     def delete(self,remotePath):
         cmd = "unlink %s" % (self._getfilepath(remotePath))
         timeout = 10
         preload = "/usr/lib64/libpdcap.so.1"
         return runpreloadcommand(cmd,timeout,preload)
-        
+
     def upload(self,localpath,remotePath):
         path = self._getfilepath(remotePath)
         return gsiDcapCopy(localpath,path)
