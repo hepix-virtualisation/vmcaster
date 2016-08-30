@@ -5,6 +5,7 @@ import logging
 import os
 
 
+log = logging.getLogger(__name__)
 
 
 def runpreloadcommand(cmd,timeout,preload):
@@ -97,11 +98,13 @@ class uploaderDcap:
         if rc == 0:
             (rc,stdout,stderr) = self.delete(path)
             if rc != 0:
-                print stderr
+                msg = "stderr={stderr}".format(stderr=stderr)
+                log.error(msg)
                 return (rc,stdout,stderr)
         rc,stdout,stderr = gsiDcapCopy(localpath,path)
         if rc != 0:
-            print stderr
+            msg = "stderr={stderr}".format(stderr=stderr)
+            log.error(msg)
             return (rc,stdout,stderr)
         return (rc,stdout,stderr)
     def download(self,remotePath,localpath):
