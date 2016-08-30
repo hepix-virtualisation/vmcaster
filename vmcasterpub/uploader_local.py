@@ -4,6 +4,8 @@ import time
 import logging
 import os
 
+log = logging.getLogger(__name__)
+
 
 def runpreloadcommand(cmd,timeout):
     process = subprocess.Popen([cmd], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -44,7 +46,7 @@ class uploaderLocal:
     def exists(self,remotePath):
         fuill = "%s/%s" % (prefix[1],remotePath)
         cmd = "stat %s" % (fuill)
-        print cmd
+        log.debug(cmd)
         timeout = 10
         return runpreloadcommand(cmd,timeout)
         
