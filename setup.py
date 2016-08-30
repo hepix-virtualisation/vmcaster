@@ -2,8 +2,10 @@ from sys import version_info
 from vmcasterpub.__version__ import version
 if version_info < (2, 6):
     import sys
-    print "Please use a newer version of python"
+    print ("Please use a newer version of python")
     sys.exit(1)
+
+
 
 try:
     from setuptools import setup, find_packages
@@ -15,12 +17,30 @@ except ImportError:
             use_setuptools()
             from setuptools import setup, find_packages
 
-try:
-    import multiprocessing
-except ImportError:
-    # its not critical if this fails though.
-    pass
 
+from setuptools.command.test import test as TestCommand
+import sys
+
+class Tox(TestCommand):
+    user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.tox_args = None
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import tox
+        import shlex
+        args = self.tox_args
+        if args:
+            args = shlex.split(self.tox_args)
+        else:
+            args = ['-c', 'tox.ini']
+        errno = tox.cmdline(args=args)
+        sys.exit(errno)
 
 setup(name='vmcaster',
     version=version,
@@ -47,8 +67,8 @@ setup(name='vmcaster',
     packages=['vmcasterpub'],
     scripts=['vmcaster'],
 
-    data_files=[('/usr/share/doc/vmcaster',['README.md','ChangeLog','LICENSE']),
-        ('/etc/vmcaster',['vmcaster.cfg.template'])],
+    data_files=[('usr/share/doc/vmcaster',['README.md','ChangeLog','LICENSE']),
+        ('etc/vmcaster',['vmcaster.cfg.template'])],
     tests_require=[
         'coverage >= 3.0',
         'nose >= 1.1.0',
@@ -56,8 +76,9 @@ setup(name='vmcaster',
         'SQLAlchemy >= 0.7.8',
     ],
     setup_requires=[
-        'nose',
         'SQLAlchemy >= 0.7.8',
     ],
     test_suite = 'nose.collector',
+    cmdclass = {'test': Tox},
+
     )
