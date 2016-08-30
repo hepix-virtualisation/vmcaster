@@ -1,20 +1,12 @@
-from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, Boolean, DateTime
-from sqlalchemy.orm import mapper
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 
-from sqlalchemy import ForeignKey
-
-from sqlalchemy.orm import backref
 try:
     from sqlalchemy.orm import relationship
 except:
     from sqlalchemy.orm import relation as relationship
 
 
-from sqlalchemy import Sequence
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-import datetime
 
 from sqlalchemy.schema import UniqueConstraint
 
