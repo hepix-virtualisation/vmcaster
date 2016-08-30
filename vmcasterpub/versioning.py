@@ -112,19 +112,19 @@ def bumpVersion(versionString, versionLevel = 0):
 if __name__ == "__main__":
     result = bumpVersion("0.0.1", 0)
     if "0.0.2" != result:
-        print "Fail"
+        print ("Fail")
     result = bumpVersion("0.0.1a", 0)
     if "0.0.2a" != result:
-        print "Fail"
+        print ("Fail")
     result = bumpVersion("0.0.1a", 1)
     if "0.1.1a" != result:
-        print "Fail"
+        print ("Fail")
     result = bumpVersion("0.0.1a", 2)
     if "1.0.1a" != result:
-        print "Fail"
+        print ("Fail")
     result = bumpVersion("0.0.1a", 3)
     if None != result:
-        print "Fail"
+        print ("Fail")
     result = bumpVersion("0.0.9", 0)
     if "0.0.10" != result:
-        print "Fail"
+        print ("Fail")
