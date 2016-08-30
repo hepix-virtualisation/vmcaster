@@ -1,5 +1,3 @@
-    
-import types
 import uploader_dcap as uploaderDcap
 import uploader_egiappdb as uploaderEgiAppDb
 
@@ -9,8 +7,6 @@ from uploader_local import uploaderLocal
 
 
 import re
-import sys
-
 import logging
 
 
