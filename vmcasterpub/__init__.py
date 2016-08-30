@@ -16,4 +16,7 @@ def replace_dist(requirement):
             # and the associated pkg_resources.working_set.entries
             return pkg_resources.require(requirement)
 
-replace_dist("SQLALchemy >= 0.6.3")
+try:
+    replace_dist("SQLALchemy >= 0.6.3")
+except:
+    pass
