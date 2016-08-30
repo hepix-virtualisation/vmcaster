@@ -29,23 +29,12 @@ import vmcasterpub.dishpubdb as model
 
 import os.path
 import logging
-import optparse
-from __version__ import version
-import urllib2
-import urllib
-import hashlib
-import datetime
-import os, statvfs
-import shutil
-import commands
+import os
 try:
     import simplejson as json
 except:
     import json
 
-import urlparse
-import subprocess
-import time
 import types
 import downloader
 
