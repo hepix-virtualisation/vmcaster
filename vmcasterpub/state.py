@@ -166,7 +166,6 @@ class imagelistpub:
             return None
         SelEndorser = query_endorser.one()
         output = {"hv:dn" : str(SelEndorser.subject)}
-        EndorserId = SelEndorser.id
         query_endorsermetadata = Session.query(model.EndorserMetadata).\
             filter(model.Endorser.subject == subject).\
             filter(model.Endorser.id == model.EndorserMetadata.fkEndorser)
@@ -330,9 +329,6 @@ class imagelistpub:
         Session = self.SessionFactory()
         query_imagelist_images = Session.query(model.Image).\
                 filter(model.Image.identifier == UUID )
-        count = query_imagelist_images.count()
-
-        imagesarray = []
         if query_imagelist_images.count() > 0:
 
             for image in query_imagelist_images:
@@ -749,7 +745,7 @@ class imagelistpub:
             smimeProcessor.Process(content["responce"])
         except smimeX509validation.truststore.TrustStoreError as exp:
             self.log.error("Validate text '%s' produced error '%s'" % (uri,exp))
-            self.log.debug("Downloaded=%s" % (resultDict['responce']))
+            self.log.debug("Downloaded=%s" % (content['responce']))
             return False
         except smimeX509validation.smimeX509ValidationError as exp:
             self.log.error("Validate text '%s' produced error '%s'" % (uri, exp))
