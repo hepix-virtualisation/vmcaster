@@ -1,8 +1,8 @@
-import urlparse 
 import subprocess
 import time
 import logging
 import os
+import signal
 
 log = logging.getLogger(__name__)
 
@@ -50,15 +50,15 @@ class uploaderScp:
         log.debug(cmd)
         timeout = 10
         return runpreloadcommand(cmd,timeout)
-        
+
     def delete(self,remotePath):
         prefix = self.remotePrefix.split(":")
         fuill = "%s/%s" % (prefix[1],remotePath)
-        
+
         cmd = "ssh %s rm %s" % (prefix[0],fuill)
         timeout = 10
         return runpreloadcommand(cmd,timeout)
-        
+
     def upload(self,localpath,remotePath):
         self.log = logging.getLogger("uploaderScp.upload")
         cmd = "scp %s %s" % (localpath,remotePath)
