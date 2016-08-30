@@ -1,7 +1,7 @@
 import smimeX509validation
 import sys
 if sys.version_info < (2, 4):
-    print "Your python interpreter is too old. Please consider upgrading."
+    print ("Your python interpreter is too old. Please consider upgrading.")
     sys.exit(1)
 
 if sys.version_info < (2, 5):
@@ -19,7 +19,7 @@ if sys.version_info < (2, 5):
                 found = True
                 break
     if not found:
-        print "Could not find SQLAlchemy installed."
+        print ("Could not find SQLAlchemy installed.")
         sys.exit(1)
 
 from sqlalchemy import create_engine
@@ -115,7 +115,7 @@ class imagelistpub:
         if query_endorser.count() == 0:
             self.log.warning('No endorsers found')
         for endorser in query_endorser:
-            print endorser.subject
+            print (endorser.subject)
 
     def endorserAdd(self, subject):
         Session = self.SessionFactory()
@@ -285,7 +285,7 @@ class imagelistpub:
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')
         for imagelist in query_imagelists:
-            print imagelist.identifier
+            print (imagelist.identifier)
 
     def imageListAdd(self,UUID):
         Session = self.SessionFactory()
@@ -575,7 +575,7 @@ class imagelistpub:
             self.log.warning('no details found')
             return None
         for item in query_imagekeys:
-            print "'%s' : '%s'" % (item.key,item.value)
+            print ("'{key}' : '{value}'".format(item.key,item.value))
         return True
 
     def imageAdd(self,UUID):
@@ -692,7 +692,7 @@ class imagelistpub:
                 imageKeys = imageDetails.keys()
                 if not "dc:identifier" in imageKeys:
                     self.log.error("Image list has an image without an identifier.")
-                    print imageKeys
+                    print (imageKeys)
                     return False
                 imageIdentifier = imageDetails["dc:identifier"]
                 missingImageMetaData = image_required_metadata_set.difference(imageKeys)
@@ -758,12 +758,12 @@ class imagelistpub:
         smimeProcessor = smimeX509validation.smimeX509validation(anchor)
         try:
             smimeProcessor.Process(content["responce"])
-        except smimeX509validation.truststore.TrustStoreError,E:
-            self.log.error("Validate text '%s' produced error '%s'" % (uri,E))
+        except smimeX509validation.truststore.TrustStoreError as exp:
+            self.log.error("Validate text '%s' produced error '%s'" % (uri,exp))
             self.log.debug("Downloaded=%s" % (resultDict['responce']))
             return False
-        except smimeX509validation.smimeX509ValidationError,E:
-            self.log.error("Validate text '%s' produced error '%s'" % (uri,E))
+        except smimeX509validation.smimeX509ValidationError as exp:
+            self.log.error("Validate text '%s' produced error '%s'" % (uri, exp))
             self.log.debug("Downloaded=%s" % (uri))
             return False
         if not smimeProcessor.verified:
