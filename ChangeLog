@@ -1,5 +1,13 @@
 Changelog
 
+vmcaster-0.0.29
+
+ * Moved to tox for unit test orchestration.
+ * Moved to pytest for unit tests
+ * Moved to flake8 for static code analysis
+ * Changed syntax to work with python3
+ * Added provisional functionality for updating image list to central server. 
+
 vmcaster-0.0.28
 
  * Add package dependency python-magic
