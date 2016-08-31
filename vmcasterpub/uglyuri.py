@@ -4,7 +4,6 @@ def uglyUriParser(uri):
     parsedUri = urlparse.urlsplit(uri)
     if isinstance(parsedUri, tuple):
         # We are probably python 2.4
-        networklocation = parsedUri[1].split(':')
         hostname = parsedUri.hostname
         user = parsedUri.username
         port = ""
