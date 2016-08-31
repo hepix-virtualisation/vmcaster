@@ -14,8 +14,10 @@ class jsonConfigParser(ConfigParser.SafeConfigParser):
     def __init__(self):
         self.log = logging.getLogger("vmCtrl.jsonConfigParser")
         ConfigParser.SafeConfigParser.__init__(self)
+
+
     def getJson(self,section,option):
-        value = unicode(self.get(section,option))
+        value = unicode(self.get(section,option)) # noqa: ignore=F821
         try:
             return json.loads(value)
         except ValueError:
