@@ -246,7 +246,7 @@ class download_facade(object):
             return output
 
         def fset(self, value):
-            if isinstance(value,  unicode):
+            if isinstance(value,  unicode): # noqa: ignore=F821
                 value = str(value)
             if not isinstance(value,  str):
                 value = ""
