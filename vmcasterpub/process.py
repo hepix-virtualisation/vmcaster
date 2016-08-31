@@ -47,8 +47,6 @@ class hostUploader:
             else:
                 self.log.error("Section '%s' is missing a 'uriReplace' config setting." % (section))
                 continue
-            
-            uriPrefix = None
             if self.config.has_option(section, 'uriMatch'):
                 uriMatch = self.config.getJson(section,'uriMatch')
             else:
@@ -72,10 +70,10 @@ class hostUploader:
         self.facard = uploader.uploaderFacade()
         try:
             self.facard.uploader = self.allHosts[remoteHost]["writeProto"]
-        except uploader.InputError, E:
+        except uploader.InputError as exp:
             self.log.error("Section '%s' has invalid protocol:%s" % (self.allHosts[remoteHost]["section"],
                 self.allHosts[remoteHost]["writeProto"]))
-            raise InputError(E.msg)
+            raise InputError(exp.msg)
         self.facard.remotePrefix = self.allHosts[remoteHost]["uriReplace"]
         self.facard.externalPrefix = self.allHosts[remoteHost]["uriMatch"]
         if hasattr(self, 'flags'):
