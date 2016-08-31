@@ -10,6 +10,9 @@ import re
 import logging
 
 
+log = logging.getLogger(__name__)
+
+
 def Property(func):
     return property(**func())
 
@@ -120,6 +123,7 @@ class uploaderFacade(object):
                 self._uploaderImp.flags = self.flags
             else:
                 errorMsg = str("Invalid upload protocol sellected:'%s'" % (name))
+                log.error(errorMsg)
                 error = InputError("Invalid Value")
                 raise error
             
