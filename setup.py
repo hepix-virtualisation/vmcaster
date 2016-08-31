@@ -21,6 +21,15 @@ except ImportError:
 from setuptools.command.test import test as TestCommand
 import sys
 
+
+doc_files_installdir = "/usr/share/doc/vmcaster"
+cfg_files_installdir = "/etc/vmcaster"
+if "VIRTUAL_ENV" in  os.environ:
+    doc_files_installdir = 'usr/share/doc/vmcaster'
+    cfg_files_installdir = "etc/vmcaster"
+
+
+
 class Tox(TestCommand):
     user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
     def initialize_options(self):
@@ -67,8 +76,8 @@ setup(name='vmcaster',
     packages=['vmcasterpub'],
     scripts=['vmcaster'],
 
-    data_files=[('usr/share/doc/vmcaster',['README.md','ChangeLog','LICENSE']),
-        ('etc/vmcaster',['vmcaster.cfg.template'])],
+    data_files=[(doc_files_installdir, ['README.md', 'ChangeLog', 'LICENSE']),
+        (cfg_files_installdir, ['vmcaster.cfg.template']) ],
     tests_require=[
         'coverage >= 3.0',
         'nose >= 1.1.0',
