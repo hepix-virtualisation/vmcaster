@@ -1,6 +1,7 @@
 import downloader_base
 import base64
 import httplib
+import socket
 
 class downloader(downloader_base.downloader):
     def __init__(self):
