@@ -91,7 +91,7 @@ def parseResultSuccess(inputStr):
             log.error("Json does not encode egiappdb:%s" % (reqKey))
             return None
     for reqKey in reqfieldsStr:
-        if not isinstance( parsedJson["egiappdb"][reqKey], unicode ):
+        if not isinstance( parsedJson["egiappdb"][reqKey], unicode ): # noqa: ignore=F821
             log.error("Json does not encode as a string egiappdb:%s" % (reqKey))
             return None
     for reqKey in reqfieldsInt:
