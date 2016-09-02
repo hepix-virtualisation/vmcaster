@@ -37,6 +37,7 @@ except:
 
 import types
 import downloader
+import versioning
 
 
 
@@ -617,10 +618,13 @@ class imagelistpub:
                 imageIdentifier = imagecontent['dc:identifier']
                 self.imageAdd(imageIdentifier)
                 self.imageListImageConnect(identifier, imageIdentifier)
-                for key in imagecontent.keys():
-                    if key in ['dc:identifier']:
-                        continue
-                    self.image_key_update( imageIdentifier ,key,imagecontent[key] )
+                db_version = self.image_key_get(imageIdentifier, 'hv:version')
+                import_version = imagecontent['hv:version']
+                if versioning.split_numeric_sort(db_version, import_version) >= 0:
+                    for key in imagecontent.keys():
+                        if key in ['dc:identifier']:
+                            continue
+                        self.image_key_update( imageIdentifier ,key,imagecontent[key] )
         if 'hv:endorser' in content.keys():
             # make endorsers a list under all cases.
             endorsersAll = [content['hv:endorser']]
@@ -642,11 +646,14 @@ class imagelistpub:
                         continue
                     value = endorserDetails[key]
                     self.endorserMetadataUpdate(endorserSubject,key,value)
-        for key in content.keys():
-            if key in ['hv:endorser' , 'hv:images' ,'dc:identifier']:
-                continue
-            value = content[key]
-            self.imagelist_key_update(identifier,key,value)
+        db_version = self.image_key_get(imageIdentifier, 'hv:version')
+        import_version = imagecontent['hv:version']
+        if versioning.split_numeric_sort(db_version, import_version) >= 0:
+            for key in content.keys():
+                if key in ['hv:endorser' , 'hv:images' ,'dc:identifier']:
+                    continue
+                value = content[key]
+                self.imagelist_key_update(identifier,key,value)
         return True
 
 
