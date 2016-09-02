@@ -1,5 +1,10 @@
 Changelog
 
+vmcaster-0.0.30
+
+* Make importing only update metadata of the image or the imagelist if the 
+  version number is the same or more than the update target
+
 vmcaster-0.0.29
 
  * Moved to tox for unit test orchestration.
