@@ -590,6 +590,7 @@ class imagelistpub:
         msg = "Adding image '{image_id}'".format(
             image_id=UUID
             )
+        log.info(msg)
         newImage = model.Image(UUID)
         Session.add(newImage)
         Session.commit()
