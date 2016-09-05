@@ -684,7 +684,7 @@ class imagelistpub:
                 ver_old=db_version,
                 ver_new=import_version
                 )
-            log.warning(msg)
+            log.info(msg)
             for key in content.keys():
                 if key in ['hv:endorser' , 'hv:images' ,'dc:identifier']:
                     continue
