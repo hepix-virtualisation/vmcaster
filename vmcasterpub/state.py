@@ -639,6 +639,8 @@ class imagelistpub:
                 self.imageAdd(imageIdentifier)
                 self.imageListImageConnect(identifier, imageIdentifier)
                 db_version = self.image_key_get(imageIdentifier, 'hv:version')
+                if db_version is None:
+                    db_version = "0.0.0"
                 import_version = imagecontent['hv:version']
                 if versioning.split_numeric_sort(db_version, import_version) >= 0:
                     msg = "Updating image '{image_id}' metadata from {ver_old} to {ver_new}".format(
@@ -672,7 +674,9 @@ class imagelistpub:
                         continue
                     value = endorserDetails[key]
                     self.endorserMetadataUpdate(endorserSubject,key,value)
-        db_version = self.image_key_get(imageIdentifier, 'hv:version')
+        db_version = self.imagelist_key_get(identifier, 'hv:version')
+        if db_version is None:
+            db_version = "0.0.0"
         import_version = imagecontent['hv:version']
         if versioning.split_numeric_sort(db_version, import_version) >= 0:
             msg = "Updating imsagelist {image_id} metadata from {ver_old} to {ver_new}".format(
