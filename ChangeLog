@@ -1,9 +1,14 @@
 Changelog
 
+vmcaster-0.0.32
+
+* Fix bug importing imagelists into and empty database
+* Improved logging for updating image lists.
+
 vmcaster-0.0.31
 
 * Set default logging level to info
-* improved logging for updating image lists.
+* Improved logging for updating image lists.
 
 vmcaster-0.0.30
 
