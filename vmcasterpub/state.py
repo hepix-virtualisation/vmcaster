@@ -40,6 +40,8 @@ import downloader
 import versioning
 
 
+log = logging.getLogger(__name__)
+
 
 # Taken from earlier vmlitrustlib
 
@@ -112,11 +114,14 @@ class imagelistpub:
         query_endorser = Session.query(model.Endorser).\
             filter(model.Endorser.subject == subject)
         if query_endorser.count() == 0:
+            msg = "Adding Endorser '{dis_name}'".format(dis_name=subject)
+            self.log.info(msg)
             newEndorser = model.Endorser(subject)
             Session.add(newEndorser)
             Session.commit()
             return True
-        self.log.warning("Endorser is already present with this subject")
+        msg = "Endorser '{dis_name}' is already present with this subject".format(dis_name=subject)
+        self.log.debug(msg)
         return False
     def endorserDel(self, subject):
         Session = self.SessionFactory()
@@ -187,7 +192,7 @@ class imagelistpub:
             filter(model.Imagelist.id == model.Endorsement.fkImageList).\
             filter(model.Endorser.id == model.Endorsement.fkEndorser)
         if queryEndorsements.count() > 0:
-            self.log.warning("'%s' already endorses '%s'" % (endorserSubject,imagelistUUID))
+            self.log.debug("'%s' already endorses '%s'" % (endorserSubject,imagelistUUID))
             return False
 
         query_imagelists = Session.query(model.Imagelist).\
@@ -200,6 +205,11 @@ class imagelistpub:
         if query_endorser.count() == 0:
             self.log.warning("Endorser does not exist.")
             return False
+        msg = "Adding '{imagelist_id}'  to lists endorsed by '{dist_name}'".format(
+            imagelist_id=imagelistUUID,
+            dist_name=endorserSubject
+            )
+        log.info(msg)
         imagelist = query_imagelists.one()
         endorser = query_endorser.one()
         endorsement = model.Endorsement(imagelist.id,endorser.id)
@@ -231,7 +241,7 @@ class imagelistpub:
             filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
             filter(model.Image.id == model.ImageListImage.fkImage)
         if queryimageBindings.count() > 0:
-            self.log.warning("'%s' already linked to '%s'" % (imageUUID,imagelistUUID))
+            self.log.debug("'%s' already linked to '%s'" % (imageUUID,imagelistUUID))
             return False
 
         query_imagelists = Session.query(model.Imagelist).\
@@ -244,6 +254,10 @@ class imagelistpub:
         if query_image.count() == 0:
             self.log.warning("Image does not exist.")
             return False
+        msg = "linking image '{image_id}' to imagelist '{image_list_id}'".format(
+            image_id=imageUUID,
+            image_list_id=imagelistUUID)
+        self.log.info(msg)
         imagelist = query_imagelists.one()
         image = query_image.one()
         imageBinding = model.ImageListImage(imagelist.id,image.id)
@@ -281,8 +295,10 @@ class imagelistpub:
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
         if query_imagelists.count() > 0:
-            self.log.warning('Imagelist already exists')
+            self.log.debug('Imagelist already exists')
             return False
+        msg = "Adding imagelist '{uuid}'".format(uuid=UUID)
+        log.info(msg)
         newImage = model.Imagelist(UUID)
         Session.add(newImage)
         Session.commit()
@@ -569,8 +585,11 @@ class imagelistpub:
         query_imagelists = Session.query(model.Image).\
                 filter(model.Image.identifier == UUID )
         if query_imagelists.count() > 0:
-            self.log.warning('Image already exists')
+            self.log.debug('Image already exists')
             return False
+        msg = "Adding image '{image_id}'".format(
+            image_id=UUID
+            )
         newImage = model.Image(UUID)
         Session.add(newImage)
         Session.commit()
@@ -621,6 +640,12 @@ class imagelistpub:
                 db_version = self.image_key_get(imageIdentifier, 'hv:version')
                 import_version = imagecontent['hv:version']
                 if versioning.split_numeric_sort(db_version, import_version) >= 0:
+                    msg = "Updating image '{image_id}' metadata from {ver_old} to {ver_new}".format(
+                        image_id=imageIdentifier,
+                        ver_old=db_version,
+                        ver_new=import_version
+                        )
+                    log.info(msg)
                     for key in imagecontent.keys():
                         if key in ['dc:identifier']:
                             continue
@@ -649,6 +674,12 @@ class imagelistpub:
         db_version = self.image_key_get(imageIdentifier, 'hv:version')
         import_version = imagecontent['hv:version']
         if versioning.split_numeric_sort(db_version, import_version) >= 0:
+            msg = "Updating imsagelist {image_id} metadata from {ver_old} to {ver_new}".format(
+                image_id=identifier,
+                ver_old=db_version,
+                ver_new=import_version
+                )
+            log.warning(msg)
             for key in content.keys():
                 if key in ['hv:endorser' , 'hv:images' ,'dc:identifier']:
                     continue
