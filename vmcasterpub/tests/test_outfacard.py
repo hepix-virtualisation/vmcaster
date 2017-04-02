@@ -1,8 +1,9 @@
-import unittest
+import pytest
 
-class TestSequenceFunctions(unittest.TestCase):
+class TestSequenceFunctions():
     def setUp(self):
         pass
+
     def tearDown(self):
         pass
     
