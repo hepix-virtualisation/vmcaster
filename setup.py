@@ -1,11 +1,10 @@
 from sys import version_info
+import os
 from vmcasterpub.__version__ import version
 if version_info < (2, 6):
     import sys
     print ("Please use a newer version of python")
     sys.exit(1)
-
-
 
 try:
     from setuptools import setup, find_packages
@@ -18,39 +17,12 @@ except ImportError:
             from setuptools import setup, find_packages
 
 
-from setuptools.command.test import test as TestCommand
-import sys
-import os
-
-
 doc_files_installdir = "/usr/share/doc/vmcaster"
 cfg_files_installdir = "/etc/vmcaster"
 if "VIRTUAL_ENV" in  os.environ:
     doc_files_installdir = 'usr/share/doc/vmcaster'
     cfg_files_installdir = "etc/vmcaster"
 
-
-
-class Tox(TestCommand):
-    user_options = [('tox-args=', 'a', "Arguments to pass to tox")]
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.tox_args = None
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-    def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
-        import tox
-        import shlex
-        args = self.tox_args
-        if args:
-            args = shlex.split(self.tox_args)
-        else:
-            args = ['-c', 'tox.ini']
-        errno = tox.cmdline(args=args)
-        sys.exit(errno)
 
 setup(name='vmcaster',
     version=version,
@@ -74,21 +46,19 @@ setup(name='vmcaster',
         'Operating System :: POSIX',
         'Programming Language :: Python',
         ],
-    packages=['vmcasterpub'],
+    packages=['vmcasterpub', 'vmcasterpub.tests'],
     scripts=['vmcaster'],
 
     data_files=[(doc_files_installdir, ['README.md', 'ChangeLog', 'LICENSE']),
         (cfg_files_installdir, ['vmcaster.cfg.template']) ],
     tests_require=[
         'coverage >= 3.0',
-        'nose >= 1.1.0',
+        'pytest',
         'mock',
         'SQLAlchemy >= 0.7.8',
     ],
     setup_requires=[
+        'pytest-runner',
         'SQLAlchemy >= 0.7.8',
     ],
-    test_suite = 'nose.collector',
-    cmdclass = {'test': Tox},
-
     )
