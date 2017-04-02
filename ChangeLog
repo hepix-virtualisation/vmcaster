@@ -1,5 +1,9 @@
 Changelog
 
+vmcaster-0.0.33
+
+* use pytest directly in setup.py
+
 vmcaster-0.0.32
 
 * Fix bug importing imagelists into and empty database
