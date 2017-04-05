@@ -23,6 +23,10 @@ class downloader(downloader_base.downloader):
             output['error'] = exp.strerror
             output['code'] = 404
             return output
+        except socket.error as exp:
+            output['error'] = exp.strerror
+            output['code'] = 404
+            return output
         responce =  con.getresponse()
         httpstatus = responce.status
         if httpstatus == 200:
