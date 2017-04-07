@@ -3,6 +3,10 @@ import base64
 import httplib
 import socket
 
+
+log = logging.getLogger(__name__)
+
+
 class downloader(downloader_base.downloader):
     def __init__(self):
         downloader_base.downloader.__init__(self)
@@ -22,10 +26,12 @@ class downloader(downloader_base.downloader):
         except socket.gaierror as exp:
             output['error'] = exp.strerror
             output['code'] = 404
+            log.error("Failed to connect to %s:%s error %s:%s" % (self.server,self.port, output['code'], output['code']))
             return output
         except socket.error as exp:
             output['error'] = exp.strerror
             output['code'] = 404
+            log.error("Failed to connect to %s:%s error %s:%s" % (self.server,self.port, output['code'], output['code']))
             return output
         responce =  con.getresponse()
         httpstatus = responce.status
