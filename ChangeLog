@@ -1,5 +1,9 @@
 Changelog
 
+vmcaster-0.0.34
+
+* Bugfix: catch socket error.
+
 vmcaster-0.0.33
 
 * use pytest directly in setup.py
