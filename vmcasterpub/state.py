@@ -787,8 +787,7 @@ class imagelistpub:
         try:
             dwonloader_responce = content["responce"]
         except KeyError:
-            self.log.error("Retrive '%s' produced error '%s'" % (uri,exp))
-            self.log.debug("Downloaded=%s" % (content['responce']))
+            self.log.error("Retrive uri failed:'%s'" % (uri))
             return False
         try:
             smimeProcessor.Process(dwonloader_responce)
