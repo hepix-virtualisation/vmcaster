@@ -2,6 +2,7 @@ import downloader_base
 import base64
 import httplib
 import socket
+import logging
 
 
 log = logging.getLogger(__name__)
