@@ -785,7 +785,13 @@ class imagelistpub:
         anchor = smimeX509validation.LoadDirChainOfTrust("/etc/grid-security/certificates/")
         smimeProcessor = smimeX509validation.smimeX509validation(anchor)
         try:
-            smimeProcessor.Process(content["responce"])
+            dwonloader_responce = content["responce"]
+        except KeyError:
+            self.log.error("Retrive '%s' produced error '%s'" % (uri,exp))
+            self.log.debug("Downloaded=%s" % (content['responce']))
+            return False
+        try:
+            smimeProcessor.Process(dwonloader_responce)
         except smimeX509validation.truststore.TrustStoreError as exp:
             self.log.error("Validate text '%s' produced error '%s'" % (uri,exp))
             self.log.debug("Downloaded=%s" % (content['responce']))
