@@ -1,5 +1,9 @@
 Changelog
 
+vmcaster-0.0.35
+
+* Improve download fail handling.
+
 vmcaster-0.0.34
 
 * Bugfix: catch socket error.
