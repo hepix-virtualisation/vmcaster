@@ -1,5 +1,9 @@
 Changelog
 
+vmcaster-0.0.36
+
+* Improve download fail handling.
+
 vmcaster-0.0.35
 
 * Improve download fail handling.
