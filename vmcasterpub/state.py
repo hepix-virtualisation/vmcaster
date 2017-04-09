@@ -677,7 +677,7 @@ class imagelistpub:
         db_version = self.imagelist_key_get(identifier, 'hv:version')
         if db_version is None:
             db_version = "0.0.0"
-        import_version = imagecontent['hv:version']
+        import_version = content['hv:version']
         if versioning.split_numeric_sort(db_version, import_version) >= 0:
             msg = "Updating imsagelist {image_id} metadata from {ver_old} to {ver_new}".format(
                 image_id=identifier,
