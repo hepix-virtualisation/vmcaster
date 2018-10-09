@@ -526,7 +526,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
         if applicationHome is not None:
             dishCfg = "{home}/{cfg}".format(home=applicationHome,cfg=".vmcaster.cfg")
     if dishCfg != None:
-        if not os.path.isfile(dishCfg):
+        if not os.path.isfile(str(dishCfg)):
             dishCfgNew = "/etc/vmcaster/vmcaster.cfg"
             log.info("Config file '%s' not found, using system defaults '%s'" % (dishCfg,dishCfgNew))
             dishCfg = dishCfgNew
@@ -541,7 +541,7 @@ This option requires an "image" selection and a "--key-value-image" parameter.""
     if imagelistLifeTime < 1:
         log.error("Imagelist Lifetime is too short at '%s'" % (imagelistLifeTime))
         sys.exit(1)
-    if not os.path.isfile(dishCfg):
+    if not os.path.isfile(str(dishCfg)):
         log.error("Configuration file '%s' was not found." % (dishCfg))
         sys.exit(1)
 
