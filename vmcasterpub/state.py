@@ -89,9 +89,6 @@ imagelist_required_metadata_types = [u'hv:endorser',
 imagelist_required_metadata_types_set = set(imagelist_required_metadata_types)
 
 
-
-
-
 class imagelistpub:
     def __init__(self, databaseConnectionString):
         self.log = logging.getLogger("imagelistpub")
@@ -122,6 +119,7 @@ class imagelistpub:
         msg = "Endorser '{dis_name}' is already present with this subject".format(dis_name=subject)
         self.log.debug(msg)
         return False
+
     def endorserDel(self, subject):
         Session = self.SessionFactory()
         query_endorser = Session.query(model.Endorser).\
@@ -133,7 +131,6 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
-
 
     def endorserMetadataUpdate(self, subject, key, value):
         Session = self.SessionFactory()
@@ -157,7 +154,6 @@ class imagelistpub:
                 item.value = value
         Session.commit()
         return True
-
 
     def endorserMetadataDel(self, subject, key):
         self.log.error("not implemented yet")
@@ -215,6 +211,7 @@ class imagelistpub:
         Session.add(endorsement)
         Session.commit()
         return True
+
     def imageListEndorserDisconnect(self, imagelistUUID, endorserSubject):
         Session = self.SessionFactory()
         queryEndorsements = Session.query(model.Endorsement).\
@@ -230,7 +227,6 @@ class imagelistpub:
 
         Session.commit()
         return True
-
 
     def imageListImageConnect(self, imagelistUUID, imageUUID):
         Session = self.SessionFactory()
@@ -264,7 +260,6 @@ class imagelistpub:
         Session.commit()
         return True
 
-
     def imageListImageDisconnect(self, imagelistUUID, imageUUID):
         Session = self.SessionFactory()
         queryImageListImage = Session.query(model.ImageListImage).\
@@ -279,7 +274,6 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
-
 
     def imageListList(self):
         Session = self.SessionFactory()
@@ -302,8 +296,6 @@ class imagelistpub:
         Session.add(newImage)
         Session.commit()
         return True
-
-
 
     def ImageList_List_Image(self, imagelistUUID):
         Session = self.SessionFactory()
@@ -341,6 +333,7 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
+
     def imageShow(self, UUID):
         Session = self.SessionFactory()
         query_imagelist_images = Session.query(model.Image).\
@@ -359,7 +352,6 @@ class imagelistpub:
                         imagemetadata[imageItem.key] = imageItem.value
                 return imagemetadata
         return None
-
 
     def imageListShow(self, UUID):
         Session = self.SessionFactory()
@@ -426,6 +418,7 @@ class imagelistpub:
                 outModel['hv:endorser'] = endorserList
 
         return {'hv:imagelist' : outModel}
+
     def imagelist_key_get(self, imageListUuid, imagelist_key):
         self.log.debug("start:imagelist_key_get(%s,%s,%s)" % (self, imageListUuid, imagelist_key))
         Session = self.SessionFactory()
@@ -440,7 +433,6 @@ class imagelistpub:
         newMetaData = query_imagelists.one()
         output = newMetaData.value
         return str(output)
-
 
     def imagelist_key_update(self, imageListUuid, imagelist_key, imagelist_key_value):
         self.log.debug("start:imagelist_key_update %s - %s - %s" % (imageListUuid, imagelist_key, imagelist_key_value))
@@ -483,8 +475,6 @@ class imagelistpub:
         Session.delete(newMetaData)
         Session.commit()
         return True
-
-
 
     def imageList(self):
         output = []
@@ -548,6 +538,7 @@ class imagelistpub:
             Session.commit()
             return True
         return True
+
     def image_key_delete(self, imageUuid, image_key):
         Session = self.SessionFactory()
         query_image_metadata = Session.query(model.ImageMetadata).\
@@ -691,7 +682,6 @@ class imagelistpub:
                 self.imagelist_key_update(identifier, key, value)
         return True
 
-
     def checkMissingFields(self, imagelistUUID, subject, issuerSub):
         content = self.imageListShow(imagelistUUID)
         if content == None:
@@ -759,14 +749,12 @@ class imagelistpub:
                 return False
         return True
 
-
     def download_imagelist(self, imagelistUUID, flags):
         Session = self.SessionFactory()
         query_imagelist_uri = Session.query(model.ImagelistMetadata).\
                 filter(model.Imagelist.identifier == imagelistUUID).\
                 filter(model.Imagelist.id == model.ImagelistMetadata.fkImageList).\
                 filter(model.ImagelistMetadata.key == 'hv:uri')
-
 
         if query_imagelist_uri.count() == 0:
             self.log.warning('image list uri not found')
