@@ -31,7 +31,7 @@ import os.path
 import logging
 try:
     import simplejson as json
-except:
+except ImportError:
     import json
 
 import types
@@ -383,7 +383,7 @@ class imagelistpub:
                     if imageItem.key in ["hv:size"]:
                         try:
                             imagemetadata[imageItem.key] = int(imageItem.value)
-                        except:
+                        except ValueError:
                             self.log.warning("Invalid value for 'hv:size'")
                             imagemetadata[imageItem.key] = imageItem.value
                     else:
