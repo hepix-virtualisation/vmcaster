@@ -684,7 +684,7 @@ class imagelistpub:
 
     def checkMissingFields(self, imagelistUUID, subject, issuerSub):
         content = self.imageListShow(imagelistUUID)
-        if content == None:
+        if content is None:
             self.log.error("Image list '%s' could not be retrived." % (imagelistUUID))
             return False
         if 'hv:imagelist' not in content.keys():
@@ -794,7 +794,7 @@ class imagelistpub:
         except ValueError:
             self.log.error("Failed to parse JSON.")
             sys.exit(20)
-        if candidate == None:
+        if candidate is None:
             self.log.error("No JSON content.")
             sys.exit(21)
         self.importer(candidate)
