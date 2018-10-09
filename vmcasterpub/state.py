@@ -29,7 +29,6 @@ import vmcasterpub.dishpubdb as model
 
 import os.path
 import logging
-import os
 try:
     import simplejson as json
 except:
