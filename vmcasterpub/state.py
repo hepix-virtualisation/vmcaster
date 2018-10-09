@@ -93,7 +93,7 @@ imagelist_required_metadata_types_set = set(imagelist_required_metadata_types)
 
 
 class imagelistpub:
-    def __init__(self,databaseConnectionString):
+    def __init__(self, databaseConnectionString):
         self.log = logging.getLogger("imagelistpub")
         self.engine = create_engine(databaseConnectionString, echo=False)
         model.init(self.engine)
@@ -135,7 +135,7 @@ class imagelistpub:
         return True
 
 
-    def endorserMetadataUpdate(self, subject,key,value):
+    def endorserMetadataUpdate(self, subject, key, value):
         Session = self.SessionFactory()
         query_endorser = Session.query(model.Endorser).\
             filter(model.Endorser.subject == subject)
@@ -149,8 +149,8 @@ class imagelistpub:
             filter(model.Endorser.id == model.EndorserMetadata.fkEndorser).\
             filter(model.EndorserMetadata.key == key)
         if query_endorsermetadata.count() == 0:
-            self.log.warning("making new key '%s' with value '%s'" % (key,value))
-            newpetadata = model.EndorserMetadata(EndorserId, key,value)
+            self.log.warning("making new key '%s' with value '%s'" % (key, value))
+            newpetadata = model.EndorserMetadata(EndorserId, key, value)
             Session.add(newpetadata)
         else:
             for item in query_endorsermetadata:
@@ -159,7 +159,7 @@ class imagelistpub:
         return True
 
 
-    def endorserMetadataDel(self, subject,key):
+    def endorserMetadataDel(self, subject, key):
         self.log.error("not implemented yet")
 
     def endorserDump(self, subject):
@@ -183,7 +183,7 @@ class imagelistpub:
             output[str(item.key)] = value
         return output
 
-    def imageListEndorserConnect(self, imagelistUUID,endorserSubject):
+    def imageListEndorserConnect(self, imagelistUUID, endorserSubject):
         Session = self.SessionFactory()
         queryEndorsements = Session.query(model.Endorsement).\
             filter(model.Endorser.subject == endorserSubject).\
@@ -191,7 +191,7 @@ class imagelistpub:
             filter(model.Imagelist.id == model.Endorsement.fkImageList).\
             filter(model.Endorser.id == model.Endorsement.fkEndorser)
         if queryEndorsements.count() > 0:
-            self.log.debug("'%s' already endorses '%s'" % (endorserSubject,imagelistUUID))
+            self.log.debug("'%s' already endorses '%s'" % (endorserSubject, imagelistUUID))
             return False
 
         query_imagelists = Session.query(model.Imagelist).\
@@ -211,11 +211,11 @@ class imagelistpub:
         log.info(msg)
         imagelist = query_imagelists.one()
         endorser = query_endorser.one()
-        endorsement = model.Endorsement(imagelist.id,endorser.id)
+        endorsement = model.Endorsement(imagelist.id, endorser.id)
         Session.add(endorsement)
         Session.commit()
         return True
-    def imageListEndorserDisconnect(self, imagelistUUID,endorserSubject):
+    def imageListEndorserDisconnect(self, imagelistUUID, endorserSubject):
         Session = self.SessionFactory()
         queryEndorsements = Session.query(model.Endorsement).\
             filter(model.Endorser.subject == endorserSubject).\
@@ -223,7 +223,7 @@ class imagelistpub:
             filter(model.Imagelist.id == model.Endorsement.fkImageList).\
             filter(model.Endorser.id == model.Endorsement.fkEndorser)
         if queryEndorsements.count() == 0:
-            self.log.warning("'%s' does not endorse '%s'" % (endorserSubject,imagelistUUID))
+            self.log.warning("'%s' does not endorse '%s'" % (endorserSubject, imagelistUUID))
             return False
         for item in queryEndorsements:
             Session.delete(item)
@@ -232,7 +232,7 @@ class imagelistpub:
         return True
 
 
-    def imageListImageConnect(self, imagelistUUID,imageUUID):
+    def imageListImageConnect(self, imagelistUUID, imageUUID):
         Session = self.SessionFactory()
         queryimageBindings = Session.query(model.ImageListImage).\
             filter(model.Image.identifier == imageUUID).\
@@ -240,7 +240,7 @@ class imagelistpub:
             filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
             filter(model.Image.id == model.ImageListImage.fkImage)
         if queryimageBindings.count() > 0:
-            self.log.debug("'%s' already linked to '%s'" % (imageUUID,imagelistUUID))
+            self.log.debug("'%s' already linked to '%s'" % (imageUUID, imagelistUUID))
             return False
 
         query_imagelists = Session.query(model.Imagelist).\
@@ -259,13 +259,13 @@ class imagelistpub:
         self.log.info(msg)
         imagelist = query_imagelists.one()
         image = query_image.one()
-        imageBinding = model.ImageListImage(imagelist.id,image.id)
+        imageBinding = model.ImageListImage(imagelist.id, image.id)
         Session.add(imageBinding)
         Session.commit()
         return True
 
 
-    def imageListImageDisconnect(self, imagelistUUID,imageUUID):
+    def imageListImageDisconnect(self, imagelistUUID, imageUUID):
         Session = self.SessionFactory()
         queryImageListImage = Session.query(model.ImageListImage).\
             filter(model.Image.identifier == imageUUID).\
@@ -273,7 +273,7 @@ class imagelistpub:
             filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
             filter(model.Image.id == model.ImageListImage.fkImage)
         if queryImageListImage.count() == 0:
-            self.log.warning("'%s' is not linked to '%s'" % (imagelistUUID,imagelistUUID))
+            self.log.warning("'%s' is not linked to '%s'" % (imagelistUUID, imagelistUUID))
             return False
         for item in queryImageListImage:
             Session.delete(item)
@@ -289,7 +289,7 @@ class imagelistpub:
         for imagelist in query_imagelists:
             print(imagelist.identifier)
 
-    def imageListAdd(self,UUID):
+    def imageListAdd(self, UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
@@ -305,7 +305,7 @@ class imagelistpub:
 
 
 
-    def ImageList_List_Image(self,imagelistUUID):
+    def ImageList_List_Image(self, imagelistUUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Image).\
                 filter(model.Imagelist.identifier == imagelistUUID).\
@@ -319,7 +319,7 @@ class imagelistpub:
              images.add(str(item.identifier))
         return images
 
-    def ImageList_List_Endorser(self,imagelistUUID):
+    def ImageList_List_Endorser(self, imagelistUUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Endorser).\
                 filter(model.Imagelist.identifier == imagelistUUID).\
@@ -333,7 +333,7 @@ class imagelistpub:
              images.add(str(item.subject))
         return images
 
-    def imagesDel(self,UUID):
+    def imagesDel(self, UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
@@ -341,7 +341,7 @@ class imagelistpub:
             Session.delete(item)
         Session.commit()
         return True
-    def imageShow(self,UUID):
+    def imageShow(self, UUID):
         Session = self.SessionFactory()
         query_imagelist_images = Session.query(model.Image).\
                 filter(model.Image.identifier == UUID )
@@ -361,7 +361,7 @@ class imagelistpub:
         return None
 
 
-    def imageListShow(self,UUID):
+    def imageListShow(self, UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
                 filter(model.Imagelist.identifier == UUID )
@@ -426,8 +426,8 @@ class imagelistpub:
                 outModel['hv:endorser'] = endorserList
 
         return {'hv:imagelist' : outModel}
-    def imagelist_key_get(self,imageListUuid, imagelist_key):
-        self.log.debug("start:imagelist_key_get(%s,%s,%s)" % (self,imageListUuid, imagelist_key))
+    def imagelist_key_get(self, imageListUuid, imagelist_key):
+        self.log.debug("start:imagelist_key_get(%s,%s,%s)" % (self, imageListUuid, imagelist_key))
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImagelistMetadata).\
                 filter(model.Imagelist.identifier == imageListUuid).\
@@ -442,7 +442,7 @@ class imagelistpub:
         return str(output)
 
 
-    def imagelist_key_update(self,imageListUuid, imagelist_key, imagelist_key_value):
+    def imagelist_key_update(self, imageListUuid, imagelist_key, imagelist_key_value):
         self.log.debug("start:imagelist_key_update %s - %s - %s" % (imageListUuid, imagelist_key, imagelist_key_value))
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist).\
@@ -450,7 +450,7 @@ class imagelistpub:
         if query_imagelists.count() == 0:
             self.log.warning('No imagelists found')
             return None
-        if imagelist_key in ['dc:identifier','hv:endorser','hv:images']:
+        if imagelist_key in ['dc:identifier', 'hv:endorser', 'hv:images']:
             self.log.warning("Reserved key '%s' cannot be added" % (imagelist_key))
             return None
         query_imagekeys = Session.query(model.ImagelistMetadata).\
@@ -465,12 +465,12 @@ class imagelistpub:
                 Session.commit()
             return imagelist_key_value
         ThisImageList = query_imagelists.one()
-        newMetaData = model.ImagelistMetadata(ThisImageList.id,imagelist_key,imagelist_key_value)
+        newMetaData = model.ImagelistMetadata(ThisImageList.id, imagelist_key, imagelist_key_value)
         Session.add(newMetaData)
         Session.commit()
         return imagelist_key_value
 
-    def imagelist_key_del(self,imageListUuid, imagelist_key):
+    def imagelist_key_del(self, imageListUuid, imagelist_key):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImagelistMetadata).\
                 filter(model.Imagelist.identifier == imageListUuid).\
@@ -494,7 +494,7 @@ class imagelistpub:
             output.append(str(item.identifier))
         return output
 
-    def image_get_imagelist(self,imageUuid):
+    def image_get_imagelist(self, imageUuid):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Imagelist.identifier).\
             filter(model.Imagelist.id == model.ImageListImage.fkImageList).\
@@ -505,7 +505,7 @@ class imagelistpub:
             output.append(str(item.identifier))
         return output
 
-    def image_key_get(self,imageUuid,image_key):
+    def image_key_get(self, imageUuid, image_key):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
@@ -513,7 +513,7 @@ class imagelistpub:
                 filter(model.ImageMetadata.key == image_key)
 
         if query_imagelists.count() == 0:
-            self.log.warning("No image meta data found for image '%s' with key '%s'" % (imageUuid,image_key))
+            self.log.warning("No image meta data found for image '%s' with key '%s'" % (imageUuid, image_key))
             return None
         if query_imagelists.count() > 1:
             self.log.warning('To  much image metadata found')
@@ -521,7 +521,7 @@ class imagelistpub:
         outputRow = query_imagelists.one()
         return str(outputRow.value)
 
-    def image_key_update(self, imageUuid ,image_key, image_value):
+    def image_key_update(self, imageUuid, image_key, image_value):
         Session = self.SessionFactory()
 
         query_image = Session.query(model.Image).\
@@ -537,7 +537,7 @@ class imagelistpub:
                 filter(model.ImageMetadata.key == image_key)
         if query_image_metadata.count() == 0:
             image = query_image.one()
-            newmetadata = model.ImageMetadata(image.id,image_key,image_value)
+            newmetadata = model.ImageMetadata(image.id, image_key, image_value)
             Session.add(newmetadata)
             Session.commit()
             return True
@@ -548,7 +548,7 @@ class imagelistpub:
             Session.commit()
             return True
         return True
-    def image_key_delete(self, imageUuid ,image_key):
+    def image_key_delete(self, imageUuid, image_key):
         Session = self.SessionFactory()
         query_image_metadata = Session.query(model.ImageMetadata).\
                 filter(model.Image.identifier == imageUuid).\
@@ -566,7 +566,7 @@ class imagelistpub:
         Session.commit()
         return True
 
-    def image_keys(self,imageListUuid, imageUuid):
+    def image_keys(self, imageListUuid, imageUuid):
         Session = self.SessionFactory()
         query_imagekeys = Session.query(model.ImageMetadata).\
                 filter(model.Imagelist.identifier == imageListUuid).\
@@ -576,10 +576,10 @@ class imagelistpub:
             self.log.warning('no details found')
             return None
         for item in query_imagekeys:
-            print("'{key}' : '{value}'".format(item.key,item.value))
+            print("'{key}' : '{value}'".format(item.key, item.value))
         return True
 
-    def imageAdd(self,UUID):
+    def imageAdd(self, UUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Image).\
                 filter(model.Image.identifier == UUID )
@@ -595,7 +595,7 @@ class imagelistpub:
         Session.commit()
         return True
 
-    def imageDelete(self,ImageUUID):
+    def imageDelete(self, ImageUUID):
         Session = self.SessionFactory()
         query_imagelists = Session.query(model.Image).\
                filter(model.Image.identifier == ImageUUID)
@@ -610,7 +610,7 @@ class imagelistpub:
             self.log.info("No items deleted")
         return False
 
-    def importer(self,dictInput):
+    def importer(self, dictInput):
         if not 'hv:imagelist' in dictInput.keys():
             self.log.error("JSON is not a 'hv:imagelist'")
             return False
@@ -621,10 +621,10 @@ class imagelistpub:
         identifier = content['dc:identifier']
         self.imageListAdd(identifier)
         for key in content.keys():
-            if key in ['dc:identifier','hv:endorser','hv:images']:
+            if key in ['dc:identifier', 'hv:endorser', 'hv:images']:
                 continue
             if isinstance(content[key], str):
-                self.imagelist_key_update(identifier, key,content[key])
+                self.imagelist_key_update(identifier, key, content[key])
         if 'hv:images' in content.keys():
             for image in content['hv:images']:
                 if not 'hv:image' in image.keys():
@@ -651,7 +651,7 @@ class imagelistpub:
                     for key in imagecontent.keys():
                         if key in ['dc:identifier']:
                             continue
-                        self.image_key_update( imageIdentifier ,key,imagecontent[key] )
+                        self.image_key_update(imageIdentifier, key, imagecontent[key])
         if 'hv:endorser' in content.keys():
             # make endorsers a list under all cases.
             endorsersAll = [content['hv:endorser']]
@@ -667,12 +667,12 @@ class imagelistpub:
                     continue
                 endorserSubject = endorserDetails['hv:dn']
                 self.endorserAdd(endorserSubject)
-                self.imageListEndorserConnect(identifier,endorserSubject)
+                self.imageListEndorserConnect(identifier, endorserSubject)
                 for key in endorserDetails.keys():
                     if key in ['hv:dn']:
                         continue
                     value = endorserDetails[key]
-                    self.endorserMetadataUpdate(endorserSubject,key,value)
+                    self.endorserMetadataUpdate(endorserSubject, key, value)
         db_version = self.imagelist_key_get(identifier, 'hv:version')
         if db_version is None:
             db_version = "0.0.0"
@@ -685,14 +685,14 @@ class imagelistpub:
                 )
             log.info(msg)
             for key in content.keys():
-                if key in ['hv:endorser' , 'hv:images' ,'dc:identifier']:
+                if key in ['hv:endorser', 'hv:images', 'dc:identifier']:
                     continue
                 value = content[key]
-                self.imagelist_key_update(identifier,key,value)
+                self.imagelist_key_update(identifier, key, value)
         return True
 
 
-    def checkMissingFields(self,imagelistUUID,subject,issuerSub):
+    def checkMissingFields(self, imagelistUUID, subject, issuerSub):
         content = self.imageListShow(imagelistUUID)
         if content == None:
             self.log.error("Image list '%s' could not be retrived." % (imagelistUUID))
@@ -726,7 +726,7 @@ class imagelistpub:
                 if len(missingImageMetaData) > 0:
                     self.log.error("Image metadata is missing for '%s'." % (imageIdentifier))
                     for item in missingImageMetaData:
-                        self.log.error("Please add '%s' to the metadata for image '%s'." % (item,imageIdentifier))
+                        self.log.error("Please add '%s' to the metadata for image '%s'." % (item, imageIdentifier))
                     return False
         if not "hv:endorser" in imagelistKeys:
             self.log.error("No endorsers found in '%s'." % (imagelistUUID))
@@ -750,12 +750,12 @@ class imagelistpub:
                 if len(reqMetaData) > 0:
                     self.log.error("Image metadata is missing for '%s'." % (endorserDetails))
                     for item in reqMetaData:
-                        self.log.error("Please add '%s' to the metadata for endorser '%s'." % (item,endorserDetails))
+                        self.log.error("Please add '%s' to the metadata for endorser '%s'." % (item, endorserDetails))
                     return False
                 if endorserDetails["hv:dn"] == subject and endorserDetails["hv:ca"] == issuerSub:
                     foundEndorser = True
             if not foundEndorser:
-                self.log.error("Could not find an endorser matching your certificate '%s' issued by '%s'." % (subject,issuerSub))
+                self.log.error("Could not find an endorser matching your certificate '%s' issued by '%s'." % (subject, issuerSub))
                 return False
         return True
 
@@ -791,7 +791,7 @@ class imagelistpub:
         try:
             smimeProcessor.Process(dwonloader_responce)
         except smimeX509validation.truststore.TrustStoreError as exp:
-            self.log.error("Validate text '%s' produced error '%s'" % (uri,exp))
+            self.log.error("Validate text '%s' produced error '%s'" % (uri, exp))
             self.log.debug("Downloaded=%s" % (content['responce']))
             return False
         except smimeX509validation.smimeX509ValidationError as exp:
