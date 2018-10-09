@@ -611,11 +611,11 @@ class imagelistpub:
         return False
 
     def importer(self, dictInput):
-        if not 'hv:imagelist' in dictInput.keys():
+        if 'hv:imagelist' not in dictInput.keys():
             self.log.error("JSON is not a 'hv:imagelist'")
             return False
         content = dictInput['hv:imagelist']
-        if not 'dc:identifier' in content.keys():
+        if 'dc:identifier' not in content.keys():
             self.log.error("Imagelists does not contain a 'dc:identifier'")
             return False
         identifier = content['dc:identifier']
@@ -627,11 +627,11 @@ class imagelistpub:
                 self.imagelist_key_update(identifier, key, content[key])
         if 'hv:images' in content.keys():
             for image in content['hv:images']:
-                if not 'hv:image' in image.keys():
+                if 'hv:image' not in image.keys():
                     self.log.warning("ignoring image '%s'" % (image))
                     continue
                 imagecontent = image['hv:image']
-                if not 'dc:identifier' in imagecontent.keys():
+                if 'dc:identifier' not in imagecontent.keys():
                     self.log.warning("image has no ID '%s'" % (image))
                     continue
                 imageIdentifier = imagecontent['dc:identifier']
@@ -658,11 +658,11 @@ class imagelistpub:
             if type(content['hv:endorser']) is types.ListType:
                 endorsersAll = content['hv:endorser']
             for endorser in endorsersAll:
-                if not 'hv:x509' in endorser.keys():
+                if 'hv:x509' not in endorser.keys():
                     self.log.error("Error processing '%s' so ignoring" % (endorser))
                     continue
                 endorserDetails = endorser['hv:x509']
-                if not 'hv:dn' in endorserDetails.keys():
+                if 'hv:dn' not in endorserDetails.keys():
                     self.log.error("Error finding DN in '%s' so ignoring" % (endorserDetails))
                     continue
                 endorserSubject = endorserDetails['hv:dn']
@@ -697,7 +697,7 @@ class imagelistpub:
         if content == None:
             self.log.error("Image list '%s' could not be retrived." % (imagelistUUID))
             return False
-        if not 'hv:imagelist' in content.keys():
+        if 'hv:imagelist' not in content.keys():
             self.log.error("Image list is not well defined for '%s'" % (imagelistUUID))
             return False
         imageliststuff = content['hv:imagelist']
@@ -712,12 +712,12 @@ class imagelistpub:
             # We have images
             imagesfromImageList = imageliststuff["hv:images"]
             for imageRawDetails in imagesfromImageList:
-                if not 'hv:image' in imageRawDetails.keys():
+                if 'hv:image' not in imageRawDetails.keys():
                     self.log.error("Image has an invalid format.")
                     return False
                 imageDetails = imageRawDetails['hv:image']
                 imageKeys = imageDetails.keys()
-                if not "dc:identifier" in imageKeys:
+                if "dc:identifier" not in imageKeys:
                     self.log.error("Image list has an image without an identifier.")
                     print(imageKeys)
                     return False
@@ -728,7 +728,7 @@ class imagelistpub:
                     for item in missingImageMetaData:
                         self.log.error("Please add '%s' to the metadata for image '%s'." % (item, imageIdentifier))
                     return False
-        if not "hv:endorser" in imagelistKeys:
+        if "hv:endorser" not in imagelistKeys:
             self.log.error("No endorsers found in '%s'." % (imagelistUUID))
             return False
         else:
@@ -742,7 +742,7 @@ class imagelistpub:
                 return False
             foundEndorser = False
             for endorserItem in endorserUntypedList:
-                if not 'hv:x509' in endorserItem.keys():
+                if 'hv:x509' not in endorserItem.keys():
                     self.log.error("Enderser is invalid '%s'." % (endorserItem))
                     return False
                 endorserDetails = endorserItem["hv:x509"]
